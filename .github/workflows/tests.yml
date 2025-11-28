@@ -25,7 +25,9 @@ jobs:
         run: pip install .[test]
 
       - name: Install testing dependencies
-        run: sudo apt-get install -y bats ripgrep
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats ripgrep
 
       - name: Run tests
         run: make test
