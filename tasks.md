@@ -11,8 +11,8 @@
 
 # version 0.2 - searching
 
-- [ ] fix README links on pypi
-- [ ] autoversioning
+- [X] fix README links on pypi
+- [X] autoversioning
 - [ ] `--version`
 - [ ] implement changelog
 - [ ] args that match dir search the dir
