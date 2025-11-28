@@ -14,7 +14,7 @@
 - [X] fix README links on pypi
 - [X] autoversioning
 - [X] `--version`
-- [ ] implement changelog
+- [X] implement changelog
 - [ ] args that match dir search the dir
 - [ ] args that match files add them to the list
 - [ ] args that match neither are substring matches applied to tasks
