@@ -6,8 +6,33 @@ on:
       - 'v*'
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install whatnext
+        run: pip install .[test]
+
+      - name: Install testing dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats ripgrep
+
+      - name: Run tests
+        run: make test
+
   publish:
     runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -25,5 +50,3 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          api-token: ${{ secrets.PYPI_API_TOKEN }}
