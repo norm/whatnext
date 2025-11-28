@@ -1,3 +1,8 @@
+Development on `whatnext`.
+
+(This file is used in tests/matching.bats,
+which will start to fail if it is removed.)
+
 # version 0.1 - basic functionality
 
 - [X] show outstanding tasks in any Markdown file anywhere in the directory
@@ -15,9 +20,9 @@
 - [X] autoversioning
 - [X] `--version`
 - [X] implement changelog
-- [ ] args that match dir search the dir
-- [ ] args that match files add them to the list
-- [ ] args that match neither are substring matches applied to tasks
+- [X] args that match dir search the dir
+- [X] args that match files add them to the list
+- [X] args that match neither are substring matches applied to tasks
 
 
 # version 0.3 - new statuses

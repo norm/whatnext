@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- nothing, yet
+Nothing, yet.
+
+
+## [v0.2] — 2025-11-28
+
+Filtering tasks by text/header can be helpful. And as useful as it
+can be to use `--dir` to specify the base dir, sometimes you just
+want to do it quicker, so you can also specify a dir or file as
+an argument to restrict searching just to that.
+
+Arguments can be mixed and matched freely. Multiple search terms
+are additive not exclusive.
 
 
 ## [v0.1] — 2025-11-28

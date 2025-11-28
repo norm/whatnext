@@ -4,6 +4,7 @@
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
                         [--config CONFIG] [--ignore PATTERN]
+                        [match ...]
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -16,8 +17,13 @@
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
                         [--config CONFIG] [--ignore PATTERN]
+                        [match ...]
 
         List tasks found in Markdown files
+
+        Positional arguments:
+          match             Only include results from matching file(s), dir(s) or
+                            where "match" is in the task text or heading
 
         Options:
           -h                Show the usage reminder and exit

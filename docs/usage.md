@@ -24,6 +24,26 @@ They will be arranged:
       headings)
 
 
+## Matching
+
+Any argument(s) can be used to filter the output:
+
+-   **\[term\]** - only show tasks that contain 'term', or tasks under
+    a heading that contains 'term' (matching is case-insensitive)
+-   **file** - if the argument matches a directory, the tasks in that file
+    will be searched
+-   **directory** - if the argument matches a directory, files under
+    that directory will be searched (if you have directories with short
+    names like "doc", this could be ambiguous, use "./doc" to clarify)
+
+```bash
+(computer)% whatnext empty
+docs/basics.md:
+    # Indicating the state of a task
+    - [ ] empty, this task is outstanding
+```
+
+
 ## Arguments
 
 `whatnext` takes the following optional arguments:
