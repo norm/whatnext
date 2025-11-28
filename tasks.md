@@ -13,7 +13,7 @@
 
 - [X] fix README links on pypi
 - [X] autoversioning
-- [ ] `--version`
+- [X] `--version`
 - [ ] implement changelog
 - [ ] args that match dir search the dir
 - [ ] args that match files add them to the list

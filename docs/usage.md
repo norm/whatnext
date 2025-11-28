@@ -30,6 +30,8 @@ They will be arranged:
 
 -   `-h` / `--help` — show a short or full usage reminder.
 
+-   `--version` — show the version and exit.
+
 -   `--dir` — the directory to search through for Markdown files,
     defaults to `.`.
 

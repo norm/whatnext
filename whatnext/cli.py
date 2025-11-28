@@ -1,5 +1,6 @@
 import argparse
 import fnmatch
+import importlib.metadata
 import os
 import shutil
 import toml
@@ -148,6 +149,11 @@ Task States:
         "--help",
         action="help",
         help="Show this help message and exit",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"whatnext version v{importlib.metadata.version('whatnext')}",
     )
     parser.add_argument(
         "--dir",

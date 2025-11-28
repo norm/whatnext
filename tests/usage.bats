@@ -2,8 +2,8 @@
     run whatnext -h
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        Usage: whatnext [-h] [--help] [--dir DIR] [-s] [-a] [--config CONFIG]
-                        [--ignore PATTERN]
+        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
+                        [--config CONFIG] [--ignore PATTERN]
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -14,14 +14,15 @@
     run whatnext --help
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        Usage: whatnext [-h] [--help] [--dir DIR] [-s] [-a] [--config CONFIG]
-                        [--ignore PATTERN]
+        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
+                        [--config CONFIG] [--ignore PATTERN]
 
         List tasks found in Markdown files
 
         Options:
           -h                Show the usage reminder and exit
           --help            Show this help message and exit
+          --version         show program's version number and exit
           --dir DIR         Directory to search (default: current directory)
           -s, --summary     Show summary of task counts per file
           -a, --all         Include all tasks and files, not just incomplete
