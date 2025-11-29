@@ -75,20 +75,10 @@ docs/basics.md:
 
 -   `-c` / `--cancelled` — show only cancelled tasks.
 
--   `-s` / `--summary` — summarise the tasks found in files,
-    rather than listing the tasks within:
-
-    ```bash
-    ░░░░░░░░░░░░░░                                             0/1  sample.md
-    ██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/7  docs/basics.md
-    ```
-
-    When there are multiple files, the progress bars are sized relative to the
-    task file with the most tasks.
-
 -   `-a` / `--all` — show all tasks, not just outstanding ones:
 
     ```bash
+    (computer)% whatnext --all
     sample.md:
         # Sample task file
         - [ ] Do something for the sake of it
@@ -110,13 +100,33 @@ docs/basics.md:
         - [x] do the last thing all lowercase
     ```
 
-    When combined with `--summary`:
+-   `-s` / `--summary` — summarise the tasks found in files,
+    rather than listing the tasks within:
 
     ```bash
-    (computer)% whatnext --summary --all
-    ░░░░░░░░░░░░                                        0/1  sample.md
-    ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/7  docs/basics.md
-    ██████████████████████████████████████████████████  3/3  archive/done/tasks.md
+    (computer)% whatnext --summary
+                                                  C/D/B/P/O
+    ░░░░░░                                        0/0/0/0/1  sample.md
+    ▚▚▚▚▚▚███████▓▓▓▓▓▓▒▒▒▒▒▒░░░░░░░░░░░░░░░░░░░  1/1/1/1/3  docs/basics.md
+    ███████████████████                           0/3/0/0/0  archive/done/tasks.md
+
+    ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
+    ```
+
+    When there are multiple files, the progress bars are sized relative to the
+    task file with the most tasks.
+
+    Summary can be combined with a task state filter, to highlight just
+    that state compared to the rest:
+
+    ```bash
+    (computer)% whatnext --summary --blocked
+                                                        B/~
+    ░░░░░░░                                             0/1  sample.md
+    ▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/6  docs/basics.md
+    ░░░░░░░░░░░░░░░░░░░░░                               0/3  archive/done/tasks.md
+
+    ▚ Blocked  ░ (Cancelled/Done/Partial/Open)
     ```
 
 
