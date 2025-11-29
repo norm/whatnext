@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Nothing, yet.
 
 
+## [v0.3] — 2025-11-29
+
+Adding more states to the roster, tasks can be marked as open (unstarted),
+in progress, cancelled, blocked, and completed.
+
+Tasks can be filtered by any of these states when showing tasks or summaries.
+
+
 ## [v0.2] — 2025-11-28
 
 Filtering tasks by text/header can be helpful. And as useful as it

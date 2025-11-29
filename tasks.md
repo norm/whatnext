@@ -27,10 +27,16 @@ which will start to fail if it is removed.)
 
 # version 0.3 - new statuses
 
-- [ ] decide upon and implement "in progress"
-- [ ] decide upon and implement "cancelled"
-- [ ] decide upon and implement "blocked"
-- [ ] warnings for unknown formats
+- [X] decide upon and implement "in progress"
+- [X] decide upon and implement "cancelled"
+- [X] decide upon and implement "blocked"
+- [X] warnings for unknown formats
+- [X] filter on incomplete
+- [X] filter on in progress
+- [X] filter on cancelled
+- [X] filter on blocked
+- [X] filter on complete
+- [X] summarise individual states, but not combos
 
 
 # version 0.4 - priorities
@@ -38,10 +44,19 @@ which will start to fail if it is removed.)
 - [ ] mark a single task as _medium_ priority
 - [ ] mark a single task **high** priority
 - [ ] mark a block of tasks via the header
-- [ ] sort higher priority tasks to the top -- decide if within files only or entire project
+- [ ] sort higher priority tasks to the top -- decide if within files
+      only or entire project
 
 
 # version 0.5 - deadlines
 
 - [ ] mark a single task as having a deadline
 - [ ] embellish deadlines with custom urgency windows
+
+
+# version 0.6 - enhancements
+
+- [ ] colour-code the output
+- [ ] pick tasks at random
+- [ ] some way to mark a section of Markdown for inclusion in the default
+      output

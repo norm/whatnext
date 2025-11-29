@@ -3,9 +3,11 @@ import fnmatch
 import importlib.metadata
 import os
 import shutil
+import sys
 import toml
 
-from whatnext.models import MarkdownFile
+from whatnext.models import MarkdownFile, State
+from whatnext.summary import format_summary
 
 
 def get_terminal_width():
@@ -35,34 +37,46 @@ def is_ignored(filepath, ignore_patterns):
     return False
 
 
-def find_markdown_files(path=".", ignore_patterns=None, include_all=False):
+def find_markdown_files(paths, ignore_patterns=None, include_all=False):
     if ignore_patterns is None:
         ignore_patterns = []
-    markdown_files = []
+    if isinstance(paths, str):
+        paths = [paths]
 
-    if os.path.isfile(path):
-        if path.endswith(".md"):
-            md_file = MarkdownFile(path, ".")
-            tasks = md_file.tasks if include_all else md_file.incomplete
-            if tasks:
-                markdown_files.append(md_file)
-        return markdown_files
+    multiple = len(paths) > 1
+    markdown_files = {}
 
-    for root, dirs, files in os.walk(path):
-        for filename in files:
-            if filename.endswith(".md"):
-                filepath = os.path.join(root, filename)
-                relative_path = os.path.relpath(filepath, path)
-                if is_ignored(relative_path, ignore_patterns):
-                    continue
-                md_file = MarkdownFile(filepath, path)
-                tasks = md_file.tasks if include_all else md_file.incomplete
-                if tasks:
-                    markdown_files.append(md_file)
+    for path in paths:
+        base_dir = "." if multiple else path
+
+        if os.path.isfile(path):
+            if path.endswith(".md"):
+                abs_path = os.path.abspath(path)
+                if abs_path not in markdown_files:
+                    md_file = MarkdownFile(path, ".")
+                    tasks = md_file.tasks if include_all else md_file.incomplete
+                    if tasks:
+                        markdown_files[abs_path] = md_file
+            continue
+
+        for root, dirs, files in os.walk(path):
+            for filename in files:
+                if filename.endswith(".md"):
+                    filepath = os.path.join(root, filename)
+                    abs_path = os.path.abspath(filepath)
+                    if abs_path in markdown_files:
+                        continue
+                    relative_path = os.path.relpath(filepath, path)
+                    if is_ignored(relative_path, ignore_patterns):
+                        continue
+                    md_file = MarkdownFile(filepath, base_dir)
+                    tasks = md_file.tasks if include_all else md_file.incomplete
+                    if tasks:
+                        markdown_files[abs_path] = md_file
 
     # files are examined depth-last as a lightweight prioritisation
     return sorted(
-        markdown_files,
+        markdown_files.values(),
         key=lambda file: (
             file.display_path.count(os.sep),
             file.display_path,
@@ -70,64 +84,13 @@ def find_markdown_files(path=".", ignore_patterns=None, include_all=False):
     )
 
 
-def progress_bar(complete, total, width):
-    filled = round(width * complete / total) if total else 0
-    return "█" * filled + "░" * (width - filled)
-
-
-def format_summary(markdown_files, width):
-    widest = max(len(mf.tasks) for mf in markdown_files)
-    count_width = len(f"{widest}/{widest}")
-    gap = "  "
-    bar_width = (
-        width
-        - count_width
-        - max(len(mf.display_path) for mf in markdown_files)
-        - len(gap) * 3
-    )
-
+def format_tasks(markdown_files, width, include_all, search_terms=None, states=None):
     lines = []
     for md_file in markdown_files:
-        total = len(md_file.tasks)
-        complete = len(md_file.complete)
-        bar = progress_bar(
-            complete,
-            total,
-            round(bar_width * total / widest)
-        )
-
-        lines.append(
-            f"{bar.ljust(bar_width)}{gap}"
-            f"{f'{complete}/{total}'.rjust(count_width)}{gap}"
-            f"{md_file.display_path}"
-        )
-
-    return "\n".join(lines)
-
-
-def format_tasks(markdown_files, width, include_all, search_terms=None):
-    lines = []
-    for md_file in markdown_files:
-        tasks = md_file.tasks if include_all else md_file.incomplete
-        file_lines = []
-        current_heading = None
-        for task in tasks:
-            if search_terms:
-                heading_matches = task.heading and any(
-                    term in task.heading.lower() for term in search_terms
-                )
-                task_matches = any(
-                    term in task.text.lower() for term in search_terms
-                )
-                if not heading_matches and not task_matches:
-                    continue
-            if task.heading and task.heading != current_heading:
-                file_lines.extend(task.wrapped_heading(width))
-                current_heading = task.heading
-            file_lines.extend(task.wrapped_text(width))
-        if file_lines:
+        file_output = md_file.as_string(width, include_all, search_terms, states)
+        if file_output:
             lines.append(f"{md_file.display_path}:")
-            lines.extend(file_lines)
+            lines.append(file_output)
     return "\n".join(lines)
 
 
@@ -155,8 +118,11 @@ def main():
         description="List tasks found in Markdown files",
         epilog="""\
 Task States:
-  - [ ]     Not started (shown by default)
-  - [X]     Done (hidden by default, use --all)
+  - [ ]     Open (shown by default)
+  - [/]     In progress (shown by default)
+  - [<]     Blocked (shown by default)
+  - [X]     Done (hidden by default)
+  - [#]     Cancelled (hidden by default)
 """,
         add_help=False,
         formatter_class=CapitalisedHelpFormatter,
@@ -203,6 +169,36 @@ Task States:
         help="Ignore files matching pattern (can be specified multiple times)",
     )
     parser.add_argument(
+        "-q", "--quiet",
+        action="store_true",
+        help="Suppress warnings",
+    )
+    parser.add_argument(
+        "-o", "--open",
+        action="store_true",
+        help="Show only open tasks",
+    )
+    parser.add_argument(
+        "-p", "--partial",
+        action="store_true",
+        help="Show only in progress tasks",
+    )
+    parser.add_argument(
+        "-b", "--blocked",
+        action="store_true",
+        help="Show only blocked tasks",
+    )
+    parser.add_argument(
+        "-d", "--done",
+        action="store_true",
+        help="Show only completed tasks",
+    )
+    parser.add_argument(
+        "-c", "--cancelled",
+        action="store_true",
+        help="Show only cancelled tasks",
+    )
+    parser.add_argument(
         "match",
         nargs="*",
         help="Only include results from matching file(s), dir(s) or where "
@@ -226,34 +222,39 @@ Task States:
     config = load_config(config_path, paths[0] if os.path.isdir(paths[0]) else ".")
     ignore_patterns = config.get("ignore", []) + args.ignore
 
-    markdown_files = []
-    seen_paths = set()
+    include_all = args.all or args.summary
+    markdown_files = find_markdown_files(paths, ignore_patterns, include_all)
 
-    for path in paths:
-        for md_file in find_markdown_files(path, ignore_patterns, args.all):
-            abs_path = os.path.abspath(md_file.path)
-            if abs_path not in seen_paths:
-                seen_paths.add(abs_path)
-                if len(paths) > 1:
-                    # when files/dirs are specified in the matching terms,
-                    # ensure a relative filename for matched tasks
-                    md_file = MarkdownFile(md_file.path, ".")
-                markdown_files.append(md_file)
-
-    markdown_files.sort(
-        key=lambda f: (f.display_path.count(os.sep), f.display_path)
-    )
+    quiet = args.quiet or os.environ.get("WHATNEXT_QUIET") == "1"
+    if not quiet:
+        for md_file in markdown_files:
+            for warning in md_file.warnings:
+                print(warning, file=sys.stderr)
 
     if not markdown_files:
         return
 
     width = get_terminal_width()
 
+    states = set()
+    if args.open:
+        states.add(State.OPEN)
+    if args.partial:
+        states.add(State.IN_PROGRESS)
+    if args.blocked:
+        states.add(State.BLOCKED)
+    if args.done:
+        states.add(State.COMPLETE)
+    if args.cancelled:
+        states.add(State.CANCELLED)
+
     if args.summary:
-        print(format_summary(markdown_files, width))
+        if not states:
+            states = set(State)
+        print(format_summary(markdown_files, width, states))
     else:
         output = format_tasks(
-            markdown_files, width, args.all, search_terms or None
+            markdown_files, width, args.all, search_terms or None, states or None
         )
         if output:
             print(output)

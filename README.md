@@ -3,8 +3,11 @@
 Document your tasks in Markdown files, using ["standard"][sn] notation:
 
 ```markdown
-- [ ] empty, this task is outstanding
-- [X] crossed, this task has been completed
+- [ ] open, this task is outstanding
+- [/] in progress, this task is partially complete
+- [X] complete, this task has been finished
+- [#] cancelled, this task has been scratched
+- [<] blocked, this task needs more input
 ```
 
 Then install `whatnext`:

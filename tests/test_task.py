@@ -8,7 +8,7 @@ class TestTask:
         "- [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, "
         "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
 
-        State.INCOMPLETE,
+        State.OPEN,
     )
 
     def test_wraps_at_40_chars(self):

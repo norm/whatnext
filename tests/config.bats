@@ -1,3 +1,5 @@
+bats_require_minimum_version 1.5.0
+
 setup() {
     mkdir -p "$BATS_TEST_TMPDIR/project"
     echo "- [ ] task one" > "$BATS_TEST_TMPDIR/project/one.md"

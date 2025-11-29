@@ -3,15 +3,26 @@
 Tasks have states, which are indicated as such:
 
 ```markdown
-- [ ] empty, this task is outstanding
-- [X] crossed, this task has been completed
+- [ ] open, this task is outstanding
+- [/] in progress, this task is partially complete
+- [X] complete, this task has been finished
+- [#] cancelled, this task has been scratched
+- [<] blocked, this task needs more input
+
+- [@] no idea what this means
 ```
 
-Completed tasks are not listed by `whatnext`.
+By default, `whatnext` lists open, in progress, and blocked tasks. In progress
+tasks are shown first, blocked tasks are shown last. Completed and cancelled
+tasks are not listed unless `--all` is used.
 
 Headers are used in grouping tasks. The second-level header that comes next
 shows these tasks are a part of the main header. This does not indicate
 a lower priority, only grouping.
+
+An unknown state marker will generate a warning, but they can be suppressed
+if you are using other states for a purpose.
+
 
 ## Multiline tasks and indentation
 

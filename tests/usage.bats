@@ -1,9 +1,12 @@
+bats_require_minimum_version 1.5.0
+
 @test "-h returns short usage" {
     run whatnext -h
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
-                        [--config CONFIG] [--ignore PATTERN]
+                        [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d]
+                        [-c]
                         [match ...]
         EOF
     )
@@ -16,7 +19,8 @@
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
-                        [--config CONFIG] [--ignore PATTERN]
+                        [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d]
+                        [-c]
                         [match ...]
 
         List tasks found in Markdown files
@@ -36,10 +40,19 @@
                             directory)
           --ignore PATTERN  Ignore files matching pattern (can be specified multiple
                             times)
+          -q, --quiet       Suppress warnings
+          -o, --open        Show only open tasks
+          -p, --partial     Show only in progress tasks
+          -b, --blocked     Show only blocked tasks
+          -d, --done        Show only completed tasks
+          -c, --cancelled   Show only cancelled tasks
 
         Task States:
-          - [ ]     Not started (shown by default)
-          - [X]     Done (hidden by default, use --all)
+          - [ ]     Open (shown by default)
+          - [/]     In progress (shown by default)
+          - [<]     Blocked (shown by default)
+          - [X]     Done (hidden by default)
+          - [#]     Cancelled (hidden by default)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")

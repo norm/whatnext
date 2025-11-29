@@ -1,3 +1,5 @@
+bats_require_minimum_version 1.5.0
+
 @test "we call tasks 'tasks' not 'todos'" {
     # whatnext terminology is "tasks" not "todos", and I keep forgetting;
     # enforce the use of tasks, except where it is used legitimately

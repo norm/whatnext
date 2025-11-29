@@ -1,7 +1,7 @@
 # Usage
 
-Without arguments, `whatnext` will show all incomplete tasks listed
-in any Markdown file:
+Without arguments, `whatnext` will show all outstanding tasks (open,
+in progress, and blocked) listed in any Markdown file:
 
 ```bash
 (computer)% whatnext
@@ -10,7 +10,9 @@ sample.md:
     - [ ] Do something for the sake of it
 docs/basics.md:
     # Indicating the state of a task
-    - [ ] empty, this task is outstanding
+    - [/] in progress, this task is partially complete
+    - [ ] open, this task is outstanding
+    - [<] blocked, this task needs more input
     # Indicating the state of a task / Multiline tasks and indentation
     - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -19,9 +21,9 @@ docs/basics.md:
 
 They will be arranged:
 
-    - by file, depth-last, in alphabetical order
-    - grouped under the heading within the file (includes any parental
-      headings)
+- by file, depth-last, in alphabetical order
+- grouped under the heading within the file (includes any parental
+  headings)
 
 
 ## Matching
@@ -37,10 +39,10 @@ Any argument(s) can be used to filter the output:
     names like "doc", this could be ambiguous, use "./doc" to clarify)
 
 ```bash
-(computer)% whatnext empty
+(computer)% whatnext open
 docs/basics.md:
     # Indicating the state of a task
-    - [ ] empty, this task is outstanding
+    - [ ] open, this task is outstanding
 ```
 
 
@@ -61,18 +63,30 @@ docs/basics.md:
 -   `--config` — path to the [config file](dotwhatnext.md), defaults
     to `.whatnext` or `WHATNEXT_CONFIG`.
 
+-   `-q` / `--quiet` — suppress warnings (or `WHATNEXT_QUIET=1`).
+
+-   `-o` / `--open` — show only open tasks.
+
+-   `-p` / `--partial` — show only in progress tasks.
+
+-   `-b` / `--blocked` — show only blocked tasks.
+
+-   `-d` / `--done` — show only completed tasks.
+
+-   `-c` / `--cancelled` — show only cancelled tasks.
+
 -   `-s` / `--summary` — summarise the tasks found in files,
     rather than listing the tasks within:
 
     ```bash
     ░░░░░░░░░░░░░░                                             0/1  sample.md
-    ██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/4  docs/basics.md
+    ██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/7  docs/basics.md
     ```
 
     When there are multiple files, the progress bars are sized relative to the
     task file with the most tasks.
 
--   `-a` / `--all` — show all tasks, not just incomplete ones:
+-   `-a` / `--all` — show all tasks, not just outstanding ones:
 
     ```bash
     sample.md:
@@ -80,8 +94,11 @@ docs/basics.md:
         - [ ] Do something for the sake of it
     docs/basics.md:
         # Indicating the state of a task
-        - [ ] empty, this task is outstanding
-        - [X] crossed, this task has been completed
+        - [/] in progress, this task is partially complete
+        - [ ] open, this task is outstanding
+        - [X] complete, this task has been finished
+        - [#] cancelled, this task has been scratched
+        - [<] blocked, this task needs more input
         # Indicating the state of a task / Multiline tasks and indentation
         - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -98,8 +115,8 @@ docs/basics.md:
     ```bash
     (computer)% whatnext --summary --all
     ░░░░░░░░░░░░                                        0/1  sample.md
-    ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/4  docs/basics.md
-    ██████████████████████████████████████              3/3  archive/done/tasks.md
+    ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/7  docs/basics.md
+    ██████████████████████████████████████████████████  3/3  archive/done/tasks.md
     ```
 
 
