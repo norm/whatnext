@@ -6,7 +6,7 @@ bats_require_minimum_version 1.5.0
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
                         [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d]
-                        [-c]
+                        [-c] [--priority LEVEL]
                         [match ...]
         EOF
     )
@@ -20,7 +20,7 @@ bats_require_minimum_version 1.5.0
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
                         [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d]
-                        [-c]
+                        [-c] [--priority LEVEL]
                         [match ...]
 
         List tasks found in Markdown files
@@ -46,6 +46,8 @@ bats_require_minimum_version 1.5.0
           -b, --blocked     Show only blocked tasks
           -d, --done        Show only completed tasks
           -c, --cancelled   Show only cancelled tasks
+          --priority LEVEL  Show only tasks of this priority (can be specified
+                            multiple times)
 
         Task States:
           - [ ]     Open (shown by default)

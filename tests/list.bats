@@ -352,3 +352,52 @@ bats_require_minimum_version 1.5.0
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
+
+@test "filter by priority" {
+    run --separate-stderr whatnext --priority high docs/prioritisation.md
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] super-urgent task
+            # **do these first**
+            - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
+        EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "filter multiple priorities" {
+    run --separate-stderr whatnext --priority high --priority medium docs/prioritisation.md
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] super-urgent task
+            # **do these first**
+            - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
+
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] semi-urgent task
+        EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "filter by priority and search" {
+    run --separate-stderr whatnext --priority high header docs/prioritisation.md
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/prioritisation.md:
+            # **do these first**
+            - [ ] inherently high priority task, because of the header
+        EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}

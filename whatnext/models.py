@@ -254,10 +254,12 @@ class MarkdownFile:
             )
         return result
 
-    def grouped_tasks(self, states=None, search_terms=None):
+    def grouped_tasks(self, states=None, search_terms=None, priorities=None):
         tasks = self.tasks
         if states:
             tasks = [task for task in tasks if task.state in states]
+        if priorities:
+            tasks = [task for task in tasks if task.priority in priorities]
         if search_terms:
             filtered = []
             for task in tasks:

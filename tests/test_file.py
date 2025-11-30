@@ -142,6 +142,16 @@ class TestGroupedTasksBasics:
             )
         ) == ([], [], [])
 
+    def test_priority_high(self):
+        assert tasks(
+            self.file.grouped_tasks(priorities={Priority.HIGH})
+        ) == ([], [], [])
+
+    def test_priority_high_and_medium(self):
+        assert tasks(
+            self.file.grouped_tasks(priorities={Priority.HIGH, Priority.MEDIUM})
+        ) == ([], [], [])
+
 
 class TestGroupedTasksPrioritisation:
     file = MarkdownFile("docs/prioritisation.md")
@@ -285,3 +295,78 @@ class TestGroupedTasksPrioritisation:
                 search_terms=["urgent"],
             )
         ) == ([], [], [])
+
+    def test_priority_high(self):
+        assert tasks(
+            self.file.grouped_tasks(priorities={Priority.HIGH})
+        ) == (
+            [
+                (
+                    "# Prioritisation",
+                    "super-urgent task",
+                    State.OPEN,
+                    Priority.HIGH
+                ),
+                (
+                    "# **do these first**",
+                    "inherently high priority task, because of the header",
+                    State.OPEN,
+                    Priority.HIGH
+                ),
+                (
+                    "# **do these first**",
+                    "no extra priority, still listed second",
+                    State.OPEN,
+                    Priority.HIGH
+                ),
+                (
+                    "# **do these first** / grouped, but still highest priority",
+                    "header priority cascades down",
+                    State.COMPLETE,
+                    Priority.HIGH
+                ),
+            ],
+            [],
+            [],
+        )
+
+    def test_priority_high_and_medium(self):
+        assert tasks(
+            self.file.grouped_tasks(priorities={Priority.HIGH, Priority.MEDIUM})
+        ) == (
+            [
+                (
+                    "# Prioritisation",
+                    "super-urgent task",
+                    State.OPEN,
+                    Priority.HIGH
+                ),
+                (
+                    "# **do these first**",
+                    "inherently high priority task, because of the header",
+                    State.OPEN,
+                    Priority.HIGH
+                ),
+                (
+                    "# **do these first**",
+                    "no extra priority, still listed second",
+                    State.OPEN,
+                    Priority.HIGH
+                ),
+                (
+                    "# **do these first** / grouped, but still highest priority",
+                    "header priority cascades down",
+                    State.COMPLETE,
+                    Priority.HIGH
+                ),
+            ],
+            [
+                (
+                    "# Prioritisation",
+                    "semi-urgent task",
+                    State.OPEN,
+                    Priority.MEDIUM
+                ),
+            ],
+            [],
+        )

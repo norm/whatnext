@@ -84,7 +84,14 @@ def find_markdown_files(paths, ignore_patterns=None, include_all=False):
     )
 
 
-def format_tasks(task_files, width, include_all, search_terms=None, states=None):
+def format_tasks(
+    task_files,
+    width,
+    include_all,
+    search_terms=None,
+    states=None,
+    priorities=None,
+):
     if not states:
         if include_all:
             states = set(State)
@@ -94,7 +101,11 @@ def format_tasks(task_files, width, include_all, search_terms=None, states=None)
     groups = [[] for _ in Priority]
     for file in task_files:
         for priority_index, tasks in enumerate(
-            file.grouped_tasks(states=states, search_terms=search_terms)
+            file.grouped_tasks(
+                states=states,
+                search_terms=search_terms,
+                priorities=priorities,
+            )
         ):
             groups[priority_index].extend(tasks)
 
@@ -225,6 +236,14 @@ Task States:
         help="Show only cancelled tasks",
     )
     parser.add_argument(
+        "--priority",
+        action="append",
+        default=[],
+        choices=[p.name.lower() for p in Priority],
+        metavar="LEVEL",
+        help="Show only tasks of this priority (can be specified multiple times)",
+    )
+    parser.add_argument(
         "match",
         nargs="*",
         help="Only include results from matching file(s), dir(s) or where "
@@ -274,6 +293,13 @@ Task States:
     if args.cancelled:
         states.add(State.CANCELLED)
 
+    if args.priority:
+        priorities = {
+            Priority[p.upper()] for p in args.priority
+        }
+    else:
+        priorities = None
+
     if args.summary:
         if not states:
             states = set(State)
@@ -285,4 +311,5 @@ Task States:
             args.all,
             search_terms or None,
             states or None,
+            priorities,
         ))

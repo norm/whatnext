@@ -95,6 +95,8 @@ docs/basics.md:
 
 -   `-c` / `--cancelled` — show only cancelled tasks.
 
+-   `--priority [level]` — show only tasks of 'level' priority.
+
 -   `-a` / `--all` — show all tasks, not just outstanding ones:
 
     ```bash

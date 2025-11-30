@@ -46,7 +46,7 @@ which will start to fail if it is removed.)
 - [X] mark a block of tasks via the header
 - [X] sort higher priority tasks to the top -- decide if within files
       only or entire project
-- [ ] filter output to a subset of priorities
+- [X] filter output to a subset of priorities
 - [ ] summarise priorities?
 
 
