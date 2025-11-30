@@ -5,6 +5,19 @@ in progress, and blocked) listed in any Markdown file:
 
 ```bash
 (computer)% whatnext
+docs/prioritisation.md:
+    # Prioritisation
+    - [ ] **super-urgent task**
+    # **do these first**
+    - [ ] inherently high priority task, because of the header
+    - [ ] **no extra priority, still listed second**
+    # **do these first** / grouped, but still highest priority
+    - [ ] header priority cascades down
+
+docs/prioritisation.md:
+    # Prioritisation
+    - [ ] _semi-urgent task_
+
 sample.md:
     # Sample task file
     - [ ] Do something for the sake of it
@@ -17,13 +30,20 @@ docs/basics.md:
     - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.
     - [ ] Ut enim ad minim veniam,
+docs/prioritisation.md:
+    # Prioritisation
+    - [ ] top, but not urgent, task
+    - [ ] not a high priority task
+    # more tasks
+    - [ ] normal priority, new header resets that
 ```
 
 They will be arranged:
 
-- by file, depth-last, in alphabetical order
-- grouped under the heading within the file (includes any parental
-  headings)
+- by [priority](prioritisation.md), high, medium, normal
+- within each priority by file, depth-last, in alphabetical order
+- grouped under the heading within the file (including parental
+  headings to show task hierarchy)
 
 
 ## Matching
@@ -79,6 +99,19 @@ docs/basics.md:
 
     ```bash
     (computer)% whatnext --all
+    docs/prioritisation.md:
+        # Prioritisation
+        - [ ] **super-urgent task**
+        # **do these first**
+        - [ ] inherently high priority task, because of the header
+        - [ ] **no extra priority, still listed second**
+        # **do these first** / grouped, but still highest priority
+        - [ ] header priority cascades down
+
+    docs/prioritisation.md:
+        # Prioritisation
+        - [ ] _semi-urgent task_
+
     sample.md:
         # Sample task file
         - [ ] Do something for the sake of it
@@ -86,13 +119,19 @@ docs/basics.md:
         # Indicating the state of a task
         - [/] in progress, this task is partially complete
         - [ ] open, this task is outstanding
+        - [<] blocked, this task needs more input
         - [X] complete, this task has been finished
         - [#] cancelled, this task has been scratched
-        - [<] blocked, this task needs more input
         # Indicating the state of a task / Multiline tasks and indentation
         - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
         - [ ] Ut enim ad minim veniam,
+    docs/prioritisation.md:
+        # Prioritisation
+        - [ ] top, but not urgent, task
+        - [ ] not a high priority task
+        # more tasks
+        - [ ] normal priority, new header resets that
     archive/done/tasks.md:
         # Some old stuff
         - [X] Do the first thing
@@ -105,10 +144,11 @@ docs/basics.md:
 
     ```bash
     (computer)% whatnext --summary
-                                                  C/D/B/P/O
-    ░░░░░░                                        0/0/0/0/1  sample.md
-    ▚▚▚▚▚▚███████▓▓▓▓▓▓▒▒▒▒▒▒░░░░░░░░░░░░░░░░░░░  1/1/1/1/3  docs/basics.md
-    ███████████████████                           0/3/0/0/0  archive/done/tasks.md
+                                                 C/D/B/P/O
+    ░░░░░                                        0/0/0/0/1  sample.md
+    ▚▚▚▚▚██████▓▓▓▓▓▒▒▒▒▒▒░░░░░░░░░░░░░░░░       1/1/1/1/3  docs/basics.md
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/0/0/0/8  docs/prioritisation.md
+    ████████████████                             0/3/0/0/0  archive/done/tasks.md
 
     ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
     ```
@@ -121,10 +161,11 @@ docs/basics.md:
 
     ```bash
     (computer)% whatnext --summary --blocked
-                                                        B/~
-    ░░░░░░░                                             0/1  sample.md
-    ▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/6  docs/basics.md
-    ░░░░░░░░░░░░░░░░░░░░░                               0/3  archive/done/tasks.md
+                                                       B/~
+    ░░░░░░                                             0/1  sample.md
+    ▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        1/6  docs/basics.md
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/8  docs/prioritisation.md
+    ░░░░░░░░░░░░░░░░░░                                 0/3  archive/done/tasks.md
 
     ▚ Blocked  ░ (Cancelled/Done/Partial/Open)
     ```

@@ -41,11 +41,13 @@ which will start to fail if it is removed.)
 
 # version 0.4 - priorities
 
-- [ ] mark a single task as _medium_ priority
-- [ ] mark a single task **high** priority
-- [ ] mark a block of tasks via the header
-- [ ] sort higher priority tasks to the top -- decide if within files
+- [X] mark a single task as _medium_ priority
+- [X] mark a single task **high** priority
+- [X] mark a block of tasks via the header
+- [X] sort higher priority tasks to the top -- decide if within files
       only or entire project
+- [ ] filter output to a subset of priorities
+- [ ] summarise priorities?
 
 
 # version 0.5 - deadlines

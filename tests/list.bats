@@ -4,6 +4,17 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr whatnext
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] super-urgent task
+            # **do these first**
+            - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
+
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] semi-urgent task
+
         sample.md:
             # Sample task file
             - [ ] Do something for the sake of it
@@ -16,6 +27,12 @@ bats_require_minimum_version 1.5.0
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+        docs/prioritisation.md:
+            # Prioritisation
+            - [/] not a high priority task
+            - [ ] top, but not urgent, task
+        tests/headerless.md:
+            - [ ] I am not a task, I am a free list!
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -31,6 +48,19 @@ bats_require_minimum_version 1.5.0
     COLUMNS=40 run --separate-stderr whatnext
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] super-urgent task
+            # **do these first**
+            - [ ] inherently high priority task,
+                  because of the header
+            - [ ] no extra priority, still
+                  listed second
+
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] semi-urgent task
+
         sample.md:
             # Sample task file
             - [ ] Do something for the sake of
@@ -50,6 +80,13 @@ bats_require_minimum_version 1.5.0
                   incididunt ut labore et dolore
                   magna aliqua.
             - [ ] Ut enim ad minim veniam,
+        docs/prioritisation.md:
+            # Prioritisation
+            - [/] not a high priority task
+            - [ ] top, but not urgent, task
+        tests/headerless.md:
+            - [ ] I am not a task, I am a free
+                  list!
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -60,6 +97,19 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr whatnext -a
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] super-urgent task
+            # **do these first**
+            - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
+            # **do these first** / grouped, but still highest priority
+            - [X] header priority cascades down
+
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] semi-urgent task
+
         sample.md:
             # Sample task file
             - [ ] Do something for the sake of it
@@ -74,11 +124,19 @@ bats_require_minimum_version 1.5.0
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+        docs/prioritisation.md:
+            # Prioritisation
+            - [/] not a high priority task
+            - [ ] top, but not urgent, task
+            # more tasks
+            - [#] normal priority, new header resets that
+        tests/headerless.md:
+            - [ ] I am not a task, I am a free list!
         archive/done/tasks.md:
             # Some old stuff
             - [X] Do the first thing
             - [X] Do the second thing
-            - [x] do the last thing all lowercase
+            - [X] do the last thing all lowercase
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -91,6 +149,17 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr whatnext --dir "$BATS_TEST_TMPDIR/project"
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] super-urgent task
+            # **do these first**
+            - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
+
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] semi-urgent task
+
         sample.md:
             # Sample task file
             - [ ] Do something for the sake of it
@@ -103,6 +172,12 @@ bats_require_minimum_version 1.5.0
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+        docs/prioritisation.md:
+            # Prioritisation
+            - [/] not a high priority task
+            - [ ] top, but not urgent, task
+        tests/headerless.md:
+            - [ ] I am not a task, I am a free list!
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")

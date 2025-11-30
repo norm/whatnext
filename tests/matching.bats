@@ -106,6 +106,29 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr whatnext docs
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
+        prioritisation.md:
+            # Prioritisation
+            - [ ] super-urgent task
+            # **do these first**
+            - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
+        usage.md:
+            # Usage
+            - [ ] super-urgent task
+            - [ ] no extra priority, still listed second
+            # Usage / Arguments
+            - [ ] super-urgent task
+            - [ ] no extra priority, still listed second
+
+        prioritisation.md:
+            # Prioritisation
+            - [ ] semi-urgent task
+        usage.md:
+            # Usage
+            - [ ] semi-urgent task
+            # Usage / Arguments
+            - [ ] semi-urgent task
+
         basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is partially complete
@@ -115,24 +138,38 @@ bats_require_minimum_version 1.5.0
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+        prioritisation.md:
+            # Prioritisation
+            - [/] not a high priority task
+            - [ ] top, but not urgent, task
         usage.md:
             # Usage
             - [/] in progress, this task is partially complete
+            - [ ] inherently high priority task, because of the header
+            - [ ] header priority cascades down
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+            - [ ] top, but not urgent, task
+            - [ ] not a high priority task
+            - [ ] normal priority, new header resets that
             - [<] blocked, this task needs more input
             # Usage / Matching
             - [ ] open, this task is outstanding
             # Usage / Arguments
             - [/] in progress, this task is partially complete
+            - [ ] inherently high priority task, because of the header
+            - [ ] header priority cascades down
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+            - [ ] top, but not urgent, task
+            - [ ] not a high priority task
+            - [ ] normal priority, new header resets that
             - [<] blocked, this task needs more input
         EOF
     )
@@ -149,6 +186,31 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr whatnext --all docs archive
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] super-urgent task
+            # **do these first**
+            - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
+            # **do these first** / grouped, but still highest priority
+            - [X] header priority cascades down
+        docs/usage.md:
+            # Usage
+            - [ ] super-urgent task
+            - [ ] no extra priority, still listed second
+            # Usage / Arguments
+            - [ ] super-urgent task
+            - [ ] no extra priority, still listed second
+
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] semi-urgent task
+        docs/usage.md:
+            # Usage
+            - [ ] semi-urgent task
+            # Usage / Arguments
+            - [ ] semi-urgent task
+
         docs/basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is partially complete
@@ -160,35 +222,51 @@ bats_require_minimum_version 1.5.0
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+        docs/prioritisation.md:
+            # Prioritisation
+            - [/] not a high priority task
+            - [ ] top, but not urgent, task
+            # more tasks
+            - [#] normal priority, new header resets that
         docs/usage.md:
             # Usage
             - [/] in progress, this task is partially complete
+            - [ ] inherently high priority task, because of the header
+            - [ ] header priority cascades down
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+            - [ ] top, but not urgent, task
+            - [ ] not a high priority task
+            - [ ] normal priority, new header resets that
             - [<] blocked, this task needs more input
             # Usage / Matching
             - [ ] open, this task is outstanding
             # Usage / Arguments
             - [/] in progress, this task is partially complete
+            - [ ] inherently high priority task, because of the header
+            - [ ] header priority cascades down
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+            - [ ] top, but not urgent, task
+            - [ ] not a high priority task
+            - [ ] normal priority, new header resets that
             - [<] blocked, this task needs more input
             - [X] complete, this task has been finished
             - [X] Do the first thing
             - [X] Do the second thing
-            - [x] do the last thing all lowercase
+            - [X] do the last thing all lowercase
             - [#] cancelled, this task has been scratched
         archive/done/tasks.md:
             # Some old stuff
             - [X] Do the first thing
             - [X] Do the second thing
-            - [x] do the last thing all lowercase
+            - [X] do the last thing all lowercase
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -233,6 +311,29 @@ bats_require_minimum_version 1.5.0
 
 @test "duplicate dirs do not duplicate output" {
     expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] super-urgent task
+            # **do these first**
+            - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
+        docs/usage.md:
+            # Usage
+            - [ ] super-urgent task
+            - [ ] no extra priority, still listed second
+            # Usage / Arguments
+            - [ ] super-urgent task
+            - [ ] no extra priority, still listed second
+
+        docs/prioritisation.md:
+            # Prioritisation
+            - [ ] semi-urgent task
+        docs/usage.md:
+            # Usage
+            - [ ] semi-urgent task
+            # Usage / Arguments
+            - [ ] semi-urgent task
+
         docs/basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is partially complete
@@ -242,24 +343,38 @@ bats_require_minimum_version 1.5.0
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+        docs/prioritisation.md:
+            # Prioritisation
+            - [/] not a high priority task
+            - [ ] top, but not urgent, task
         docs/usage.md:
             # Usage
             - [/] in progress, this task is partially complete
+            - [ ] inherently high priority task, because of the header
+            - [ ] header priority cascades down
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+            - [ ] top, but not urgent, task
+            - [ ] not a high priority task
+            - [ ] normal priority, new header resets that
             - [<] blocked, this task needs more input
             # Usage / Matching
             - [ ] open, this task is outstanding
             # Usage / Arguments
             - [/] in progress, this task is partially complete
+            - [ ] inherently high priority task, because of the header
+            - [ ] header priority cascades down
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+            - [ ] top, but not urgent, task
+            - [ ] not a high priority task
+            - [ ] normal priority, new header resets that
             - [<] blocked, this task needs more input
         EOF
     )
@@ -290,27 +405,51 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr whatnext sample.md docs/usage.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/usage.md:
+            # Usage
+            - [ ] super-urgent task
+            - [ ] no extra priority, still listed second
+            # Usage / Arguments
+            - [ ] super-urgent task
+            - [ ] no extra priority, still listed second
+
+        docs/usage.md:
+            # Usage
+            - [ ] semi-urgent task
+            # Usage / Arguments
+            - [ ] semi-urgent task
+
         sample.md:
             # Sample task file
             - [ ] Do something for the sake of it
         docs/usage.md:
             # Usage
             - [/] in progress, this task is partially complete
+            - [ ] inherently high priority task, because of the header
+            - [ ] header priority cascades down
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+            - [ ] top, but not urgent, task
+            - [ ] not a high priority task
+            - [ ] normal priority, new header resets that
             - [<] blocked, this task needs more input
             # Usage / Matching
             - [ ] open, this task is outstanding
             # Usage / Arguments
             - [/] in progress, this task is partially complete
+            - [ ] inherently high priority task, because of the header
+            - [ ] header priority cascades down
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+            - [ ] top, but not urgent, task
+            - [ ] not a high priority task
+            - [ ] normal priority, new header resets that
             - [<] blocked, this task needs more input
         EOF
     )
@@ -345,22 +484,46 @@ bats_require_minimum_version 1.5.0
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/usage.md:
             # Usage
+            - [ ] super-urgent task
+            - [ ] no extra priority, still listed second
+            # Usage / Arguments
+            - [ ] super-urgent task
+            - [ ] no extra priority, still listed second
+
+        docs/usage.md:
+            # Usage
+            - [ ] semi-urgent task
+            # Usage / Arguments
+            - [ ] semi-urgent task
+
+        docs/usage.md:
+            # Usage
             - [/] in progress, this task is partially complete
+            - [ ] inherently high priority task, because of the header
+            - [ ] header priority cascades down
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+            - [ ] top, but not urgent, task
+            - [ ] not a high priority task
+            - [ ] normal priority, new header resets that
             - [<] blocked, this task needs more input
             # Usage / Matching
             - [ ] open, this task is outstanding
             # Usage / Arguments
             - [/] in progress, this task is partially complete
+            - [ ] inherently high priority task, because of the header
+            - [ ] header priority cascades down
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+            - [ ] top, but not urgent, task
+            - [ ] not a high priority task
+            - [ ] normal priority, new header resets that
             - [<] blocked, this task needs more input
         EOF
     )
