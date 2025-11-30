@@ -6,7 +6,7 @@ import shutil
 import sys
 import toml
 
-from whatnext.models import MarkdownFile, State
+from whatnext.models import MarkdownFile, Priority, State
 from whatnext.summary import format_summary
 
 
@@ -44,7 +44,7 @@ def find_markdown_files(paths, ignore_patterns=None, include_all=False):
         paths = [paths]
 
     multiple = len(paths) > 1
-    markdown_files = {}
+    task_files = {}
 
     for path in paths:
         base_dir = "." if multiple else path
@@ -52,11 +52,11 @@ def find_markdown_files(paths, ignore_patterns=None, include_all=False):
         if os.path.isfile(path):
             if path.endswith(".md"):
                 abs_path = os.path.abspath(path)
-                if abs_path not in markdown_files:
-                    md_file = MarkdownFile(path, ".")
-                    tasks = md_file.tasks if include_all else md_file.incomplete
+                if abs_path not in task_files:
+                    file = MarkdownFile(path, ".")
+                    tasks = file.tasks if include_all else file.incomplete
                     if tasks:
-                        markdown_files[abs_path] = md_file
+                        task_files[abs_path] = file
             continue
 
         for root, dirs, files in os.walk(path):
@@ -64,19 +64,19 @@ def find_markdown_files(paths, ignore_patterns=None, include_all=False):
                 if filename.endswith(".md"):
                     filepath = os.path.join(root, filename)
                     abs_path = os.path.abspath(filepath)
-                    if abs_path in markdown_files:
+                    if abs_path in task_files:
                         continue
                     relative_path = os.path.relpath(filepath, path)
                     if is_ignored(relative_path, ignore_patterns):
                         continue
-                    md_file = MarkdownFile(filepath, base_dir)
-                    tasks = md_file.tasks if include_all else md_file.incomplete
+                    file = MarkdownFile(filepath, base_dir)
+                    tasks = file.tasks if include_all else file.incomplete
                     if tasks:
-                        markdown_files[abs_path] = md_file
+                        task_files[abs_path] = file
 
     # files are examined depth-last as a lightweight prioritisation
     return sorted(
-        markdown_files.values(),
+        task_files.values(),
         key=lambda file: (
             file.display_path.count(os.sep),
             file.display_path,
@@ -84,14 +84,40 @@ def find_markdown_files(paths, ignore_patterns=None, include_all=False):
     )
 
 
-def format_tasks(markdown_files, width, include_all, search_terms=None, states=None):
-    lines = []
-    for md_file in markdown_files:
-        file_output = md_file.as_string(width, include_all, search_terms, states)
-        if file_output:
-            lines.append(f"{md_file.display_path}:")
-            lines.append(file_output)
-    return "\n".join(lines)
+def format_tasks(task_files, width, include_all, search_terms=None, states=None):
+    if not states:
+        if include_all:
+            states = set(State)
+        else:
+            states = {State.IN_PROGRESS, State.OPEN, State.BLOCKED}
+
+    groups = [[] for _ in Priority]
+    for file in task_files:
+        for priority_index, tasks in enumerate(
+            file.grouped_tasks(states=states, search_terms=search_terms)
+        ):
+            groups[priority_index].extend(tasks)
+
+    output = ""
+    for tasks in groups:
+        if not tasks:
+            continue
+        current_file = None
+        current_heading = None
+        for task in tasks:
+            if task.file != current_file:
+                output += f"{task.file.display_path}:\n"
+                current_file = task.file
+                current_heading = None
+            if task.heading and task.heading != current_heading:
+                for line in task.wrapped_heading(width):
+                    output += f"{line}\n"
+                current_heading = task.heading
+            for line in task.wrapped_task(width):
+                output += f"{line}\n"
+        output += "\n"
+
+    return output
 
 
 class CapitalisedHelpFormatter(argparse.RawDescriptionHelpFormatter):
@@ -223,15 +249,15 @@ Task States:
     ignore_patterns = config.get("ignore", []) + args.ignore
 
     include_all = args.all or args.summary
-    markdown_files = find_markdown_files(paths, ignore_patterns, include_all)
+    task_files = find_markdown_files(paths, ignore_patterns, include_all)
 
     quiet = args.quiet or os.environ.get("WHATNEXT_QUIET") == "1"
     if not quiet:
-        for md_file in markdown_files:
-            for warning in md_file.warnings:
+        for file in task_files:
+            for warning in file.warnings:
                 print(warning, file=sys.stderr)
 
-    if not markdown_files:
+    if not task_files:
         return
 
     width = get_terminal_width()
@@ -251,10 +277,12 @@ Task States:
     if args.summary:
         if not states:
             states = set(State)
-        print(format_summary(markdown_files, width, states))
+        print(format_summary(task_files, width, states))
     else:
-        output = format_tasks(
-            markdown_files, width, args.all, search_terms or None, states or None
-        )
-        if output:
-            print(output)
+        print(format_tasks(
+            task_files,
+            width,
+            args.all,
+            search_terms or None,
+            states or None,
+        ))

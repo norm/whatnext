@@ -1,6 +1,7 @@
 # What next?
 
-Document your tasks in Markdown files, using ["standard"][sn] notation:
+Document your tasks in Markdown files, using an expanded version of the
+original [GitHub task list notation][sn]:
 
 ```markdown
 - [ ] open, this task is outstanding
@@ -8,6 +9,9 @@ Document your tasks in Markdown files, using ["standard"][sn] notation:
 - [X] complete, this task has been finished
 - [#] cancelled, this task has been scratched
 - [<] blocked, this task needs more input
+
+- [ ] _a little more important_
+- [ ] **a lot more important**
 ```
 
 Then install `whatnext`:
@@ -16,18 +20,29 @@ Then install `whatnext`:
 pip install whatnext
 ```
 
-Now run it and it'll tell you what's next:
+Now run it and it'll tell you what's next, sorting by priority and state:
 
 ```bash
 (computer)% whatnext
 README.md:
     # What next?
-    - [ ] empty, this task is outstanding
+    - [ ] a lot more important
+
+README.md:
+    # What next?
+    - [ ] a little more important
+
+README.md:
+    # What next?
+    - [/] in progress, this task is partially complete
+    - [ ] open, this task is outstanding
+    - [<] blocked, this task needs more input
 ```
 
 More detail to be found:
 
 - [The basics of task formatting](docs/basics.md)
+- [Prioritisation](docs/prioritisation.md)
 - [whatnext usage and arguments](docs/usage.md)
 - [The `.whatnext` file](docs/dotwhatnext.md)
 

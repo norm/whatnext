@@ -4,6 +4,12 @@ import re
 import textwrap
 
 
+class Priority(Enum):
+    HIGH = 0
+    MEDIUM = 1
+    NORMAL = 2
+
+
 class State(Enum):
     def __new__(cls, config):
         obj = object.__new__(cls)
@@ -59,13 +65,15 @@ class State(Enum):
 
 
 class Task:
-    def __init__(self, heading, text, state):
+    def __init__(self, file, heading, text, state, priority=Priority.NORMAL):
+        self.file = file
         self.heading = heading
         self.text = text
         self.state = state
+        self.priority = priority
 
-    def wrapped_text(self, width=80, indent="    "):
-        text = " ".join(self.text.split())
+    def wrapped_task(self, width=80, indent="    "):
+        text = f"- [{self.state.markers[0]}] " + " ".join(self.text.split())
         if width is None or len(indent + text) <= width:
             return [indent + text]
         return textwrap.wrap(
@@ -96,6 +104,28 @@ class MarkdownFile:
     """, re.VERBOSE)
     TASK_PATTERN = re.compile(r""" ^ (\s*) -[ ] \[ (.) \] """, re.VERBOSE)
 
+    @staticmethod
+    def detect_priority(text):
+        if text.startswith("**") and text.endswith("**") and len(text) > 4:
+            return Priority.HIGH
+        if (
+            text.startswith("_")
+            and not text.startswith("__")
+            and text.endswith("_")
+            and not text.endswith("__")
+            and len(text) > 2
+        ):
+            return Priority.MEDIUM
+        return Priority.NORMAL
+
+    @staticmethod
+    def strip_emphasis(text):
+        if text.startswith("**") and text.endswith("**") and len(text) > 4:
+            return text[2:-2]
+        if text.startswith("_") and text.endswith("_") and len(text) > 2:
+            return text[1:-1]
+        return text
+
     def __init__(self, path, base_dir=".", lines=None):
         self.path = path
         self.base_dir = base_dir
@@ -110,8 +140,8 @@ class MarkdownFile:
 
     def extract_tasks(self):
         tasks = []
-        for heading, lines, start_line in self.sections():
-            tasks.extend(self.tasks_in_section(heading, lines, start_line))
+        for heading, lines, start_line, priority in self.sections():
+            tasks.extend(self.tasks_in_section(heading, lines, start_line, priority))
         return tasks
 
     def read_lines(self):
@@ -122,34 +152,39 @@ class MarkdownFile:
 
     def sections(self):
         heading = None
+        priority = Priority.NORMAL
         lines = []
         start_line = 1
         results = []
 
-        # stack stores (level, text) -- explicit level needed for
+        # stack stores (level, text, priority) -- explicit level needed for
         # skipped headings (# -> ### -> ##, where position != depth)
         stack = []
 
         for line_index, line in enumerate(self.read_lines(), 1):
             if match := self.HEADING_PATTERN.match(line):
                 if lines:
-                    results.append((heading, lines, start_line))
+                    results.append((heading, lines, start_line, priority))
                     lines = []
                 level = len(match.group(1))
                 while stack and stack[-1][0] >= level:
                     stack.pop()
-                stack.append((level, match.group(2)))
-                heading = "# " + " / ".join(text for _, text in stack)
+                heading_text = match.group(2)
+                heading_priority = self.detect_priority(heading_text)
+                stack.append((level, heading_text, heading_priority))
+                heading = "# " + " / ".join(text for _, text, _ in stack)
+                priority = min((p for _, _, p in stack), key=lambda p: p.value)
                 start_line = line_index + 1
             else:
                 lines.append(line)
 
         if lines:
-            results.append((heading, lines, start_line))
+            results.append((heading, lines, start_line, priority))
 
         return results
 
-    def tasks_in_section(self, heading, lines, start_line):
+    def tasks_in_section(self, heading, lines, start_line, heading_priority):
+        prefix_width = len("- [.] ")
         tasks = []
         index = -1
         while (index := index + 1) < len(lines):
@@ -157,7 +192,7 @@ class MarkdownFile:
                 marker = match.group(2)
                 state = State.from_marker(marker)
                 if state is None:
-                    text = lines[index].lstrip()[6:]
+                    text = lines[index].lstrip()[prefix_width:]
                     line_index = start_line + index
                     self.warnings.append(
                         f"WARNING: ignoring invalid state '{marker}' "
@@ -165,14 +200,25 @@ class MarkdownFile:
                     )
                     continue
                 text = lines[index].lstrip()
-                indent = len(match.group(1)) + 6
+                indent = len(match.group(1)) + prefix_width
                 while (
                     index + 1 < len(lines)
                     and self.is_continuation(lines[index + 1], indent)
                 ):
                     index += 1
                     text += "\n" + lines[index].strip()
-                tasks.append(Task(heading, text, state))
+                task_content = text[prefix_width:]
+                task_priority = self.detect_priority(task_content)
+                priority = min(heading_priority, task_priority, key=lambda p: p.value)
+                tasks.append(
+                    Task(
+                        self,
+                        heading,
+                        self.strip_emphasis(task_content),
+                        state,
+                        priority,
+                    )
+                )
 
         return tasks
 
@@ -188,13 +234,14 @@ class MarkdownFile:
 
     @property
     def incomplete(self):
-        outstanding_states = {State.IN_PROGRESS, State.OPEN, State.BLOCKED}
-        tasks = [task for task in self.tasks if task.state in outstanding_states]
-        return self.sort_by_state(tasks)
-
-    @property
-    def sorted_tasks(self):
-        return self.sort_by_state(self.tasks)
+        outstanding_states = {
+            State.IN_PROGRESS,
+            State.OPEN,
+            State.BLOCKED,
+        }
+        return self.sort_by_state(
+            task for task in self.tasks if task.state in outstanding_states
+        )
 
     def sort_by_state(self, tasks):
         by_heading = {}
@@ -207,29 +254,24 @@ class MarkdownFile:
             )
         return result
 
-    def as_string(self, width=80, include_all=False, search_terms=None, states=None):
+    def grouped_tasks(self, states=None, search_terms=None):
+        tasks = self.tasks
         if states:
-            tasks = self.sort_by_state(
-                [task for task in self.tasks if task.state in states]
-            )
-        elif include_all:
-            tasks = self.sorted_tasks
-        else:
-            tasks = self.incomplete
-        lines = []
-        current_heading = None
-        for task in tasks:
-            if search_terms:
+            tasks = [task for task in tasks if task.state in states]
+        if search_terms:
+            filtered = []
+            for task in tasks:
                 heading_matches = task.heading and any(
                     term in task.heading.lower() for term in search_terms
                 )
                 task_matches = any(
                     term in task.text.lower() for term in search_terms
                 )
-                if not heading_matches and not task_matches:
-                    continue
-            if task.heading and task.heading != current_heading:
-                lines.extend(task.wrapped_heading(width))
-                current_heading = task.heading
-            lines.extend(task.wrapped_text(width))
-        return "\n".join(lines)
+                if heading_matches or task_matches:
+                    filtered.append(task)
+            tasks = filtered
+        return (
+            self.sort_by_state(t for t in tasks if t.priority == Priority.HIGH),
+            self.sort_by_state(t for t in tasks if t.priority == Priority.MEDIUM),
+            self.sort_by_state(t for t in tasks if t.priority == Priority.NORMAL),
+        )
