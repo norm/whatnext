@@ -12,6 +12,8 @@ original [GitHub task list notation][sn]:
 
 - [ ] _a little more important_
 - [ ] **a lot more important**
+
+- [ ] get NYE fireworks tickets @2025-12-31
 ```
 
 Then install `whatnext`:
@@ -43,6 +45,7 @@ More detail to be found:
 
 - [The basics of task formatting](docs/basics.md)
 - [Prioritisation](docs/prioritisation.md)
+- [Deadlines](docs/deadlines.md)
 - [whatnext usage and arguments](docs/usage.md)
 - [The `.whatnext` file](docs/dotwhatnext.md)
 

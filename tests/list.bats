@@ -1,23 +1,37 @@
 bats_require_minimum_version 1.5.0
 
 @test "list tasks" {
-    run --separate-stderr whatnext
+    WHATNEXT_TODAY=2025-12-25 run --separate-stderr \
+        whatnext
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/deadlines.md:
+            # version 0.5 / OVERDUE 2w 6d
+            - [ ] complete and release
+            # Christmas dinner / OVERDUE 2d
+            - [ ] book Christmas delivery
+
+        docs/deadlines.md:
+            # Christmas dinner / HIGH
+            - [ ] roast the potatoes
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / HIGH
             - [ ] super-urgent task
-            # do these first
+            # do these first / HIGH
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
 
+        docs/deadlines.md:
+            # Christmas dinner / MEDIUM
+            - [ ] prep the make-ahead gravy
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / MEDIUM
             - [ ] semi-urgent task
 
-        sample.md:
-            # Sample task file
-            - [ ] Do something for the sake of it
+        docs/deadlines.md:
+            # Christmas dinner / IMMINENT TODAY
+            - [ ] prep sprouts
+
         docs/basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is partially complete
@@ -44,27 +58,29 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 }
 
+@test "default list is open, partial, blocked" {
+    diff -u <(whatnext) <(whatnext --open --partial --blocked)
+}
+
+
 @test "list tasks, changes width" {
-    COLUMNS=40 run --separate-stderr whatnext
+    COLUMNS=40 WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
+        whatnext
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / HIGH
             - [ ] super-urgent task
-            # do these first
+            # do these first / HIGH
             - [ ] inherently high priority task,
                   because of the header
             - [ ] no extra priority, still
                   listed second
 
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / MEDIUM
             - [ ] semi-urgent task
 
-        sample.md:
-            # Sample task file
-            - [ ] Do something for the sake of
-                  it
         docs/basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is
@@ -80,6 +96,14 @@ bats_require_minimum_version 1.5.0
                   incididunt ut labore et dolore
                   magna aliqua.
             - [ ] Ut enim ad minim veniam,
+        docs/deadlines.md:
+            # version 0.5
+            - [ ] complete and release
+            # Christmas dinner
+            - [ ] book Christmas delivery
+            - [ ] prep the make-ahead gravy
+            - [ ] roast the potatoes
+            - [ ] prep sprouts
         docs/prioritisation.md:
             # Prioritisation
             - [/] not a high priority task
@@ -94,25 +118,24 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "list all tasks" {
-    run --separate-stderr whatnext -a
+    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
+        whatnext \
+            --all
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / HIGH
             - [ ] super-urgent task
-            # do these first
+            # do these first / HIGH
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
-            # do these first / grouped, but still highest priority
+            # do these first / grouped, but still highest priority / HIGH
             - [X] header priority cascades down
 
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / MEDIUM
             - [ ] semi-urgent task
 
-        sample.md:
-            # Sample task file
-            - [ ] Do something for the sake of it
         docs/basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is partially complete
@@ -124,6 +147,14 @@ bats_require_minimum_version 1.5.0
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+        docs/deadlines.md:
+            # version 0.5
+            - [ ] complete and release
+            # Christmas dinner
+            - [ ] book Christmas delivery
+            - [ ] prep the make-ahead gravy
+            - [ ] roast the potatoes
+            - [ ] prep sprouts
         docs/prioritisation.md:
             # Prioritisation
             - [/] not a high priority task
@@ -146,23 +177,22 @@ bats_require_minimum_version 1.5.0
 @test "list tasks with --dir" {
     cp -r . "$BATS_TEST_TMPDIR/project"
 
-    run --separate-stderr whatnext --dir "$BATS_TEST_TMPDIR/project"
+    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
+        whatnext \
+            --dir "$BATS_TEST_TMPDIR/project"
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / HIGH
             - [ ] super-urgent task
-            # do these first
+            # do these first / HIGH
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
 
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / MEDIUM
             - [ ] semi-urgent task
 
-        sample.md:
-            # Sample task file
-            - [ ] Do something for the sake of it
         docs/basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is partially complete
@@ -172,6 +202,14 @@ bats_require_minimum_version 1.5.0
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+        docs/deadlines.md:
+            # version 0.5
+            - [ ] complete and release
+            # Christmas dinner
+            - [ ] book Christmas delivery
+            - [ ] prep the make-ahead gravy
+            - [ ] roast the potatoes
+            - [ ] prep sprouts
         docs/prioritisation.md:
             # Prioritisation
             - [/] not a high priority task
@@ -184,20 +222,24 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 }
 
-@test "warnings suppressed with --quiet" {
-    run --separate-stderr whatnext --quiet
+@test "warnings can be suppressed" {
+    run --separate-stderr \
+        whatnext \
+            --quiet
+    [ $status -eq 0 ]
+    [ -z "$stderr" ]
+
+    WHATNEXT_QUIET=1 run --separate-stderr \
+        whatnext
     [ $status -eq 0 ]
     [ -z "$stderr" ]
 }
 
-@test "warnings suppressed with WHATNEXT_QUIET=1" {
-    WHATNEXT_QUIET=1 run --separate-stderr whatnext
-    [ $status -eq 0 ]
-    [ -z "$stderr" ]
-}
-
-@test "--open filters to open tasks" {
-    run --separate-stderr whatnext --open docs/basics.md
+@test "filter just open tasks" {
+    run --separate-stderr \
+        whatnext \
+            --open \
+            docs/basics.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
@@ -213,13 +255,19 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 
     # short flag
-    run --separate-stderr whatnext -o docs/basics.md
+    run --separate-stderr \
+        whatnext \
+            -o \
+            docs/basics.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
-@test "--partial filters to in progress tasks" {
-    run --separate-stderr whatnext --partial docs/basics.md
+@test "filter just in progress tasks" {
+    run --separate-stderr \
+        whatnext \
+            --partial \
+            docs/basics.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
@@ -231,13 +279,19 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 
     # short flag
-    run --separate-stderr whatnext -p docs/basics.md
+    run --separate-stderr \
+        whatnext \
+            -p \
+            docs/basics.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
-@test "--blocked filters to blocked tasks" {
-    run --separate-stderr whatnext --blocked docs/basics.md
+@test "filter just blocked tasks" {
+    run --separate-stderr \
+        whatnext \
+            --blocked \
+            docs/basics.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
@@ -249,13 +303,19 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 
     # short flag
-    run --separate-stderr whatnext -b docs/basics.md
+    run --separate-stderr \
+        whatnext \
+            -b \
+            docs/basics.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
-@test "--done filters to completed tasks" {
-    run --separate-stderr whatnext --done docs/basics.md
+@test "filter just completed tasks" {
+    run --separate-stderr \
+        whatnext \
+            --done \
+            docs/basics.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
@@ -267,13 +327,19 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 
     # short flag
-    run --separate-stderr whatnext -d docs/basics.md
+    run --separate-stderr \
+        whatnext \
+            -d \
+            docs/basics.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
-@test "--cancelled filters to cancelled tasks" {
-    run --separate-stderr whatnext --cancelled docs/basics.md
+@test "filter just cancelled tasks" {
+    run --separate-stderr \
+        whatnext \
+            --cancelled \
+            docs/basics.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
@@ -285,13 +351,20 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 
     # short flag
-    run --separate-stderr whatnext -c docs/basics.md
+    run --separate-stderr \
+        whatnext \
+            -c \
+            docs/basics.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "state filters can be combined" {
-    run --separate-stderr whatnext -bc docs/basics.md
+    run --separate-stderr \
+        whatnext \
+            --blocked \
+            --cancelled \
+            docs/basics.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
@@ -303,7 +376,11 @@ bats_require_minimum_version 1.5.0
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
-    run --separate-stderr whatnext -op docs/basics.md
+    run --separate-stderr \
+        whatnext \
+            --open \
+            --partial \
+            docs/basics.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
@@ -319,7 +396,14 @@ bats_require_minimum_version 1.5.0
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
-    run --separate-stderr whatnext -bcdop docs/basics.md
+    run --separate-stderr \
+        whatnext \
+            --blocked \
+            --cancelled \
+            --done \
+            --open \
+            --partial \
+            docs/basics.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
@@ -340,7 +424,11 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "state filter combines with search" {
-    run --separate-stderr whatnext --open lorem docs/basics.md
+    run --separate-stderr \
+        whatnext \
+            --open \
+            lorem \
+            docs/basics.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
@@ -354,13 +442,16 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "filter by priority" {
-    run --separate-stderr whatnext --priority high docs/prioritisation.md
+    run --separate-stderr \
+        whatnext \
+            --priority high \
+            docs/prioritisation.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / HIGH
             - [ ] super-urgent task
-            # do these first
+            # do these first / HIGH
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
         EOF
@@ -370,18 +461,22 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "filter multiple priorities" {
-    run --separate-stderr whatnext --priority high --priority medium docs/prioritisation.md
+    run --separate-stderr \
+        whatnext \
+            --priority high \
+            --priority medium \
+            docs/prioritisation.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / HIGH
             - [ ] super-urgent task
-            # do these first
+            # do these first / HIGH
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
 
         docs/prioritisation.md:
-            # Prioritisation
+            # Prioritisation / MEDIUM
             - [ ] semi-urgent task
         EOF
     )
@@ -390,11 +485,15 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "filter by priority and search" {
-    run --separate-stderr whatnext --priority high header docs/prioritisation.md
+    run --separate-stderr \
+        whatnext \
+            --priority high \
+            header \
+            docs/prioritisation.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/prioritisation.md:
-            # do these first
+            # do these first / HIGH
             - [ ] inherently high priority task, because of the header
         EOF
     )

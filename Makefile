@@ -6,7 +6,7 @@ endif
 
 .PHONY: test flake8 bats pytest
 
-test: flake8 bats pytest
+test: flake8 pytest bats
 
 flake8:
 	flake8 whatnext tests

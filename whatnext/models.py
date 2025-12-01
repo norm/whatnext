@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from enum import Enum
 import os
 import re
@@ -12,9 +13,11 @@ class Priority(Enum):
         obj.label = config["label"]
         return obj
 
-    HIGH = {"value": 0, "abbrev": "H", "label": "High"}
-    MEDIUM = {"value": 1, "abbrev": "M", "label": "Medium"}
-    NORMAL = {"value": 2, "abbrev": "N", "label": "Normal"}
+    OVERDUE = {"value": 0, "abbrev": "!", "label": "Overdue"}
+    HIGH = {"value": 1, "abbrev": "H", "label": "High"}
+    MEDIUM = {"value": 2, "abbrev": "M", "label": "Medium"}
+    IMMINENT = {"value": 3, "abbrev": "I", "label": "Imminent"}
+    NORMAL = {"value": 4, "abbrev": "N", "label": "Normal"}
 
 
 class State(Enum):
@@ -72,12 +75,33 @@ class State(Enum):
 
 
 class Task:
-    def __init__(self, file, heading, text, state, priority=Priority.NORMAL):
+    def __init__(
+        self,
+        file,
+        heading,
+        text,
+        state,
+        priority=Priority.NORMAL,
+        due=None,
+        imminent=None,
+    ):
         self.file = file
         self.heading = heading
         self.text = text
         self.state = state
         self.priority = priority
+        self.due = due
+        self.imminent = imminent
+
+    def as_dict(self):
+        return {
+            "heading": self.heading,
+            "state": self.state,
+            "text": self.text,
+            "priority": self.priority,
+            "due": self.due,
+            "imminent": self.imminent,
+        }
 
     def wrapped_task(self, width=80, indent="    "):
         text = f"- [{self.state.markers[0]}] " + " ".join(self.text.split())
@@ -90,13 +114,50 @@ class Task:
             subsequent_indent=indent + "      ",
         )
 
+    def format_duration(self, days):
+        if days >= 365:
+            years = days // 365
+            months = (days % 365) // 30
+            if months:
+                return f"{years}y {months}m"
+            return f"{years}y"
+        if days >= 30:
+            months = days // 30
+            weeks = (days % 30) // 7
+            if weeks:
+                return f"{months}m {weeks}w"
+            return f"{months}m"
+        if days >= 14:
+            weeks = days // 7
+            remainder = days % 7
+            if remainder:
+                return f"{weeks}w {remainder}d"
+            return f"{weeks}w"
+        return f"{days}d"
+
+    def format_overdue_duration(self):
+        return self.format_duration((self.file.today - self.due).days)
+
+    def format_imminent_countdown(self):
+        days = (self.due - self.file.today).days
+        if days == 0:
+            return "TODAY"
+        return self.format_duration(days)
+
     def wrapped_heading(self, width=80, indent="    "):
         if not self.heading:
             return []
-        if width is None or len(indent + self.heading) <= width:
-            return [indent + self.heading]
+        heading = self.heading
+        if self.priority == Priority.OVERDUE:
+            heading = f"{self.heading} / OVERDUE {self.format_overdue_duration()}"
+        elif self.priority == Priority.IMMINENT:
+            heading = f"{self.heading} / IMMINENT {self.format_imminent_countdown()}"
+        elif self.priority != Priority.NORMAL:
+            heading = f"{self.heading} / {self.priority.label.upper()}"
+        if width is None or len(indent + heading) <= width:
+            return [indent + heading]
         return textwrap.wrap(
-            self.heading,
+            heading,
             width=width,
             initial_indent=indent,
             subsequent_indent=indent + "  ",
@@ -109,10 +170,76 @@ class MarkdownFile:
             (\#+) \s+ (.*)
         $
     """, re.VERBOSE)
-    TASK_PATTERN = re.compile(r""" ^ (\s*) -[ ] \[ (.) \] """, re.VERBOSE)
+    TASK_PATTERN = re.compile(r"""
+        ^
+            (\s*) -[ ] \[ (.) \]
+    """, re.VERBOSE)
+    DEADLINE_PATTERN = re.compile(r"""
+        ^
+            (.+?)
+            (?:
+                \s+
+                @(\d{4}-\d{2}-\d{2})
+                (?:
+                    /(\d+)([wd])
+                )?
+            )?
+            \s*
+        $
+    """, re.VERBOSE)
+    DEFAULT_URGENCY = timedelta(weeks=2)
+
+    def __init__(
+        self,
+        *,
+        source=None,
+        source_string=None,
+        path=None,
+        base_dir=".",
+        today,
+    ):
+        if source is not None and source_string is not None:
+            raise ValueError("Cannot specify both source and source_string")
+        if source is None and source_string is None:
+            raise ValueError("Must specify either source or source_string")
+
+        if source is not None:
+            self.path = source
+            self._lines = None
+        else:
+            self.path = path or "string"
+            self._lines = source_string.splitlines()
+
+        self.base_dir = base_dir
+        self.today = today
+        self.warnings = []
+        self.tasks = self.extract_tasks()
 
     @staticmethod
-    def detect_priority(text):
+    def parse_deadline(text):
+        match = MarkdownFile.DEADLINE_PATTERN.match(text)
+        cleaned = match.group(1)
+        date_str = match.group(2)
+        if date_str is None:
+            return (None, None, cleaned)
+        try:
+            due = date.fromisoformat(date_str)
+        except ValueError:
+            # preserve invalid date in output so user can see and fix it
+            return (None, None, text)
+        urgency = MarkdownFile.DEFAULT_URGENCY
+        if match.group(3) and match.group(4):
+            amount = int(match.group(3))
+            unit = match.group(4)
+            if unit == "d":
+                urgency = timedelta(days=amount)
+            elif unit == "w":
+                urgency = timedelta(weeks=amount)
+        imminent = due - urgency
+        return (due, imminent, cleaned)
+
+    @staticmethod
+    def parse_priority(text):
         if text.startswith("**") and text.endswith("**") and len(text) > 4:
             return Priority.HIGH
         if (
@@ -133,18 +260,6 @@ class MarkdownFile:
             return text[1:-1]
         return text
 
-    def __init__(self, path, base_dir=".", lines=None):
-        self.path = path
-        self.base_dir = base_dir
-        self.provided_lines = lines
-        self.warnings = []
-        self.tasks = self.extract_tasks()
-
-    @classmethod
-    def from_string(cls, content, path="test.md"):
-        lines = content.splitlines()
-        return cls(path, ".", lines)
-
     def extract_tasks(self):
         tasks = []
         for heading, lines, start_line, priority in self.sections():
@@ -152,8 +267,8 @@ class MarkdownFile:
         return tasks
 
     def read_lines(self):
-        if self.provided_lines is not None:
-            return self.provided_lines
+        if self._lines is not None:
+            return self._lines
         with open(self.path) as handle:
             return [line.rstrip("\n") for line in handle]
 
@@ -177,7 +292,7 @@ class MarkdownFile:
                 while stack and stack[-1][0] >= level:
                     stack.pop()
                 heading_text = match.group(2)
-                heading_priority = self.detect_priority(heading_text)
+                heading_priority = self.parse_priority(heading_text)
                 stack.append((level, heading_text, heading_priority))
                 heading = "# " + " / ".join(
                     self.strip_emphasis(text) for _, text, _ in stack
@@ -192,6 +307,35 @@ class MarkdownFile:
 
         return results
 
+    def parse_task(self, heading, heading_priority, marker, task_content, line_index):
+        state = State.from_marker(marker)
+        if state is None:
+            self.warnings.append(
+                f"WARNING: ignoring invalid state '{marker}' "
+                f"in '{task_content}', {self.display_path} line {line_index}"
+            )
+            return None
+        due, imminent_date, cleaned_text = self.parse_deadline(task_content)
+        display_text = self.strip_emphasis(cleaned_text)
+        display_text = " ".join(display_text.split())
+
+        if due is None:
+            task_priority = self.parse_priority(cleaned_text)
+            priority = min(heading_priority, task_priority, key=lambda p: p.value)
+        elif self.today > due:
+            priority = Priority.OVERDUE
+        elif self.today >= imminent_date:
+            task_priority = self.parse_priority(cleaned_text)
+            emphasis = min(heading_priority, task_priority, key=lambda p: p.value)
+            if emphasis == Priority.NORMAL:
+                priority = Priority.IMMINENT
+            else:
+                priority = emphasis
+        else:
+            priority = Priority.NORMAL
+
+        return Task(self, heading, display_text, state, priority, due, imminent_date)
+
     def tasks_in_section(self, heading, lines, start_line, heading_priority):
         prefix_width = len("- [.] ")
         tasks = []
@@ -199,15 +343,6 @@ class MarkdownFile:
         while (index := index + 1) < len(lines):
             if match := self.TASK_PATTERN.match(lines[index]):
                 marker = match.group(2)
-                state = State.from_marker(marker)
-                if state is None:
-                    text = lines[index].lstrip()[prefix_width:]
-                    line_index = start_line + index
-                    self.warnings.append(
-                        f"WARNING: ignoring invalid state '{marker}' "
-                        f"in '{text}', {self.display_path} line {line_index}"
-                    )
-                    continue
                 text = lines[index].lstrip()
                 indent = len(match.group(1)) + prefix_width
                 while (
@@ -215,19 +350,18 @@ class MarkdownFile:
                     and self.is_continuation(lines[index + 1], indent)
                 ):
                     index += 1
-                    text += "\n" + lines[index].strip()
+                    text += " " + lines[index].strip()
                 task_content = text[prefix_width:]
-                task_priority = self.detect_priority(task_content)
-                priority = min(heading_priority, task_priority, key=lambda p: p.value)
-                tasks.append(
-                    Task(
-                        self,
-                        heading,
-                        self.strip_emphasis(task_content),
-                        state,
-                        priority,
-                    )
+                line_index = start_line + index
+                task = self.parse_task(
+                    heading,
+                    heading_priority,
+                    marker,
+                    task_content,
+                    line_index,
                 )
+                if task is not None:
+                    tasks.append(task)
 
         return tasks
 
@@ -282,7 +416,9 @@ class MarkdownFile:
                     filtered.append(task)
             tasks = filtered
         return (
+            self.sort_by_state(t for t in tasks if t.priority == Priority.OVERDUE),
             self.sort_by_state(t for t in tasks if t.priority == Priority.HIGH),
             self.sort_by_state(t for t in tasks if t.priority == Priority.MEDIUM),
+            self.sort_by_state(t for t in tasks if t.priority == Priority.IMMINENT),
             self.sort_by_state(t for t in tasks if t.priority == Priority.NORMAL),
         )

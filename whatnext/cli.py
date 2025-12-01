@@ -1,4 +1,5 @@
 import argparse
+from datetime import date
 import fnmatch
 import importlib.metadata
 import os
@@ -24,6 +25,8 @@ def get_terminal_width():
 def load_config(config_path=None, directory="."):
     if config_path is None:
         config_path = os.path.join(directory, ".whatnext")
+    elif not (config_path.startswith("./") or os.path.isabs(config_path)):
+        config_path = os.path.join(directory, config_path)
     if os.path.exists(config_path):
         with open(config_path) as handle:
             return toml.load(handle)
@@ -37,11 +40,20 @@ def is_ignored(filepath, ignore_patterns):
     return False
 
 
-def find_markdown_files(paths, ignore_patterns=None, include_all=False):
+def find_markdown_files(paths, today, ignore_patterns=None, include_all=False):
     if ignore_patterns is None:
         ignore_patterns = []
     if isinstance(paths, str):
         paths = [paths]
+
+    seen = set()
+    unique_paths = []
+    for path in paths:
+        abs_path = os.path.abspath(path)
+        if abs_path not in seen:
+            seen.add(abs_path)
+            unique_paths.append(path)
+    paths = unique_paths
 
     multiple = len(paths) > 1
     task_files = {}
@@ -53,7 +65,7 @@ def find_markdown_files(paths, ignore_patterns=None, include_all=False):
             if path.endswith(".md"):
                 abs_path = os.path.abspath(path)
                 if abs_path not in task_files:
-                    file = MarkdownFile(path, ".")
+                    file = MarkdownFile(source=path, today=today)
                     tasks = file.tasks if include_all else file.incomplete
                     if tasks:
                         task_files[abs_path] = file
@@ -69,7 +81,7 @@ def find_markdown_files(paths, ignore_patterns=None, include_all=False):
                     relative_path = os.path.relpath(filepath, path)
                     if is_ignored(relative_path, ignore_patterns):
                         continue
-                    file = MarkdownFile(filepath, base_dir)
+                    file = MarkdownFile(source=filepath, base_dir=base_dir, today=today)
                     tasks = file.tasks if include_all else file.incomplete
                     if tasks:
                         task_files[abs_path] = file
@@ -181,8 +193,8 @@ Task States:
     )
     parser.add_argument(
         "--dir",
-        default=".",
-        help="Directory to search (default: current directory)",
+        default=os.environ.get("WHATNEXT_DIR", "."),
+        help="Directory to search (default: WHATNEXT_DIR, or '.')",
     )
     parser.add_argument(
         "-s", "--summary",
@@ -196,7 +208,8 @@ Task States:
     )
     parser.add_argument(
         "--config",
-        help="Path to config file (default: .whatnext in search directory)",
+        default=os.environ.get("WHATNEXT_CONFIG"),
+        help="Path to config file (default: WHATNEXT_CONFIG, or '.whatnext' in --dir)",
     )
     parser.add_argument(
         "--ignore",
@@ -208,7 +221,7 @@ Task States:
     parser.add_argument(
         "-q", "--quiet",
         action="store_true",
-        help="Suppress warnings",
+        help="Suppress warnings (or set WHATNEXT_QUIET)",
     )
     parser.add_argument(
         "-o", "--open",
@@ -263,12 +276,15 @@ Task States:
     if not paths:
         paths = [args.dir]
 
-    config_path = args.config or os.environ.get("WHATNEXT_CONFIG")
-    config = load_config(config_path, paths[0] if os.path.isdir(paths[0]) else ".")
+    config = load_config(args.config, args.dir)
     ignore_patterns = config.get("ignore", []) + args.ignore
 
     include_all = args.all or args.summary
-    task_files = find_markdown_files(paths, ignore_patterns, include_all)
+    if "WHATNEXT_TODAY" in os.environ:
+        today = date.fromisoformat(os.environ["WHATNEXT_TODAY"])
+    else:
+        today = date.today()
+    task_files = find_markdown_files(paths, today, ignore_patterns, include_all)
 
     quiet = args.quiet or os.environ.get("WHATNEXT_QUIET") == "1"
     if not quiet:

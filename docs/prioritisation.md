@@ -38,3 +38,6 @@ there are only three states of priority.
 
 Highest priority wins, so a _high_ priority task under a **highest** priority
 header is still highest priority.
+
+There are two even higher priorities `imminent` and `overdue`, which are
+[triggered by deadlines](deadlines.md).

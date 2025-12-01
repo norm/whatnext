@@ -11,6 +11,8 @@ STATE_DISPLAY_ORDER = [
     State.OPEN,
 ]
 PRIORITY_DISPLAY_ORDER = [
+    Priority.OVERDUE,
+    Priority.IMMINENT,
     Priority.HIGH,
     Priority.MEDIUM,
     Priority.NORMAL,

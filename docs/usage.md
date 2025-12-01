@@ -1,46 +1,42 @@
 # Usage
 
-Without arguments, `whatnext` will show all outstanding tasks (open,
-in progress, and blocked) listed in any Markdown file:
+Without arguments, `whatnext` will show all outstanding tasks listed in any
+Markdown file in the current directory:
+
+(all examples assume you are running it in the [example](example/) directory
+on December 25th 2025):
 
 ```bash
 (computer)% whatnext
-docs/prioritisation.md:
-    # Prioritisation
-    - [ ] super-urgent task
-    # do these first
-    - [ ] inherently high priority task, because of the header
-    - [ ] no extra priority, still listed second
-    # do these first / grouped, but still highest priority
-    - [ ] header priority cascades down
+tasks.md:
+    # Get S Done / OVERDUE 1m 3w
+    - [ ] come up with better projects
+projects/obelisk.md:
+    # Project Obelisk / OVERDUE 31y 2m
+    - [<] watch archaeologists discover (needs time machine)
 
-docs/prioritisation.md:
-    # Prioritisation
-    - [ ] semi-urgent task
+projects/obelisk.md:
+    # Project Obelisk / HIGH
+    - [ ] bury obelisk in desert
 
-sample.md:
-    # Sample task file
-    - [ ] Do something for the sake of it
-docs/basics.md:
-    # Indicating the state of a task
-    - [/] in progress, this task is partially complete
-    - [ ] open, this task is outstanding
-    - [<] blocked, this task needs more input
-    # Indicating the state of a task / Multiline tasks and indentation
-    - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    - [ ] Ut enim ad minim veniam,
-docs/prioritisation.md:
-    # Prioritisation
-    - [ ] top, but not urgent, task
-    - [ ] not a high priority task
-    # more tasks
-    - [ ] normal priority, new header resets that
+tasks.md:
+    # Get S Done / MEDIUM
+    - [ ] question entire existence
+
+tasks.md:
+    # Get S Done / IMMINENT 11d
+    - [ ] start third project
+
+projects/obelisk.md:
+    # Project Obelisk
+    - [/] carve runes into obelisk
+    - [ ] research into runic meaning
 ```
 
 They will be arranged:
 
-- by [priority](prioritisation.md), high, medium, normal
+- by [priority](prioritisation.md) and [deadline](deadlines.md):
+  overdue, high, medium, imminent, normal
 - within each priority by file, depth-last, in alphabetical order
 - grouped under the heading within the file (including parental
   headings to show task hierarchy)
@@ -59,10 +55,19 @@ Any argument(s) can be used to filter the output:
     names like "doc", this could be ambiguous, use "./doc" to clarify)
 
 ```bash
-(computer)% whatnext open
-docs/basics.md:
-    # Indicating the state of a task
-    - [ ] open, this task is outstanding
+(computer)% whatnext research
+projects/obelisk.md:
+    # Project Obelisk
+    - [ ] research into runic meaning
+
+(computer)% whatnext research question
+tasks.md:
+    # Get S Done / MEDIUM
+    - [ ] question entire existence
+
+projects/obelisk.md:
+    # Project Obelisk
+    - [ ] research into runic meaning
 ```
 
 
@@ -70,20 +75,41 @@ docs/basics.md:
 
 `whatnext` takes the following optional arguments:
 
--   `-h` / `--help` — show a short or full usage reminder.
+-   `-a` / `--all` — show all tasks, the default is to list
+    `--open --partial --blocked`.
 
--   `--version` — show the version and exit.
+    ```bash
+    (computer)% whatnext --all
+    tasks.md:
+        # Get S Done / OVERDUE 1m 3w
+        - [ ] come up with better projects
+    projects/obelisk.md:
+        # Project Obelisk / OVERDUE 31y 2m
+        - [<] watch archaeologists discover (needs time machine)
 
--   `--dir` — the directory to search through for Markdown files,
-    defaults to `.`.
+    projects/obelisk.md:
+        # Project Obelisk / HIGH
+        - [ ] bury obelisk in desert
 
--   `--ignore [pattern]` — ignore files matching the given
-    [filename pattern][glob]; can be specified multiple times.
+    tasks.md:
+        # Get S Done / MEDIUM
+        - [ ] question entire existence
 
--   `--config` — path to the [config file](dotwhatnext.md), defaults
-    to `.whatnext` or `WHATNEXT_CONFIG`.
+    tasks.md:
+        # Get S Done / IMMINENT 11d
+        - [ ] start third project
 
--   `-q` / `--quiet` — suppress warnings (or `WHATNEXT_QUIET=1`).
+    projects/obelisk.md:
+        # Project Obelisk
+        - [/] carve runes into obelisk
+        - [ ] research into runic meaning
+    archived/projects/tangerine.md:
+        # Project Tangerine
+        - [X] acquire trebuchet plans
+        - [X] source counterweight materials
+        - [X] build it
+        - [#] throw fruit at neighbours (they moved away)
+    ```
 
 -   `-o` / `--open` — show only open tasks.
 
@@ -95,62 +121,18 @@ docs/basics.md:
 
 -   `-c` / `--cancelled` — show only cancelled tasks.
 
--   `--priority [level]` — show only tasks of 'level' priority.
-
--   `-a` / `--all` — show all tasks, not just outstanding ones:
-
-    ```bash
-    (computer)% whatnext --all
-    docs/prioritisation.md:
-        # Prioritisation
-        - [ ] **super-urgent task**
-        # **do these first**
-        - [ ] inherently high priority task, because of the header
-        - [ ] **no extra priority, still listed second**
-        # **do these first** / grouped, but still highest priority
-        - [ ] header priority cascades down
-
-    docs/prioritisation.md:
-        # Prioritisation
-        - [ ] _semi-urgent task_
-
-    sample.md:
-        # Sample task file
-        - [ ] Do something for the sake of it
-    docs/basics.md:
-        # Indicating the state of a task
-        - [/] in progress, this task is partially complete
-        - [ ] open, this task is outstanding
-        - [<] blocked, this task needs more input
-        - [X] complete, this task has been finished
-        - [#] cancelled, this task has been scratched
-        # Indicating the state of a task / Multiline tasks and indentation
-        - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        - [ ] Ut enim ad minim veniam,
-    docs/prioritisation.md:
-        # Prioritisation
-        - [ ] top, but not urgent, task
-        - [ ] not a high priority task
-        # more tasks
-        - [ ] normal priority, new header resets that
-    archive/done/tasks.md:
-        # Some old stuff
-        - [X] Do the first thing
-        - [X] Do the second thing
-        - [x] do the last thing all lowercase
-    ```
+-   `--priority [level]` — show only tasks of 'level' priority; levels are
+    `overdue`, `imminent`, `high`, `medium`, `normal`.
 
 -   `-s` / `--summary` — summarise the tasks found in files,
     rather than listing the tasks within:
 
     ```bash
     (computer)% whatnext --summary
-                                                 C/D/B/P/O
-    ░░░░░                                        0/0/0/0/1  sample.md
-    ▚▚▚▚▚██████▓▓▓▓▓▒▒▒▒▒▒░░░░░░░░░░░░░░░░       1/1/1/1/3  docs/basics.md
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/0/0/0/8  docs/prioritisation.md
-    ████████████████                             0/3/0/0/0  archive/done/tasks.md
+                                         C/D/B/P/O
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░           0/0/0/0/3  tasks.md
+    ▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░  0/0/1/1/2  projects/obelisk.md
+    ▚▚▚▚▚▚▚▚▚██████████████████████████  1/3/0/0/0  archived/projects/tangerine.md
 
     ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
     ```
@@ -163,11 +145,10 @@ docs/basics.md:
 
     ```bash
     (computer)% whatnext --summary --blocked
-                                                       B/~
-    ░░░░░░                                             0/1  sample.md
-    ▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        1/6  docs/basics.md
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/8  docs/prioritisation.md
-    ░░░░░░░░░░░░░░░░░░                                 0/3  archive/done/tasks.md
+                                               B/~
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░            0/3  tasks.md
+    ▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/3  projects/obelisk.md
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/4  archived/projects/tangerine.md
 
     ▚ Blocked  ░ (Cancelled/Done/Partial/Open)
     ```
@@ -177,14 +158,28 @@ docs/basics.md:
 
     ```bash
     (computer)% whatnext --summary --priority high
-                                                       H/~
-    ░░░░░░░░                                           0/1  sample.md
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0/5  docs/basics.md
-    ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░  3/3  docs/prioritisation.md
-    ░░░░░░░░                                           0/1  tests/headerless.md
+                                                          H/~
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░               0/3  tasks.md
+    ▚▚▚▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/3  projects/obelisk.md
 
-    ▚ High  ░ (Medium/Normal)
+    ▚ High  ░ (Overdue/Imminent/Medium/Normal)
     ```
+
+-   `-q` / `--quiet` — suppress warnings (or `$WHATNEXT_QUIET=1`).
+
+-   `--ignore [pattern]` — ignore files matching the given
+    [filename pattern][glob]; can be specified multiple times
+    or put in the config file.
+
+-   `--config` — path to the [config file](dotwhatnext.md), defaults
+    to `.whatnext` or `$WHATNEXT_CONFIG`.
+
+-   `--dir` — the directory to search through for Markdown files,
+    defaults to `.` or `$WHATNEXT_DIR`.
+
+-   `-h` / `--help` — show a short or full usage reminder.
+
+-   `--version` — show the version and exit.
 
 
 [glob]: https://docs.python.org/3/library/fnmatch.html

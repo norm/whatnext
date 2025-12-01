@@ -52,10 +52,12 @@ which will start to fail if it is removed.)
 
 # version 0.5 - deadlines
 
-- [ ] mark a single task as having a deadline
-- [ ] embellish deadlines with custom urgency windows
-- [ ] filter output based on urgency
-- [ ] summarise urgency?
+- [X] mark a single task as having a deadline
+- [X] embellish deadlines with custom urgency windows
+- [X] filter output based on urgency
+- [X] summarise urgency?
+- [X] rework sample.md to example.md, and use it for docs/usage.md
+- [ ] completed/cancelled in sixth category?
 
 
 # future enhancements

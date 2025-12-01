@@ -1,120 +1,118 @@
 bats_require_minimum_version 1.5.0
 
-setup() {
-    mkdir -p "$BATS_TEST_TMPDIR/project"
-    echo "- [ ] task one" > "$BATS_TEST_TMPDIR/project/one.md"
-    echo "- [ ] task two" > "$BATS_TEST_TMPDIR/project/two.md"
-    echo "- [ ] task three" > "$BATS_TEST_TMPDIR/project/three.md"
-    mkdir -p "$BATS_TEST_TMPDIR/config"
-    echo 'ignore = ["three.md"]' > "$BATS_TEST_TMPDIR/config/whatevernext"
+@test "default config is in the dir root" {
+    WHATNEXT_DIR=example \
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext
+
+    diff -u <(echo "") <(echo "$output")
+    [ $status -eq 0 ]
 }
 
-@test "baseline" {
-    run whatnext \
-            --dir "$BATS_TEST_TMPDIR/project"
+
+@test "config arg is also relative to the dir root" {
+    WHATNEXT_DIR=example \
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --config .whatnext.all \
+                --all
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        one.md:
-            - [ ] task one
-        three.md:
-            - [ ] task three
-        two.md:
-            - [ ] task two
+        projects/obelisk.md:
+            # Project Obelisk / OVERDUE 30y 2m
+            - [<] watch archaeologists discover (needs time machine)
+
+        tasks.md:
+            # Get S Done / MEDIUM
+            - [ ] question entire existence
+
+        tasks.md:
+            # Get S Done
+            - [ ] come up with better projects
+            - [ ] start third project
+        projects/obelisk.md:
+            # Project Obelisk
+            - [/] carve runes into obelisk
+            - [ ] research into runic meaning
+            - [ ] bury obelisk in desert
+        archived/projects/tangerine.md:
+            # Project Tangerine
+            - [X] acquire trebuchet plans
+            - [X] source counterweight materials
+            - [X] build it
+            - [#] throw fruit at neighbours (they moved away)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
-@test "default config file" {
-    echo 'ignore = ["two.md"]' > "$BATS_TEST_TMPDIR/project/.whatnext"
-
-    run whatnext \
-            --dir "$BATS_TEST_TMPDIR/project"
+@test "config arg from environment" {
+    WHATNEXT_CONFIG=.whatnext.all \
+    WHATNEXT_DIR=example \
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --all
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        one.md:
-            - [ ] task one
-        three.md:
-            - [ ] task three
+        projects/obelisk.md:
+            # Project Obelisk / OVERDUE 30y 2m
+            - [<] watch archaeologists discover (needs time machine)
+
+        tasks.md:
+            # Get S Done / MEDIUM
+            - [ ] question entire existence
+
+        tasks.md:
+            # Get S Done
+            - [ ] come up with better projects
+            - [ ] start third project
+        projects/obelisk.md:
+            # Project Obelisk
+            - [/] carve runes into obelisk
+            - [ ] research into runic meaning
+            - [ ] bury obelisk in desert
+        archived/projects/tangerine.md:
+            # Project Tangerine
+            - [X] acquire trebuchet plans
+            - [X] source counterweight materials
+            - [X] build it
+            - [#] throw fruit at neighbours (they moved away)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
-@test "config from argument" {
-    run whatnext \
-            --dir "$BATS_TEST_TMPDIR/project" \
-            --config "$BATS_TEST_TMPDIR/config/whatevernext"
+@test "absolute config is relative to running dir" {
+    WHATNEXT_DIR=example \
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --config ./tests/dot-whatnext
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        one.md:
-            - [ ] task one
-        two.md:
-            - [ ] task two
+        tasks.md:
+            # Get S Done / MEDIUM
+            - [ ] question entire existence
+
+        tasks.md:
+            # Get S Done
+            - [ ] come up with better projects
+            - [ ] start third project
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
-}
 
-@test "config from environment" {
-    WHATNEXT_CONFIG="$BATS_TEST_TMPDIR/config/whatevernext" \
-        run whatnext \
-                --dir "$BATS_TEST_TMPDIR/project"
-
-    expected_output=$(sed -e 's/^        //' <<"        EOF"
-        one.md:
-            - [ ] task one
-        two.md:
-            - [ ] task two
-        EOF
-    )
-    diff -u <(echo "$expected_output") <(echo "$output")
-    [ $status -eq 0 ]
-}
-
-@test "ignore option" {
-    run whatnext \
-            --dir "$BATS_TEST_TMPDIR/project" \
-            --ignore 'two.md' \
-            --ignore 'three.md'
-
-    expected_output=$(sed -e 's/^        //' <<"        EOF"
-        one.md:
-            - [ ] task one
-        EOF
-    )
-    diff -u <(echo "$expected_output") <(echo "$output")
-    [ $status -eq 0 ]
-}
-
-@test "ignore option globs" {
-    run whatnext \
-            --dir "$BATS_TEST_TMPDIR/project" \
-            --ignore 't*.md'
-
-    expected_output=$(sed -e 's/^        //' <<"        EOF"
-        one.md:
-            - [ ] task one
-        EOF
-    )
-    diff -u <(echo "$expected_output") <(echo "$output")
-    [ $status -eq 0 ]
-}
-
-@test "ignore options and config combine" {
-    WHATNEXT_CONFIG="$BATS_TEST_TMPDIR/config/whatevernext" \
-        run whatnext \
-                --dir "$BATS_TEST_TMPDIR/project" \
-                --ignore 'two.md'
-
-    expected_output=$(sed -e 's/^        //' <<"        EOF"
-        one.md:
-            - [ ] task one
-        EOF
-    )
+    WHATNEXT_CONFIG=./tests/dot-whatnext \
+    WHATNEXT_DIR=example \
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }

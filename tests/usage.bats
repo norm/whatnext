@@ -1,7 +1,9 @@
 bats_require_minimum_version 1.5.0
 
 @test "-h returns short usage" {
-    run whatnext -h
+    run --separate-stderr \
+        whatnext \
+            -h
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
@@ -15,7 +17,9 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "--help returns long usage" {
-    run whatnext --help
+    run --separate-stderr \
+        whatnext \
+            --help
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
@@ -33,14 +37,14 @@ bats_require_minimum_version 1.5.0
           -h                Show the usage reminder and exit
           --help            Show this help message and exit
           --version         show program's version number and exit
-          --dir DIR         Directory to search (default: current directory)
+          --dir DIR         Directory to search (default: WHATNEXT_DIR, or '.')
           -s, --summary     Show summary of task counts per file
           -a, --all         Include all tasks and files, not just incomplete
-          --config CONFIG   Path to config file (default: .whatnext in search
-                            directory)
+          --config CONFIG   Path to config file (default: WHATNEXT_CONFIG, or
+                            '.whatnext' in --dir)
           --ignore PATTERN  Ignore files matching pattern (can be specified multiple
                             times)
-          -q, --quiet       Suppress warnings
+          -q, --quiet       Suppress warnings (or set WHATNEXT_QUIET)
           -o, --open        Show only open tasks
           -p, --partial     Show only in progress tasks
           -b, --blocked     Show only blocked tasks

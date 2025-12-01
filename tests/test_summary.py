@@ -16,6 +16,8 @@ class TestPriorityVisualisationMap:
         )
         assert selected_in_order == [Priority.HIGH]
         assert char_map[Priority.HIGH] == SHADING[0]
+        assert char_map[Priority.OVERDUE] == SHADING[-1]
+        assert char_map[Priority.IMMINENT] == SHADING[-1]
         assert char_map[Priority.MEDIUM] == SHADING[-1]
         assert char_map[Priority.NORMAL] == SHADING[-1]
 
@@ -25,9 +27,11 @@ class TestPriorityVisualisationMap:
             PRIORITY_DISPLAY_ORDER,
         )
         assert selected_in_order == list(PRIORITY_DISPLAY_ORDER)
-        assert char_map[Priority.HIGH] == SHADING[0]
-        assert char_map[Priority.MEDIUM] == SHADING[1]
-        assert char_map[Priority.NORMAL] == SHADING[2]
+        assert char_map[Priority.OVERDUE] == SHADING[0]
+        assert char_map[Priority.IMMINENT] == SHADING[1]
+        assert char_map[Priority.HIGH] == SHADING[2]
+        assert char_map[Priority.MEDIUM] == SHADING[3]
+        assert char_map[Priority.NORMAL] == SHADING[4]
 
 
 class TestPriorityHeader:
@@ -47,6 +51,8 @@ class TestPriorityHeader:
 class TestPriorityLegend:
     def test_high_priority_legend(self):
         char_map = {
+            Priority.OVERDUE: SHADING[-1],
+            Priority.IMMINENT: SHADING[-1],
             Priority.HIGH: SHADING[0],
             Priority.MEDIUM: SHADING[-1],
             Priority.NORMAL: SHADING[-1],
@@ -57,10 +63,12 @@ class TestPriorityLegend:
             PRIORITY_DISPLAY_ORDER,
             has_remainder=True,
         )
-        assert legend == "▚ High  ░ (Medium/Normal)"
+        assert legend == "▚ High  ░ (Overdue/Imminent/Medium/Normal)"
 
     def test_medium_priority_legend(self):
         char_map = {
+            Priority.OVERDUE: SHADING[-1],
+            Priority.IMMINENT: SHADING[-1],
             Priority.HIGH: SHADING[-1],
             Priority.MEDIUM: SHADING[0],
             Priority.NORMAL: SHADING[-1],
@@ -71,4 +79,4 @@ class TestPriorityLegend:
             PRIORITY_DISPLAY_ORDER,
             has_remainder=True,
         )
-        assert legend == "▚ Medium  ░ (High/Normal)"
+        assert legend == "▚ Medium  ░ (Overdue/Imminent/High/Normal)"

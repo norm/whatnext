@@ -1,4 +1,6 @@
-from whatnext.models import Priority, Task, State
+from datetime import date
+
+from whatnext.models import MarkdownFile, Priority, Task, State
 
 
 class TestTask:
@@ -51,3 +53,87 @@ class TestTask:
         assert self.task.wrapped_heading() == [
             "    # Indicating the state of a task / Multiline tasks and indentation"
         ]
+
+
+class TestOverdueHeading:
+    def test_overdue_by_1_day(self):
+        file = MarkdownFile(
+            source_string="# Tasks\n- [ ] do thing @2025-01-01",
+            today=date(2025, 1, 2),
+        )
+        task = file.tasks[0]
+        assert task.wrapped_heading() == ["    # Tasks / OVERDUE 1d"]
+
+    def test_overdue_by_3_days(self):
+        file = MarkdownFile(
+            source_string="# Tasks\n- [ ] do thing @2025-01-01",
+            today=date(2025, 1, 4),
+        )
+        task = file.tasks[0]
+        assert task.wrapped_heading() == ["    # Tasks / OVERDUE 3d"]
+
+    def test_overdue_by_1_week(self):
+        file = MarkdownFile(
+            source_string="# Tasks\n- [ ] do thing @2025-01-01",
+            today=date(2025, 1, 11),
+        )
+        task = file.tasks[0]
+        assert task.wrapped_heading() == ["    # Tasks / OVERDUE 10d"]
+
+    def test_overdue_by_2_weeks(self):
+        file = MarkdownFile(
+            source_string="# Tasks\n- [ ] do thing @2025-01-01",
+            today=date(2025, 1, 17),
+        )
+        task = file.tasks[0]
+        assert task.wrapped_heading() == ["    # Tasks / OVERDUE 2w 2d"]
+
+    def test_overdue_by_5_weeks(self):
+        file = MarkdownFile(
+            source_string="# Tasks\n- [ ] do thing @2025-01-01",
+            today=date(2025, 2, 10),
+        )
+        task = file.tasks[0]
+        assert task.wrapped_heading() == ["    # Tasks / OVERDUE 1m 1w"]
+
+    def test_overdue_by_10_years(self):
+        file = MarkdownFile(
+            source_string="# Tasks\n- [ ] do thing @2015-01-01",
+            today=date(2025, 11, 1),
+        )
+        task = file.tasks[0]
+        assert task.wrapped_heading() == ["    # Tasks / OVERDUE 10y 10m"]
+
+
+class TestImminentHeading:
+    def test_imminent_1_day_left(self):
+        file = MarkdownFile(
+            source_string="# Tasks\n- [ ] do thing @2025-01-10",
+            today=date(2025, 1, 9),
+        )
+        task = file.tasks[0]
+        assert task.wrapped_heading() == ["    # Tasks / IMMINENT 1d"]
+
+    def test_imminent_3_days_left(self):
+        file = MarkdownFile(
+            source_string="# Tasks\n- [ ] do thing @2025-01-10",
+            today=date(2025, 1, 7),
+        )
+        task = file.tasks[0]
+        assert task.wrapped_heading() == ["    # Tasks / IMMINENT 3d"]
+
+    def test_imminent_2_weeks_left(self):
+        file = MarkdownFile(
+            source_string="# Tasks\n- [ ] do thing @2025-01-20/3w",
+            today=date(2025, 1, 4),
+        )
+        task = file.tasks[0]
+        assert task.wrapped_heading() == ["    # Tasks / IMMINENT 2w 2d"]
+
+    def test_imminent_on_deadline_day(self):
+        file = MarkdownFile(
+            source_string="# Tasks\n- [ ] do thing @2025-01-10",
+            today=date(2025, 1, 10),
+        )
+        task = file.tasks[0]
+        assert task.wrapped_heading() == ["    # Tasks / IMMINENT TODAY"]
