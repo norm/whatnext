@@ -7,7 +7,7 @@ bats_require_minimum_version 1.5.0
         docs/prioritisation.md:
             # Prioritisation
             - [ ] super-urgent task
-            # **do these first**
+            # do these first
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
 
@@ -51,7 +51,7 @@ bats_require_minimum_version 1.5.0
         docs/prioritisation.md:
             # Prioritisation
             - [ ] super-urgent task
-            # **do these first**
+            # do these first
             - [ ] inherently high priority task,
                   because of the header
             - [ ] no extra priority, still
@@ -100,10 +100,10 @@ bats_require_minimum_version 1.5.0
         docs/prioritisation.md:
             # Prioritisation
             - [ ] super-urgent task
-            # **do these first**
+            # do these first
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
-            # **do these first** / grouped, but still highest priority
+            # do these first / grouped, but still highest priority
             - [X] header priority cascades down
 
         docs/prioritisation.md:
@@ -152,7 +152,7 @@ bats_require_minimum_version 1.5.0
         docs/prioritisation.md:
             # Prioritisation
             - [ ] super-urgent task
-            # **do these first**
+            # do these first
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
 
@@ -360,7 +360,7 @@ bats_require_minimum_version 1.5.0
         docs/prioritisation.md:
             # Prioritisation
             - [ ] super-urgent task
-            # **do these first**
+            # do these first
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
         EOF
@@ -376,7 +376,7 @@ bats_require_minimum_version 1.5.0
         docs/prioritisation.md:
             # Prioritisation
             - [ ] super-urgent task
-            # **do these first**
+            # do these first
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
 
@@ -394,7 +394,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/prioritisation.md:
-            # **do these first**
+            # do these first
             - [ ] inherently high priority task, because of the header
         EOF
     )

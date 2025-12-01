@@ -179,7 +179,9 @@ class MarkdownFile:
                 heading_text = match.group(2)
                 heading_priority = self.detect_priority(heading_text)
                 stack.append((level, heading_text, heading_priority))
-                heading = "# " + " / ".join(text for _, text, _ in stack)
+                heading = "# " + " / ".join(
+                    self.strip_emphasis(text) for _, text, _ in stack
+                )
                 priority = min((p for _, _, p in stack), key=lambda p: p.value)
                 start_line = line_index + 1
             else:

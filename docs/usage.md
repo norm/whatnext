@@ -7,16 +7,16 @@ in progress, and blocked) listed in any Markdown file:
 (computer)% whatnext
 docs/prioritisation.md:
     # Prioritisation
-    - [ ] **super-urgent task**
-    # **do these first**
+    - [ ] super-urgent task
+    # do these first
     - [ ] inherently high priority task, because of the header
-    - [ ] **no extra priority, still listed second**
-    # **do these first** / grouped, but still highest priority
+    - [ ] no extra priority, still listed second
+    # do these first / grouped, but still highest priority
     - [ ] header priority cascades down
 
 docs/prioritisation.md:
     # Prioritisation
-    - [ ] _semi-urgent task_
+    - [ ] semi-urgent task
 
 sample.md:
     # Sample task file

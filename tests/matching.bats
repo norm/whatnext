@@ -109,13 +109,10 @@ bats_require_minimum_version 1.5.0
         prioritisation.md:
             # Prioritisation
             - [ ] super-urgent task
-            # **do these first**
+            # do these first
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
         usage.md:
-            # Usage
-            - [ ] super-urgent task
-            - [ ] no extra priority, still listed second
             # Usage / Arguments
             - [ ] super-urgent task
             - [ ] no extra priority, still listed second
@@ -124,8 +121,6 @@ bats_require_minimum_version 1.5.0
             # Prioritisation
             - [ ] semi-urgent task
         usage.md:
-            # Usage
-            - [ ] semi-urgent task
             # Usage / Arguments
             - [ ] semi-urgent task
 
@@ -145,8 +140,11 @@ bats_require_minimum_version 1.5.0
         usage.md:
             # Usage
             - [/] in progress, this task is partially complete
+            - [ ] super-urgent task
             - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
             - [ ] header priority cascades down
+            - [ ] semi-urgent task
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
@@ -189,15 +187,12 @@ bats_require_minimum_version 1.5.0
         docs/prioritisation.md:
             # Prioritisation
             - [ ] super-urgent task
-            # **do these first**
+            # do these first
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
-            # **do these first** / grouped, but still highest priority
+            # do these first / grouped, but still highest priority
             - [X] header priority cascades down
         docs/usage.md:
-            # Usage
-            - [ ] super-urgent task
-            - [ ] no extra priority, still listed second
             # Usage / Arguments
             - [ ] super-urgent task
             - [ ] no extra priority, still listed second
@@ -206,8 +201,6 @@ bats_require_minimum_version 1.5.0
             # Prioritisation
             - [ ] semi-urgent task
         docs/usage.md:
-            # Usage
-            - [ ] semi-urgent task
             # Usage / Arguments
             - [ ] semi-urgent task
 
@@ -231,8 +224,11 @@ bats_require_minimum_version 1.5.0
         docs/usage.md:
             # Usage
             - [/] in progress, this task is partially complete
+            - [ ] super-urgent task
             - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
             - [ ] header priority cascades down
+            - [ ] semi-urgent task
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
@@ -314,13 +310,10 @@ bats_require_minimum_version 1.5.0
         docs/prioritisation.md:
             # Prioritisation
             - [ ] super-urgent task
-            # **do these first**
+            # do these first
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
         docs/usage.md:
-            # Usage
-            - [ ] super-urgent task
-            - [ ] no extra priority, still listed second
             # Usage / Arguments
             - [ ] super-urgent task
             - [ ] no extra priority, still listed second
@@ -329,8 +322,6 @@ bats_require_minimum_version 1.5.0
             # Prioritisation
             - [ ] semi-urgent task
         docs/usage.md:
-            # Usage
-            - [ ] semi-urgent task
             # Usage / Arguments
             - [ ] semi-urgent task
 
@@ -350,8 +341,11 @@ bats_require_minimum_version 1.5.0
         docs/usage.md:
             # Usage
             - [/] in progress, this task is partially complete
+            - [ ] super-urgent task
             - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
             - [ ] header priority cascades down
+            - [ ] semi-urgent task
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
@@ -406,16 +400,11 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/usage.md:
-            # Usage
-            - [ ] super-urgent task
-            - [ ] no extra priority, still listed second
             # Usage / Arguments
             - [ ] super-urgent task
             - [ ] no extra priority, still listed second
 
         docs/usage.md:
-            # Usage
-            - [ ] semi-urgent task
             # Usage / Arguments
             - [ ] semi-urgent task
 
@@ -425,8 +414,11 @@ bats_require_minimum_version 1.5.0
         docs/usage.md:
             # Usage
             - [/] in progress, this task is partially complete
+            - [ ] super-urgent task
             - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
             - [ ] header priority cascades down
+            - [ ] semi-urgent task
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
@@ -483,24 +475,22 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr whatnext docs/usage.md
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/usage.md:
-            # Usage
-            - [ ] super-urgent task
-            - [ ] no extra priority, still listed second
             # Usage / Arguments
             - [ ] super-urgent task
             - [ ] no extra priority, still listed second
 
         docs/usage.md:
-            # Usage
-            - [ ] semi-urgent task
             # Usage / Arguments
             - [ ] semi-urgent task
 
         docs/usage.md:
             # Usage
             - [/] in progress, this task is partially complete
+            - [ ] super-urgent task
             - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
             - [ ] header priority cascades down
+            - [ ] semi-urgent task
             - [ ] Do something for the sake of it
             - [ ] open, this task is outstanding
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do

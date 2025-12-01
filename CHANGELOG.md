@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Nothing, yet.
 
-## [v0.4] - ???
+## [v0.4] - 2025-12-01
 
 Individual tasks and sections of tasks can be marked with emphasis to denote
 \_medium\_ priority or as \*\*high\*\* priority. They will be displayed at the

@@ -166,19 +166,19 @@ class TestGroupedTasksPrioritisation:
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first**",
+                    "# do these first",
                     "inherently high priority task, because of the header",
                     State.OPEN,
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first**",
+                    "# do these first",
                     "no extra priority, still listed second",
                     State.OPEN,
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first** / grouped, but still highest priority",
+                    "# do these first / grouped, but still highest priority",
                     "header priority cascades down",
                     State.COMPLETE,
                     Priority.HIGH
@@ -234,19 +234,19 @@ class TestGroupedTasksPrioritisation:
         assert tasks(self.file.grouped_tasks(search_terms=["priority"])) == (
             [
                 (
-                    "# **do these first**",
+                    "# do these first",
                     "inherently high priority task, because of the header",
                     State.OPEN,
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first**",
+                    "# do these first",
                     "no extra priority, still listed second",
                     State.OPEN,
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first** / grouped, but still highest priority",
+                    "# do these first / grouped, but still highest priority",
                     "header priority cascades down",
                     State.COMPLETE,
                     Priority.HIGH
@@ -278,7 +278,7 @@ class TestGroupedTasksPrioritisation:
         ) == (
             [
                 (
-                    "# **do these first** / grouped, but still highest priority",
+                    "# do these first / grouped, but still highest priority",
                     "header priority cascades down",
                     State.COMPLETE,
                     Priority.HIGH
@@ -308,19 +308,19 @@ class TestGroupedTasksPrioritisation:
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first**",
+                    "# do these first",
                     "inherently high priority task, because of the header",
                     State.OPEN,
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first**",
+                    "# do these first",
                     "no extra priority, still listed second",
                     State.OPEN,
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first** / grouped, but still highest priority",
+                    "# do these first / grouped, but still highest priority",
                     "header priority cascades down",
                     State.COMPLETE,
                     Priority.HIGH
@@ -342,19 +342,19 @@ class TestGroupedTasksPrioritisation:
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first**",
+                    "# do these first",
                     "inherently high priority task, because of the header",
                     State.OPEN,
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first**",
+                    "# do these first",
                     "no extra priority, still listed second",
                     State.OPEN,
                     Priority.HIGH
                 ),
                 (
-                    "# **do these first** / grouped, but still highest priority",
+                    "# do these first / grouped, but still highest priority",
                     "header priority cascades down",
                     State.COMPLETE,
                     Priority.HIGH
