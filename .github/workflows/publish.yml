@@ -85,11 +85,11 @@ jobs:
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
+          NOTES: ${{ steps.changelog.outputs.notes }}
         run: |
           version="${{ steps.version.outputs.version }}"
-          notes="${{ steps.changelog.outputs.notes }}"
           pypi_link="https://pypi.org/project/whatnext/${version}/"
-          full_notes=$(printf '%s\n\n---\n[pypi release](%s)' "$notes" "$pypi_link")
+          full_notes=$(printf '%s\n\n---\n[pypi release](%s)' "$NOTES" "$pypi_link")
           gh release create "${{ github.ref_name }}" \
             --title "whatnext ${version}" \
             --notes "$full_notes"
