@@ -27,12 +27,16 @@ Now run it and it'll tell you what's next, sorting by priority and state:
 ```bash
 (computer)% whatnext
 README.md:
-    # What next?
+    # What next? / HIGH
     - [ ] a lot more important
 
 README.md:
-    # What next?
+    # What next? / MEDIUM
     - [ ] a little more important
+
+README.md:
+    # What next? / IMMINENT 6d
+    - [ ] get NYE fireworks tickets
 
 README.md:
     # What next?

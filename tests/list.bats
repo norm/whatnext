@@ -129,8 +129,6 @@ bats_require_minimum_version 1.5.0
             # do these first / HIGH
             - [ ] inherently high priority task, because of the header
             - [ ] no extra priority, still listed second
-            # do these first / grouped, but still highest priority / HIGH
-            - [X] header priority cascades down
 
         docs/prioritisation.md:
             # Prioritisation / MEDIUM
@@ -141,8 +139,6 @@ bats_require_minimum_version 1.5.0
             - [/] in progress, this task is partially complete
             - [ ] open, this task is outstanding
             - [<] blocked, this task needs more input
-            - [X] complete, this task has been finished
-            - [#] cancelled, this task has been scratched
             # Indicating the state of a task / Multiline tasks and indentation
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -159,12 +155,20 @@ bats_require_minimum_version 1.5.0
             # Prioritisation
             - [/] not a high priority task
             - [ ] top, but not urgent, task
-            # more tasks
-            - [#] normal priority, new header resets that
         tests/headerless.md:
             - [ ] I am not a task, I am a free list!
+
+        docs/basics.md:
+            # Indicating the state of a task / FINISHED
+            - [X] complete, this task has been finished
+            - [#] cancelled, this task has been scratched
+        docs/prioritisation.md:
+            # do these first / grouped, but still highest priority / FINISHED
+            - [X] header priority cascades down
+            # more tasks / FINISHED
+            - [#] normal priority, new header resets that
         archive/done/tasks.md:
-            # Some old stuff
+            # Some old stuff / FINISHED
             - [X] Do the first thing
             - [X] Do the second thing
             - [X] do the last thing all lowercase
@@ -319,7 +323,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
-            # Indicating the state of a task
+            # Indicating the state of a task / FINISHED
             - [X] complete, this task has been finished
         EOF
     )
@@ -343,7 +347,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/basics.md:
-            # Indicating the state of a task
+            # Indicating the state of a task / FINISHED
             - [#] cancelled, this task has been scratched
         EOF
     )
@@ -370,6 +374,9 @@ bats_require_minimum_version 1.5.0
         docs/basics.md:
             # Indicating the state of a task
             - [<] blocked, this task needs more input
+
+        docs/basics.md:
+            # Indicating the state of a task / FINISHED
             - [#] cancelled, this task has been scratched
         EOF
     )
@@ -411,12 +418,15 @@ bats_require_minimum_version 1.5.0
             - [/] in progress, this task is partially complete
             - [ ] open, this task is outstanding
             - [<] blocked, this task needs more input
-            - [X] complete, this task has been finished
-            - [#] cancelled, this task has been scratched
             # Indicating the state of a task / Multiline tasks and indentation
             - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
                   eiusmod tempor incididunt ut labore et dolore magna aliqua.
             - [ ] Ut enim ad minim veniam,
+
+        docs/basics.md:
+            # Indicating the state of a task / FINISHED
+            - [X] complete, this task has been finished
+            - [#] cancelled, this task has been scratched
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")

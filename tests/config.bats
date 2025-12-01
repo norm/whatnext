@@ -37,8 +37,9 @@ bats_require_minimum_version 1.5.0
             - [/] carve runes into obelisk
             - [ ] research into runic meaning
             - [ ] bury obelisk in desert
+
         archived/projects/tangerine.md:
-            # Project Tangerine
+            # Project Tangerine / FINISHED
             - [X] acquire trebuchet plans
             - [X] source counterweight materials
             - [X] build it
@@ -75,8 +76,9 @@ bats_require_minimum_version 1.5.0
             - [/] carve runes into obelisk
             - [ ] research into runic meaning
             - [ ] bury obelisk in desert
+
         archived/projects/tangerine.md:
-            # Project Tangerine
+            # Project Tangerine / FINISHED
             - [X] acquire trebuchet plans
             - [X] source counterweight materials
             - [X] build it

@@ -43,7 +43,7 @@ class TestFileParsing:
             "heading": None,
             "state": State.COMPLETE,
             "text": "complete, this task has been finished",
-            "priority": Priority.NORMAL,
+            "priority": Priority.FINISHED,
             "due": None,
             "imminent": None,
         }
@@ -57,7 +57,7 @@ class TestFileParsing:
             "heading": None,
             "state": State.CANCELLED,
             "text": "cancelled, this task has been scratched",
-            "priority": Priority.NORMAL,
+            "priority": Priority.FINISHED,
             "due": None,
             "imminent": None,
         }
@@ -208,7 +208,7 @@ class TestFileParsing:
             "heading": "# do these first / grouped, but still highest priority",
             "state": State.COMPLETE,
             "text": "header priority cascades down",
-            "priority": Priority.HIGH,
+            "priority": Priority.FINISHED,
             "due": None,
             "imminent": None,
         }
@@ -216,7 +216,7 @@ class TestFileParsing:
             "heading": "# more tasks",
             "state": State.CANCELLED,
             "text": "normal priority, new header resets that",
-            "priority": Priority.NORMAL,
+            "priority": Priority.FINISHED,
             "due": None,
             "imminent": None,
         }
@@ -464,18 +464,6 @@ class TestGroupedTasksBasics:
                     Priority.NORMAL
                 ),
                 (
-                    "# Indicating the state of a task",
-                    "complete, this task has been finished",
-                    State.COMPLETE,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Indicating the state of a task",
-                    "cancelled, this task has been scratched",
-                    State.CANCELLED,
-                    Priority.NORMAL
-                ),
-                (
                     "# Indicating the state of a task / Multiline tasks and indentation",  # noqa: E501
                     "Lorem ipsum dolor sit amet, consectetur adipisicing elit, "
                     "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",  # noqa: E501
@@ -487,6 +475,20 @@ class TestGroupedTasksBasics:
                     "Ut enim ad minim veniam,",
                     State.OPEN,
                     Priority.NORMAL
+                ),
+            ],
+            [
+                (
+                    "# Indicating the state of a task",
+                    "complete, this task has been finished",
+                    State.COMPLETE,
+                    Priority.FINISHED
+                ),
+                (
+                    "# Indicating the state of a task",
+                    "cancelled, this task has been scratched",
+                    State.CANCELLED,
+                    Priority.FINISHED
                 ),
             ],
         )
@@ -513,6 +515,7 @@ class TestGroupedTasksBasics:
                     Priority.NORMAL
                 ),
             ],
+            [],
         )
 
     def test_search_terms(self):
@@ -536,6 +539,7 @@ class TestGroupedTasksBasics:
                     Priority.NORMAL
                 ),
             ],
+            [],
         )
 
     def test_search_terms_and_state(self):
@@ -549,18 +553,19 @@ class TestGroupedTasksBasics:
             [],
             [],
             [],
+            [],
             [
                 (
                     "# Indicating the state of a task",
                     "complete, this task has been finished",
                     State.COMPLETE,
-                    Priority.NORMAL
+                    Priority.FINISHED
                 ),
                 (
                     "# Indicating the state of a task",
                     "cancelled, this task has been scratched",
                     State.CANCELLED,
-                    Priority.NORMAL
+                    Priority.FINISHED
                 ),
             ],
         )
@@ -571,17 +576,17 @@ class TestGroupedTasksBasics:
                 states={State.COMPLETE},
                 search_terms=["lorem"],
             )
-        ) == ([], [], [], [], [])
+        ) == ([], [], [], [], [], [])
 
     def test_priority_high(self):
         assert tasks(
             self.file.grouped_tasks(priorities={Priority.HIGH})
-        ) == ([], [], [], [], [])
+        ) == ([], [], [], [], [], [])
 
     def test_priority_high_and_medium(self):
         assert tasks(
             self.file.grouped_tasks(priorities={Priority.HIGH, Priority.MEDIUM})
-        ) == ([], [], [], [], [])
+        ) == ([], [], [], [], [], [])
 
 
 class TestGroupedTasksPrioritisation:
@@ -609,12 +614,6 @@ class TestGroupedTasksPrioritisation:
                     State.OPEN,
                     Priority.HIGH
                 ),
-                (
-                    "# do these first / grouped, but still highest priority",
-                    "header priority cascades down",
-                    State.COMPLETE,
-                    Priority.HIGH
-                ),
             ],
             [
                 (
@@ -638,11 +637,19 @@ class TestGroupedTasksPrioritisation:
                     State.OPEN,
                     Priority.NORMAL
                 ),
+            ],
+            [
+                (
+                    "# do these first / grouped, but still highest priority",
+                    "header priority cascades down",
+                    State.COMPLETE,
+                    Priority.FINISHED
+                ),
                 (
                     "# more tasks",
                     "normal priority, new header resets that",
                     State.CANCELLED,
-                    Priority.NORMAL
+                    Priority.FINISHED
                 ),
             ],
         )
@@ -663,6 +670,7 @@ class TestGroupedTasksPrioritisation:
                     Priority.NORMAL
                 ),
             ],
+            [],
         )
 
     def test_search_terms(self):
@@ -681,12 +689,6 @@ class TestGroupedTasksPrioritisation:
                     State.OPEN,
                     Priority.HIGH
                 ),
-                (
-                    "# do these first / grouped, but still highest priority",
-                    "header priority cascades down",
-                    State.COMPLETE,
-                    Priority.HIGH
-                ),
             ],
             [],
             [],
@@ -697,11 +699,19 @@ class TestGroupedTasksPrioritisation:
                     State.IN_PROGRESS,
                     Priority.NORMAL
                 ),
+            ],
+            [
+                (
+                    "# do these first / grouped, but still highest priority",
+                    "header priority cascades down",
+                    State.COMPLETE,
+                    Priority.FINISHED
+                ),
                 (
                     "# more tasks",
                     "normal priority, new header resets that",
                     State.CANCELLED,
-                    Priority.NORMAL
+                    Priority.FINISHED
                 ),
             ],
         )
@@ -714,17 +724,18 @@ class TestGroupedTasksPrioritisation:
             )
         ) == (
             [],
+            [],
+            [],
+            [],
+            [],
             [
                 (
                     "# do these first / grouped, but still highest priority",
                     "header priority cascades down",
                     State.COMPLETE,
-                    Priority.HIGH
+                    Priority.FINISHED
                 ),
             ],
-            [],
-            [],
-            [],
         )
 
     def test_search_terms_and_state_no_overlap(self):
@@ -733,7 +744,7 @@ class TestGroupedTasksPrioritisation:
                 states={State.COMPLETE},
                 search_terms=["urgent"],
             )
-        ) == ([], [], [], [], [])
+        ) == ([], [], [], [], [], [])
 
     def test_priority_high(self):
         assert tasks(
@@ -759,13 +770,8 @@ class TestGroupedTasksPrioritisation:
                     State.OPEN,
                     Priority.HIGH
                 ),
-                (
-                    "# do these first / grouped, but still highest priority",
-                    "header priority cascades down",
-                    State.COMPLETE,
-                    Priority.HIGH
-                ),
             ],
+            [],
             [],
             [],
             [],
@@ -795,12 +801,6 @@ class TestGroupedTasksPrioritisation:
                     State.OPEN,
                     Priority.HIGH
                 ),
-                (
-                    "# do these first / grouped, but still highest priority",
-                    "header priority cascades down",
-                    State.COMPLETE,
-                    Priority.HIGH
-                ),
             ],
             [
                 (
@@ -810,6 +810,7 @@ class TestGroupedTasksPrioritisation:
                     Priority.MEDIUM
                 ),
             ],
+            [],
             [],
             [],
         )
@@ -855,6 +856,7 @@ class TestGroupedTasksDeadlines:
                     Priority.NORMAL
                 ),
             ],
+            [],
         )
 
     def test_inside_window_becomes_imminent(self):
@@ -897,6 +899,7 @@ class TestGroupedTasksDeadlines:
                     Priority.NORMAL
                 ),
             ],
+            [],
         )
 
     def test_emphasis_applies_inside_window(self):
@@ -941,6 +944,7 @@ class TestGroupedTasksDeadlines:
                     Priority.NORMAL
                 ),
             ],
+            [],
         )
 
     def test_high_emphasis_on_deadline_day(self):
@@ -985,6 +989,7 @@ class TestGroupedTasksDeadlines:
                 ),
             ],
             [],
+            [],
         )
 
     def test_past_deadline_becomes_overdue(self):
@@ -1022,6 +1027,7 @@ class TestGroupedTasksDeadlines:
                     Priority.OVERDUE
                 ),
             ],
+            [],
             [],
             [],
             [],

@@ -182,18 +182,19 @@ bats_require_minimum_version 1.5.0
             # Get S Done
             - [ ] come up with better projects
             - [ ] start third project
-        archive/done/tasks.md:
-            # Some old stuff
-            - [X] Do the first thing
-            - [X] Do the second thing
-            - [X] do the last thing all lowercase
         example/projects/obelisk.md:
             # Project Obelisk
             - [/] carve runes into obelisk
             - [ ] research into runic meaning
             - [ ] bury obelisk in desert
+
+        archive/done/tasks.md:
+            # Some old stuff / FINISHED
+            - [X] Do the first thing
+            - [X] Do the second thing
+            - [X] do the last thing all lowercase
         example/archived/projects/tangerine.md:
-            # Project Tangerine
+            # Project Tangerine / FINISHED
             - [X] acquire trebuchet plans
             - [X] source counterweight materials
             - [X] build it

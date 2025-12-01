@@ -57,7 +57,7 @@ which will start to fail if it is removed.)
 - [X] filter output based on urgency
 - [X] summarise urgency?
 - [X] rework sample.md to example.md, and use it for docs/usage.md
-- [ ] completed/cancelled in sixth category?
+- [X] completed/cancelled in sixth category
 
 
 # future enhancements

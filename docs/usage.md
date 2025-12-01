@@ -103,8 +103,9 @@ projects/obelisk.md:
         # Project Obelisk
         - [/] carve runes into obelisk
         - [ ] research into runic meaning
+
     archived/projects/tangerine.md:
-        # Project Tangerine
+        # Project Tangerine / FINISHED
         - [X] acquire trebuchet plans
         - [X] source counterweight materials
         - [X] build it

@@ -18,6 +18,7 @@ class Priority(Enum):
     MEDIUM = {"value": 2, "abbrev": "M", "label": "Medium"}
     IMMINENT = {"value": 3, "abbrev": "I", "label": "Imminent"}
     NORMAL = {"value": 4, "abbrev": "N", "label": "Normal"}
+    FINISHED = {"value": 5, "abbrev": "F", "label": "Finished"}
 
 
 class State(Enum):
@@ -319,7 +320,9 @@ class MarkdownFile:
         display_text = self.strip_emphasis(cleaned_text)
         display_text = " ".join(display_text.split())
 
-        if due is None:
+        if state in {State.COMPLETE, State.CANCELLED}:
+            priority = Priority.FINISHED
+        elif due is None:
             task_priority = self.parse_priority(cleaned_text)
             priority = min(heading_priority, task_priority, key=lambda p: p.value)
         elif self.today > due:
@@ -421,4 +424,5 @@ class MarkdownFile:
             self.sort_by_state(t for t in tasks if t.priority == Priority.MEDIUM),
             self.sort_by_state(t for t in tasks if t.priority == Priority.IMMINENT),
             self.sort_by_state(t for t in tasks if t.priority == Priority.NORMAL),
+            self.sort_by_state(t for t in tasks if t.priority == Priority.FINISHED),
         )
