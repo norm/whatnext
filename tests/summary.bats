@@ -143,3 +143,54 @@ bats_require_minimum_version 1.5.0
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
+
+@test "summarise high priority tasks" {
+    run --separate-stderr whatnext --summary --priority high
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+                                                           H/~
+        ░░░░░░░░                                           0/1  sample.md
+        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0/5  docs/basics.md
+        ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░  3/3  docs/prioritisation.md
+        ░░░░░░░░                                           0/1  tests/headerless.md
+
+        ▚ High  ░ (Medium/Normal)
+        EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "summarise medium priority tasks" {
+    run --separate-stderr whatnext --summary --priority medium
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+                                                           M/~
+        ░░░░░░░░                                           0/1  sample.md
+        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0/5  docs/basics.md
+        ▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/5  docs/prioritisation.md
+        ░░░░░░░░                                           0/1  tests/headerless.md
+
+        ▚ Medium  ░ (High/Normal)
+        EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "summarise multiple priority levels" {
+    run --separate-stderr whatnext --summary --priority high --priority normal
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+                                                         H/N/~
+        ████████                                         0/1/0  sample.md
+        ███████████████████████████████████████          0/5/0  docs/basics.md
+        ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚███████████████░░░░░░░░  3/2/1  docs/prioritisation.md
+        ████████                                         0/1/0  tests/headerless.md
+
+        ▚ High  █ Normal  ░ (Medium)
+        EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}

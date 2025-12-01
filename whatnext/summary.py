@@ -1,26 +1,31 @@
 from collections import Counter
 
-from whatnext.models import State
+from whatnext.models import Priority, State
 
 # done states leftmost (darker), active states rightmost (lighter)
-DISPLAY_ORDER = [
+STATE_DISPLAY_ORDER = [
     State.CANCELLED,
     State.COMPLETE,
     State.BLOCKED,
     State.IN_PROGRESS,
     State.OPEN,
 ]
+PRIORITY_DISPLAY_ORDER = [
+    Priority.HIGH,
+    Priority.MEDIUM,
+    Priority.NORMAL,
+]
 SHADING = ["▚", "█", "▓", "▒", "░"]
 
 
-def build_visualisation_map(selected_states):
-    selected_in_order = [s for s in DISPLAY_ORDER if s in selected_states]
+def build_visualisation_map(selected, display_order):
+    selected_in_order = [s for s in display_order if s in selected]
     char_map = {}
-    for i, state in enumerate(selected_in_order):
-        char_map[state] = SHADING[i]
-    for state in DISPLAY_ORDER:
-        if state not in char_map:
-            char_map[state] = SHADING[-1]
+    for i, item in enumerate(selected_in_order):
+        char_map[item] = SHADING[i]
+    for item in display_order:
+        if item not in char_map:
+            char_map[item] = SHADING[-1]
     return char_map, selected_in_order
 
 
@@ -31,36 +36,60 @@ def make_header(selected_in_order, has_remainder):
     return "/".join(parts)
 
 
-def make_legend(char_map, selected_in_order, has_remainder):
+def make_legend(char_map, selected_in_order, display_order, has_remainder):
     parts = [f"{char_map[s]} {s.label}" for s in selected_in_order]
     if has_remainder:
-        unselected = [s.label for s in DISPLAY_ORDER if s not in selected_in_order]
+        unselected = [s.label for s in display_order if s not in selected_in_order]
         parts.append(f"{SHADING[-1]} ({'/'.join(unselected)})")
     return "  ".join(parts)
 
 
-def build_bar(counts, total, width, char_map, selected_in_order):
+def build_bar(counts, total, width, char_map, selected_in_order, display_order):
     if total == 0:
         return ""
 
-    remainder_states = [s for s in DISPLAY_ORDER if s not in selected_in_order]
+    remainder = [s for s in display_order if s not in selected_in_order]
     parts = []
     cumulative = 0
     bar_pos = 0
-    for state in selected_in_order + remainder_states:
-        count = counts.get(state, 0)
+    for item in selected_in_order + remainder:
+        count = counts.get(item, 0)
         cumulative += count
         end_pos = round(width * cumulative / total)
-        parts.append(char_map[state] * (end_pos - bar_pos))
+        parts.append(char_map[item] * (end_pos - bar_pos))
         bar_pos = end_pos
     return "".join(parts)
 
 
-def format_summary(markdown_files, width, selected_states):
-    char_map, selected_in_order = build_visualisation_map(selected_states)
-    has_remainder = len(selected_states) < len(DISPLAY_ORDER)
+OUTSTANDING_STATES = {State.IN_PROGRESS, State.OPEN, State.BLOCKED}
 
-    widest = max(len(mf.tasks) for mf in markdown_files)
+
+def format_summary(markdown_files, width, selected_states, selected_priorities=None):
+    if selected_priorities:
+        display_order = PRIORITY_DISPLAY_ORDER
+        selected = selected_priorities
+        count_attr = "priority"
+    else:
+        display_order = STATE_DISPLAY_ORDER
+        selected = selected_states
+        count_attr = "state"
+
+    char_map, selected_in_order = build_visualisation_map(selected, display_order)
+    has_remainder = len(selected) < len(display_order)
+
+    file_tasks = []
+    for mf in markdown_files:
+        if selected_priorities:
+            tasks = [t for t in mf.tasks if t.state in OUTSTANDING_STATES]
+        else:
+            tasks = mf.tasks
+        if tasks:
+            file_tasks.append((mf, tasks))
+
+    if not file_tasks:
+        return ""
+
+    widest = max(len(tasks) for _, tasks in file_tasks)
     count_width = len("/".join(str(widest) for _ in selected_in_order))
     if has_remainder:
         count_width += len(f"/{widest}")
@@ -69,7 +98,7 @@ def format_summary(markdown_files, width, selected_states):
         10,
         width
         - count_width
-        - max(len(mf.display_path) for mf in markdown_files)
+        - max(len(mf.display_path) for mf, _ in file_tasks)
         - len(gap) * 3
     )
 
@@ -77,17 +106,19 @@ def format_summary(markdown_files, width, selected_states):
     header = header.rjust(bar_width + len(gap) + count_width)
 
     lines = [header]
-    for file in markdown_files:
-        total = len(file.tasks)
-        counts = Counter(task.state for task in file.tasks)
+    for file, tasks in file_tasks:
+        total = len(tasks)
+        counts = Counter(getattr(task, count_attr) for task in tasks)
 
         file_bar_width = round(bar_width * total / widest)
-        bar = build_bar(counts, total, file_bar_width, char_map, selected_in_order)
+        bar = build_bar(
+            counts, total, file_bar_width, char_map, selected_in_order, display_order
+        )
 
         count_parts = [str(counts.get(s, 0)) for s in selected_in_order]
         if has_remainder:
             remainder_count = sum(
-                counts.get(s, 0) for s in DISPLAY_ORDER if s not in selected_states
+                counts.get(s, 0) for s in display_order if s not in selected
             )
             count_parts.append(str(remainder_count))
         count_str = "/".join(count_parts)
@@ -99,6 +130,6 @@ def format_summary(markdown_files, width, selected_states):
         )
 
     lines.append("")
-    lines.append(make_legend(char_map, selected_in_order, has_remainder))
+    lines.append(make_legend(char_map, selected_in_order, display_order, has_remainder))
 
     return "\n".join(lines)

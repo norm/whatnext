@@ -5,9 +5,16 @@ import textwrap
 
 
 class Priority(Enum):
-    HIGH = 0
-    MEDIUM = 1
-    NORMAL = 2
+    def __new__(cls, config):
+        obj = object.__new__(cls)
+        obj._value_ = config["value"]
+        obj.abbrev = config["abbrev"]
+        obj.label = config["label"]
+        return obj
+
+    HIGH = {"value": 0, "abbrev": "H", "label": "High"}
+    MEDIUM = {"value": 1, "abbrev": "M", "label": "Medium"}
+    NORMAL = {"value": 2, "abbrev": "N", "label": "Normal"}
 
 
 class State(Enum):

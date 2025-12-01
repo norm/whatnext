@@ -172,5 +172,19 @@ docs/basics.md:
     ▚ Blocked  ░ (Cancelled/Done/Partial/Open)
     ```
 
+    Summary can also be combined with a priority filter, to show the
+    distribution of priorities among outstanding tasks:
+
+    ```bash
+    (computer)% whatnext --summary --priority high
+                                                       H/~
+    ░░░░░░░░                                           0/1  sample.md
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0/5  docs/basics.md
+    ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░  3/3  docs/prioritisation.md
+    ░░░░░░░░                                           0/1  tests/headerless.md
+
+    ▚ High  ░ (Medium/Normal)
+    ```
+
 
 [glob]: https://docs.python.org/3/library/fnmatch.html

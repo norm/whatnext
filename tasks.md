@@ -47,7 +47,7 @@ which will start to fail if it is removed.)
 - [X] sort higher priority tasks to the top -- decide if within files
       only or entire project
 - [X] filter output to a subset of priorities
-- [ ] summarise priorities?
+- [X] summarise priorities?
 
 
 # version 0.5 - deadlines

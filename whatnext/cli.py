@@ -303,7 +303,12 @@ Task States:
     if args.summary:
         if not states:
             states = set(State)
-        print(format_summary(task_files, width, states))
+        print(format_summary(
+            task_files,
+            width,
+            states,
+            priorities,
+        ))
     else:
         print(format_tasks(
             task_files,
