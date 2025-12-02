@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## [v0.6] - unreleased
 
 Output is now colour-coded by default, override with `--color/--no-color`
@@ -12,7 +13,8 @@ or by setting `WHATNEXT_COLOR`.
 
 Focused task selection:
 
-- `whatnext 5` will only show five highest status tasks.
+- `whatnext 5` will show the five highest status tasks.
+- `whatnext 5r` will show five randomly selected tasks.
 
 
 ## [v0.5] - 2025-12-01

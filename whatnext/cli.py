@@ -3,6 +3,8 @@ from datetime import date
 import fnmatch
 import importlib.metadata
 import os
+import random
+import re
 import shutil
 import sys
 import toml
@@ -98,15 +100,14 @@ def find_markdown_files(paths, today, ignore_patterns=None, include_all=False):
     )
 
 
-def format_tasks(
+def collect_tasks(
     task_files,
-    width,
     include_all,
     search_terms=None,
     states=None,
     priorities=None,
-    use_colour=False,
     limit=None,
+    randomise=False,
 ):
     if not states:
         if include_all:
@@ -125,19 +126,39 @@ def format_tasks(
         ):
             groups[priority_index].extend(tasks)
 
+    if randomise:
+        all_tasks = []
+        for group in groups:
+            all_tasks.extend(group)
+        random.shuffle(all_tasks)
+        if limit is not None:
+            all_tasks = all_tasks[:limit]
+        return all_tasks
+
+    # Non-random: return tasks in priority order, respecting limit
+    result = []
+    for group in groups:
+        for task in group:
+            if limit is not None and len(result) >= limit:
+                return result
+            result.append(task)
+    return result
+
+
+def format_tasks(tasks, width, use_colour=False):
+    # Group tasks by priority for display
+    groups = [[] for _ in Priority]
+    for task in tasks:
+        groups[task.priority.value].append(task)
+
     output = ""
-    task_count = 0
-    for priority_index, tasks in enumerate(groups):
-        if not tasks:
+    for priority_index, group_tasks in enumerate(groups):
+        if not group_tasks:
             continue
-        if limit is not None and task_count >= limit:
-            break
         group_output = ""
         current_file = None
         current_heading = None
-        for task in tasks:
-            if limit is not None and task_count >= limit:
-                break
+        for task in group_tasks:
             if task.file != current_file:
                 group_output += f"{task.file.display_path}:\n"
                 current_file = task.file
@@ -158,7 +179,6 @@ def format_tasks(
                     text_colour = "yellow"
             for line in task.wrapped_task(width, text_colour=text_colour):
                 group_output += f"{line}\n"
-            task_count += 1
         group_output = group_output.rstrip("\n")
         if use_colour:
             if priority_index == Priority.OVERDUE.value:
@@ -328,7 +348,8 @@ Deadlines:
              "    [file/dir] - only include results from files within\n"
              "    [string]   - only include tasks with this string in the\n"
              "                 task text, or header grouping\n"
-             "    [n]        - limit the number of results to a max of n",
+             "    [n]        - limit to n results, in priority order\n"
+             "    [n]r       - limit to n results, selected at random",
     )
     args = parser.parse_args()
 
@@ -336,9 +357,13 @@ Deadlines:
     paths = []
     search_terms = []
     limit = None
+    randomise = False
     for target in args.match:
         if target.isdigit():
             limit = int(target)
+        elif re.match(r'^\d+r$', target):
+            limit = int(target[:-1])
+            randomise = True
         elif os.path.isdir(target) or os.path.isfile(target):
             paths.append(target)
         else:
@@ -408,13 +433,13 @@ Deadlines:
             priorities,
         ))
     else:
-        print(format_tasks(
+        tasks = collect_tasks(
             task_files,
-            width,
             args.all,
             search_terms or None,
             states or None,
             priorities,
-            use_colour,
             limit,
-        ))
+            randomise,
+        )
+        print(format_tasks(tasks, width, use_colour))

@@ -91,6 +91,8 @@ projects/obelisk.md:
 Tasks are shown in priority order, so the limit returns the most urgent first.
 The limit can be combined with other arguments.
 
+To show a random selection of tasks rather than by priority, use `5r`.
+
 
 ## Arguments
 

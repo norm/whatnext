@@ -1,7 +1,7 @@
 from datetime import date
 from textwrap import dedent
 
-from whatnext.cli import format_tasks
+from whatnext.cli import collect_tasks, format_tasks
 from whatnext.models import MarkdownFile, Priority, State
 
 
@@ -14,18 +14,18 @@ class TestColourOutput:
         source="example/projects/obelisk.md",
         today=date(1990, 1, 1),
     )
-    tasks = MarkdownFile(
+    tasks_file = MarkdownFile(
         source="example/tasks.md",
         today=date(2025, 12, 25),
     )
 
     def test_overdue_tasks_output(self):
-        output = format_tasks(
+        tasks = collect_tasks(
             [self.obelisk],
-            width=80,
             include_all=False,
             priorities={Priority.OVERDUE},
         )
+        output = format_tasks(tasks, width=80)
         expected = dedent("""\
             example/projects/obelisk.md:
                 # Project Obelisk / OVERDUE 31y 2m
@@ -33,13 +33,12 @@ class TestColourOutput:
         assert output == expected
 
     def test_overdue_tasks_output_is_bold_magenta(self):
-        output = format_tasks(
+        tasks = collect_tasks(
             [self.obelisk],
-            width=80,
             include_all=False,
             priorities={Priority.OVERDUE},
-            use_colour=True,
         )
+        output = format_tasks(tasks, width=80, use_colour=True)
         expected = dedent("""\
             \x1b[1m\x1b[35mexample/projects/obelisk.md:
                 # Project Obelisk / OVERDUE 31y 2m
@@ -47,12 +46,12 @@ class TestColourOutput:
         assert output == expected
 
     def test_imminent_tasks_output(self):
-        output = format_tasks(
-            [self.tasks],
-            width=80,
+        tasks = collect_tasks(
+            [self.tasks_file],
             include_all=False,
             priorities={Priority.IMMINENT},
         )
+        output = format_tasks(tasks, width=80)
         expected = dedent("""\
             example/tasks.md:
                 # Get S Done / IMMINENT 11d
@@ -60,13 +59,12 @@ class TestColourOutput:
         assert output == expected
 
     def test_imminent_tasks_output_is_green(self):
-        output = format_tasks(
-            [self.tasks],
-            width=80,
+        tasks = collect_tasks(
+            [self.tasks_file],
             include_all=False,
             priorities={Priority.IMMINENT},
-            use_colour=True,
         )
+        output = format_tasks(tasks, width=80, use_colour=True)
         expected = dedent("""\
             \x1b[32mexample/tasks.md:
                 # Get S Done / IMMINENT 11d
@@ -74,13 +72,12 @@ class TestColourOutput:
         assert output == expected
 
     def test_blocked_task_text_is_cyan(self):
-        output = format_tasks(
+        tasks = collect_tasks(
             [self.obelisk_early],
-            width=80,
             include_all=False,
             states={State.BLOCKED},
-            use_colour=True,
         )
+        output = format_tasks(tasks, width=80, use_colour=True)
         cyan = "\x1b[36m"
         reset = "\x1b[0m"
         task = f"{cyan}watch archaeologists discover (needs time machine){reset}"
@@ -91,13 +88,12 @@ class TestColourOutput:
         assert output == expected
 
     def test_in_progress_task_text_is_yellow(self):
-        output = format_tasks(
+        tasks = collect_tasks(
             [self.obelisk_early],
-            width=80,
             include_all=False,
             states={State.IN_PROGRESS},
-            use_colour=True,
         )
+        output = format_tasks(tasks, width=80, use_colour=True)
         yellow = "\x1b[33m"
         reset = "\x1b[0m"
         expected = dedent(f"""\

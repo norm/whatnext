@@ -563,3 +563,21 @@ bats_require_minimum_version 1.5.0
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
+
+@test "random selection" {
+    first_output=$(WHATNEXT_TODAY=2025-01-01 whatnext 3r)
+    task_count=$(echo "$first_output" | grep -c '    - \[')
+    [ "$task_count" -eq 3 ]
+
+    # should exit long before 10,000 iterations, that's just safety
+    found_different=0
+    for i in $(seq 1 10000); do
+        current=$(WHATNEXT_TODAY=2025-01-01 whatnext 3r)
+        if [ "$current" != "$first_output" ]; then
+            found_different=1
+            break
+        fi
+    done
+
+    [ "$found_different" -eq 1 ]
+}

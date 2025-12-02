@@ -34,7 +34,8 @@ bats_require_minimum_version 1.5.0
                                 [file/dir] - only include results from files within
                                 [string]   - only include tasks with this string in the
                                              task text, or header grouping
-                                [n]        - limit the number of results to a max of n
+                                [n]        - limit to n results, in priority order
+                                [n]r       - limit to n results, selected at random
 
         Options:
           -h                Show the usage reminder and exit
