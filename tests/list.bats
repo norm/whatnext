@@ -55,6 +55,9 @@ bats_require_minimum_version 1.5.0
     expected_stderr+=" docs/basics.md line 12"
     diff -u <(echo "$expected_stderr") <(echo "$stderr")
 
+    # no extraneous blank lines at the end
+    [ $(WHATNEXT_TODAY=2025-12-25 whatnext 2>/dev/null | wc -l) -eq 42 ]
+
     [ $status -eq 0 ]
 }
 

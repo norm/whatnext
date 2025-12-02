@@ -140,7 +140,7 @@ def format_tasks(
                 output += f"{line}\n"
         output += "\n"
 
-    return output
+    return output.rstrip()
 
 
 class CapitalisedHelpFormatter(argparse.RawDescriptionHelpFormatter):
