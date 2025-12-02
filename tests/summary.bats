@@ -8,6 +8,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                      C/D/B/P/O
+        ░░░░░░░░░░░                                  0/0/0/0/2  docs/annotations.md
         ▚▚▚▚▚██████▓▓▓▓▓▒▒▒▒▒▒░░░░░░░░░░░░░░░░       1/1/1/1/3  docs/basics.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░                  0/0/0/0/5  docs/deadlines.md
         ▚▚▚▚▚██████▒▒▒▒▒░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/1/0/1/5  docs/prioritisation.md
@@ -30,6 +31,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                     C/D/B/P/O
+        ░░          0/0/0/0/2  docs/annotations.md
         ▚██▓▒░░░░   1/1/1/1/3  docs/basics.md
         ░░░░░░      0/0/0/0/5  docs/deadlines.md
         ▚█▒▒░░░░░░  1/1/0/1/5  docs/prioritisation.md
@@ -52,6 +54,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            O/~
+        ▚▚▚▚▚▚▚▚▚▚▚▚                                       2/0  docs/annotations.md
         ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░        3/4  docs/basics.md
         ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚                    5/0  docs/deadlines.md
         ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░  5/3  docs/prioritisation.md
@@ -74,6 +77,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            P/~
+        ░░░░░░░░░░░░                                       0/2  docs/annotations.md
         ▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        1/6  docs/basics.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                    0/5  docs/deadlines.md
         ▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/7  docs/prioritisation.md
@@ -96,6 +100,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            B/~
+        ░░░░░░░░░░░░                                       0/2  docs/annotations.md
         ▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        1/6  docs/basics.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                    0/5  docs/deadlines.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/8  docs/prioritisation.md
@@ -118,6 +123,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            D/~
+        ░░░░░░░░░░░░                                       0/2  docs/annotations.md
         ▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        1/6  docs/basics.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                    0/5  docs/deadlines.md
         ▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/7  docs/prioritisation.md
@@ -140,6 +146,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            C/~
+        ░░░░░░░░░░░░                                       0/2  docs/annotations.md
         ▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        1/6  docs/basics.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                    0/5  docs/deadlines.md
         ▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/7  docs/prioritisation.md
@@ -163,6 +170,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                          C/O/~
+        ████████████                                     0/2/0  docs/annotations.md
         ▚▚▚▚▚▚█████████████████░░░░░░░░░░░░░░░░░░        1/3/3  docs/basics.md
         █████████████████████████████                    0/5/0  docs/deadlines.md
         ▚▚▚▚▚▚█████████████████████████████░░░░░░░░░░░░  1/5/2  docs/prioritisation.md
@@ -185,6 +193,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            H/~
+        ░░░░░░░░░░░░░░░░                                   0/2  docs/annotations.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0/5  docs/basics.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0/5  docs/deadlines.md
         ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░  3/3  docs/prioritisation.md
@@ -206,6 +215,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            M/~
+        ░░░░░░░░░░░░░░░░                                   0/2  docs/annotations.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0/5  docs/basics.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0/5  docs/deadlines.md
         ▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/5  docs/prioritisation.md
@@ -228,6 +238,7 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                          H/N/~
+        ████████████████                                 0/2/0  docs/annotations.md
         ███████████████████████████████████████          0/5/0  docs/basics.md
         ███████████████████████████████████████          0/5/0  docs/deadlines.md
         ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚███████████████░░░░░░░░  3/2/1  docs/prioritisation.md

@@ -16,6 +16,9 @@ Focused task selection:
 - `whatnext 5` will show the five highest status tasks.
 - `whatnext 5r` will show five randomly selected tasks.
 
+Annotations, including a ` ```whatnext ` fenced block allows notes that appear
+in context in the output.
+
 
 ## [v0.5] - 2025-12-01
 

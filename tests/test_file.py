@@ -18,6 +18,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_in_progress_task(self):
@@ -32,6 +33,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_complete_task(self):
@@ -46,6 +48,7 @@ class TestFileParsing:
             "priority": Priority.FINISHED,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_cancelled_task(self):
@@ -60,6 +63,7 @@ class TestFileParsing:
             "priority": Priority.FINISHED,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_blocked_task(self):
@@ -74,6 +78,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_multiline_task(self):
@@ -98,6 +103,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_multiline_task_wrong_indent(self):
@@ -115,6 +121,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_normal_priority(self):
@@ -129,6 +136,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_medium_priority(self):
@@ -143,6 +151,7 @@ class TestFileParsing:
             "priority": Priority.MEDIUM,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_high_priority(self):
@@ -157,6 +166,7 @@ class TestFileParsing:
             "priority": Priority.HIGH,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_priority_from_header_and_precedence(self):
@@ -187,6 +197,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
         assert file.tasks[1].as_dict() == {
             "heading": "# do these first",
@@ -195,6 +206,7 @@ class TestFileParsing:
             "priority": Priority.HIGH,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
         assert file.tasks[2].as_dict() == {
             "heading": "# do these first",
@@ -203,6 +215,7 @@ class TestFileParsing:
             "priority": Priority.HIGH,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
         assert file.tasks[3].as_dict() == {
             "heading": "# do these first / grouped, but still highest priority",
@@ -211,6 +224,7 @@ class TestFileParsing:
             "priority": Priority.FINISHED,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
         assert file.tasks[4].as_dict() == {
             "heading": "# more tasks",
@@ -219,6 +233,7 @@ class TestFileParsing:
             "priority": Priority.FINISHED,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_high_task_under_medium_header(self):
@@ -237,6 +252,7 @@ class TestFileParsing:
             "priority": Priority.HIGH,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_medium_task_under_high_header(self):
@@ -255,6 +271,7 @@ class TestFileParsing:
             "priority": Priority.HIGH,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_medium_subsection_under_high_header(self):
@@ -275,6 +292,7 @@ class TestFileParsing:
             "priority": Priority.HIGH,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_simple_deadline(self):
@@ -292,6 +310,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": date(2025, 12, 5),
             "imminent": date(2025, 11, 21),
+            "annotation": None,
         }
 
     def test_deadline_outside_urgency_window_no_priority(self):
@@ -311,6 +330,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": date(2025, 12, 23),
             "imminent": date(2025, 12, 2),
+            "annotation": None,
         }
         assert file.tasks[1].as_dict() == {
             "heading": "# Christmas dinner",
@@ -319,6 +339,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": date(2025, 12, 25),
             "imminent": date(2025, 12, 24),
+            "annotation": None,
         }
         assert file.tasks[2].as_dict() == {
             "heading": "# Christmas dinner",
@@ -327,6 +348,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": date(2025, 12, 25),
             "imminent": date(2025, 12, 25),
+            "annotation": None,
         }
 
     def test_deadline_inside_urgency_gains_imminent_priority(self):
@@ -383,6 +405,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_non_date_format_ignored(self):
@@ -397,6 +420,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_invalid_urgency_invalidates_deadline(self):
@@ -411,6 +435,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
     def test_email_not_deadline(self):
@@ -425,6 +450,7 @@ class TestFileParsing:
             "priority": Priority.NORMAL,
             "due": None,
             "imminent": None,
+            "annotation": None,
         }
 
 
@@ -1033,3 +1059,132 @@ class TestGroupedTasksDeadlines:
             [],
             [],
         )
+
+
+class TestAnnotationParsing:
+    def test_annotations_associated_with_headings(self):
+        file = MarkdownFile(
+            source="example/projects/obelisk.md",
+            today=date(2025, 1, 1),
+        )
+        assert len(file.tasks) == 4
+        assert file.tasks[0].as_dict() == {
+            "heading": "# Project Obelisk",
+            "state": State.OPEN,
+            "text": "research into runic meaning",
+            "priority": Priority.NORMAL,
+            "due": None,
+            "imminent": None,
+            "annotation": "Something something star gate",
+        }
+        assert file.tasks[1].as_dict() == {
+            "heading": "# Project Obelisk",
+            "state": State.IN_PROGRESS,
+            "text": "carve runes into obelisk",
+            "priority": Priority.NORMAL,
+            "due": None,
+            "imminent": None,
+            "annotation": "Something something star gate",
+        }
+        assert file.tasks[2].as_dict() == {
+            "heading": "# Project Obelisk",
+            "state": State.OPEN,
+            "text": "bury obelisk in desert",
+            "priority": Priority.NORMAL,
+            "due": date(2026, 1, 5),
+            "imminent": date(2025, 12, 22),
+            "annotation": "Something something star gate",
+        }
+        assert file.tasks[3].as_dict() == {
+            "heading": "# Project Obelisk / Discovery",
+            "state": State.BLOCKED,
+            "text": "watch archaeologists discover (needs time machine)",
+            "priority": Priority.OVERDUE,
+            "due": date(1994, 10, 28),
+            "imminent": date(1994, 10, 14),
+            "annotation": "Mess with Jackson",
+        }
+
+    def test_other_fenced_blocks_ignored(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Only 'whatnext' blocks
+
+                ```
+                notes notes notes
+                ```
+
+                - [ ] not this one
+
+                ##
+
+                ```python
+                print("hello")
+                ```
+
+                - [ ] not this one either
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert len(file.tasks) == 2
+        assert file.tasks[0].as_dict() == {
+            "heading": "# Only 'whatnext' blocks",
+            "state": State.OPEN,
+            "text": "not this one",
+            "priority": Priority.NORMAL,
+            "due": None,
+            "imminent": None,
+            "annotation": None,
+        }
+        assert file.tasks[1].as_dict() == {
+            "heading": "# Only 'whatnext' blocks",
+            "state": State.OPEN,
+            "text": "not this one either",
+            "priority": Priority.NORMAL,
+            "due": None,
+            "imminent": None,
+            "annotation": None,
+        }
+
+    def test_multiple_annotations_combine(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Shattered thoughts
+
+                ```whatnext
+                notes notes notes
+                ```
+
+                ```whatnext
+                more notes
+                ```
+
+                - [ ] something about notes
+
+                ```whatnext
+                what are this?
+                ```
+
+                - [ ] are this?
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert len(file.tasks) == 2
+        assert file.tasks[0].as_dict() == {
+            "heading": "# Shattered thoughts",
+            "state": State.OPEN,
+            "text": "something about notes",
+            "priority": Priority.NORMAL,
+            "due": None,
+            "imminent": None,
+            "annotation": "notes notes notes more notes what are this?",
+        }
+        assert file.tasks[1].as_dict() == {
+            "heading": "# Shattered thoughts",
+            "state": State.OPEN,
+            "text": "are this?",
+            "priority": Priority.NORMAL,
+            "due": None,
+            "imminent": None,
+            "annotation": "notes notes notes more notes what are this?",
+        }

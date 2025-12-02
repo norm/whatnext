@@ -66,5 +66,5 @@ which will start to fail if it is removed.)
 - [X] colour-code the output
 - [X] {n} most important tasks
 - [X] pick tasks at random
-- [ ] some way to mark a section of Markdown for inclusion in the default
+- [X] some way to mark a section of Markdown for inclusion in the default
       output

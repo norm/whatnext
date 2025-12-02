@@ -87,6 +87,7 @@ class Task:
         priority=Priority.NORMAL,
         due=None,
         imminent=None,
+        annotation=None,
     ):
         self.file = file
         self.heading = heading
@@ -95,6 +96,7 @@ class Task:
         self.priority = priority
         self.due = due
         self.imminent = imminent
+        self.annotation = annotation
 
     def as_dict(self):
         return {
@@ -104,6 +106,7 @@ class Task:
             "priority": self.priority,
             "due": self.due,
             "imminent": self.imminent,
+            "annotation": self.annotation,
         }
 
     def wrapped_task(self, width=80, indent="    ", text_colour=None):
@@ -150,6 +153,19 @@ class Task:
             return "TODAY"
         return self.format_duration(days)
 
+    def wrapped_annotation(self, width=80, indent="    "):
+        if not self.annotation:
+            return []
+        text = " ".join(self.annotation.split())
+        if width is None or len(indent + text) <= width:
+            return [indent + text]
+        return textwrap.wrap(
+            text,
+            width=width,
+            initial_indent=indent,
+            subsequent_indent=indent,
+        )
+
     def wrapped_heading(self, width=80, indent="    "):
         if not self.heading:
             return []
@@ -193,6 +209,8 @@ class MarkdownFile:
             \s*
         $
     """, re.VERBOSE)
+    ANNOTATION_START = re.compile(r"^```whatnext\s*$")
+    ANNOTATION_END = re.compile(r"^```\s*$")
     DEFAULT_URGENCY = timedelta(weeks=2)
 
     def __init__(
@@ -268,8 +286,10 @@ class MarkdownFile:
 
     def extract_tasks(self):
         tasks = []
-        for heading, lines, start_line, priority in self.sections():
-            tasks.extend(self.tasks_in_section(heading, lines, start_line, priority))
+        for heading, lines, start_line, priority, annotation in self.sections():
+            tasks.extend(
+                self.tasks_in_section(heading, lines, start_line, priority, annotation)
+            )
         return tasks
 
     def read_lines(self):
@@ -281,6 +301,7 @@ class MarkdownFile:
     def sections(self):
         heading = None
         priority = Priority.NORMAL
+        annotation_parts = []
         lines = []
         start_line = 1
         results = []
@@ -289,11 +310,36 @@ class MarkdownFile:
         # skipped headings (# -> ### -> ##, where position != depth)
         stack = []
 
+        in_annotation = False
+        annotation_delimiter = None
+
         for line_index, line in enumerate(self.read_lines(), 1):
+            if in_annotation:
+                if annotation_delimiter:
+                    closes = (
+                        line.startswith(annotation_delimiter)
+                        and not line.strip()[len(annotation_delimiter):]
+                    )
+                    if closes:
+                        in_annotation = False
+                        annotation_delimiter = None
+                    else:
+                        annotation_parts.append(line)
+                elif self.ANNOTATION_END.match(line):
+                    in_annotation = False
+                else:
+                    annotation_parts.append(line)
+                continue
+            if self.ANNOTATION_START.match(line):
+                annotation_delimiter = re.match(r'^(`+)', line).group(1)
+                in_annotation = True
+                continue
             if match := self.HEADING_PATTERN.match(line):
                 if lines:
-                    results.append((heading, lines, start_line, priority))
+                    annotation = " ".join(" ".join(annotation_parts).split()) or None
+                    results.append((heading, lines, start_line, priority, annotation))
                     lines = []
+                    annotation_parts = []
                 level = len(match.group(1))
                 while stack and stack[-1][0] >= level:
                     stack.pop()
@@ -309,11 +355,14 @@ class MarkdownFile:
                 lines.append(line)
 
         if lines:
-            results.append((heading, lines, start_line, priority))
+            annotation = " ".join(" ".join(annotation_parts).split()) or None
+            results.append((heading, lines, start_line, priority, annotation))
 
         return results
 
-    def parse_task(self, heading, heading_priority, marker, task_content, line_index):
+    def parse_task(
+        self, heading, heading_priority, marker, task_content, line_index, annotation
+    ):
         state = State.from_marker(marker)
         if state is None:
             self.warnings.append(
@@ -342,9 +391,13 @@ class MarkdownFile:
         else:
             priority = Priority.NORMAL
 
-        return Task(self, heading, display_text, state, priority, due, imminent_date)
+        return Task(
+            self, heading, display_text, state, priority, due, imminent_date, annotation
+        )
 
-    def tasks_in_section(self, heading, lines, start_line, heading_priority):
+    def tasks_in_section(
+        self, heading, lines, start_line, heading_priority, annotation
+    ):
         prefix_width = len("- [.] ")
         tasks = []
         index = -1
@@ -367,6 +420,7 @@ class MarkdownFile:
                     marker,
                     task_content,
                     line_index,
+                    annotation,
                 )
                 if task is not None:
                     tasks.append(task)

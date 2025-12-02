@@ -167,6 +167,9 @@ def format_tasks(tasks, width, use_colour=False):
                 for line in task.wrapped_heading(width):
                     group_output += f"{line}\n"
                 current_heading = task.heading
+                if task.annotation:
+                    for line in task.wrapped_annotation(width):
+                        group_output += f"{line}\n"
             text_colour = None
             in_coloured_block = priority_index in (
                 Priority.OVERDUE.value,
@@ -246,6 +249,11 @@ Deadlines:
 
   Are "immiment" priority two weeks before (or as specified -- /2d),
   and are "overdue" priority after the date passes.
+
+Annotations:
+  ```whatnext
+  Short notes that appear in the output
+  ```
 """,
         add_help=False,
         formatter_class=CapitalisedHelpFormatter,

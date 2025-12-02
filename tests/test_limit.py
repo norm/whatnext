@@ -14,12 +14,13 @@ class TestLimit:
         tasks = collect_tasks([self.obelisk], include_all=False, limit=1)
         assert [t.as_dict() for t in tasks] == [
             {
-                "heading": "# Project Obelisk",
+                "heading": "# Project Obelisk / Discovery",
                 "state": State.BLOCKED,
                 "text": "watch archaeologists discover (needs time machine)",
                 "priority": Priority.OVERDUE,
                 "due": date(1994, 10, 28),
                 "imminent": date(1994, 10, 14),
+                "annotation": "Mess with Jackson",
             },
         ]
 
@@ -27,12 +28,13 @@ class TestLimit:
         tasks = collect_tasks([self.obelisk], include_all=False, limit=3)
         assert [t.as_dict() for t in tasks] == [
             {
-                "heading": "# Project Obelisk",
+                "heading": "# Project Obelisk / Discovery",
                 "state": State.BLOCKED,
                 "text": "watch archaeologists discover (needs time machine)",
                 "priority": Priority.OVERDUE,
                 "due": date(1994, 10, 28),
                 "imminent": date(1994, 10, 14),
+                "annotation": "Mess with Jackson",
             },
             {
                 "heading": "# Project Obelisk",
@@ -41,6 +43,7 @@ class TestLimit:
                 "priority": Priority.HIGH,
                 "due": date(2026, 1, 5),
                 "imminent": date(2025, 12, 22),
+                "annotation": "Something something star gate",
             },
             {
                 "heading": "# Project Obelisk",
@@ -49,6 +52,7 @@ class TestLimit:
                 "priority": Priority.NORMAL,
                 "due": None,
                 "imminent": None,
+                "annotation": "Something something star gate",
             },
         ]
 

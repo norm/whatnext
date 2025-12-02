@@ -33,6 +33,11 @@ bats_require_minimum_version 1.5.0
             # Christmas dinner / IMMINENT TODAY
             - [ ] prep sprouts
 
+        docs/annotations.md:
+            # Project Anvil
+            Let the anvils ring!
+            - [ ] introduce ourselves
+            - [ ] inherit throne
         docs/basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is partially complete
@@ -57,7 +62,7 @@ bats_require_minimum_version 1.5.0
     diff -u <(echo "$expected_stderr") <(echo "$stderr")
 
     # no extraneous blank lines at the end
-    [ $(WHATNEXT_TODAY=2025-12-25 whatnext 2>/dev/null | wc -l) -eq 42 ]
+    [ $(WHATNEXT_TODAY=2025-12-25 whatnext 2>/dev/null | wc -l) -eq 47 ]
 
     [ $status -eq 0 ]
 }
@@ -87,6 +92,11 @@ bats_require_minimum_version 1.5.0
             # Prioritisation / MEDIUM
             - [ ] semi-urgent task
 
+        docs/annotations.md:
+            # Project Anvil
+            Let the anvils ring!
+            - [ ] introduce ourselves
+            - [ ] inherit throne
         docs/basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is
@@ -141,6 +151,11 @@ bats_require_minimum_version 1.5.0
             # Prioritisation / MEDIUM
             - [ ] semi-urgent task
 
+        docs/annotations.md:
+            # Project Anvil
+            Let the anvils ring!
+            - [ ] introduce ourselves
+            - [ ] inherit throne
         docs/basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is partially complete
@@ -205,6 +220,11 @@ bats_require_minimum_version 1.5.0
             # Prioritisation / MEDIUM
             - [ ] semi-urgent task
 
+        docs/annotations.md:
+            # Project Anvil
+            Let the anvils ring!
+            - [ ] introduce ourselves
+            - [ ] inherit throne
         docs/basics.md:
             # Indicating the state of a task
             - [/] in progress, this task is partially complete
@@ -538,9 +558,10 @@ bats_require_minimum_version 1.5.0
             # Prioritisation / MEDIUM
             - [ ] semi-urgent task
 
-        docs/basics.md:
-            # Indicating the state of a task
-            - [/] in progress, this task is partially complete
+        docs/annotations.md:
+            # Project Anvil
+            Let the anvils ring!
+            - [ ] introduce ourselves
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")

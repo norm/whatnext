@@ -21,7 +21,8 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         projects/obelisk.md:
-            # Project Obelisk / OVERDUE 30y 2m
+            # Project Obelisk / Discovery / OVERDUE 30y 2m
+            Mess with Jackson
             - [<] watch archaeologists discover (needs time machine)
 
         tasks.md:
@@ -34,6 +35,7 @@ bats_require_minimum_version 1.5.0
             - [ ] start third project
         projects/obelisk.md:
             # Project Obelisk
+            Something something star gate
             - [/] carve runes into obelisk
             - [ ] research into runic meaning
             - [ ] bury obelisk in desert
@@ -60,7 +62,8 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         projects/obelisk.md:
-            # Project Obelisk / OVERDUE 30y 2m
+            # Project Obelisk / Discovery / OVERDUE 30y 2m
+            Mess with Jackson
             - [<] watch archaeologists discover (needs time machine)
 
         tasks.md:
@@ -73,6 +76,7 @@ bats_require_minimum_version 1.5.0
             - [ ] start third project
         projects/obelisk.md:
             # Project Obelisk
+            Something something star gate
             - [/] carve runes into obelisk
             - [ ] research into runic meaning
             - [ ] bury obelisk in desert

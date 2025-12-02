@@ -50,6 +50,7 @@ More detail to be found:
 - [The basics of task formatting](docs/basics.md)
 - [Prioritisation](docs/prioritisation.md)
 - [Deadlines](docs/deadlines.md)
+- [Annotations](docs/annotations.md)
 - [whatnext usage and arguments](docs/usage.md)
 - [The `.whatnext` file](docs/dotwhatnext.md)
 

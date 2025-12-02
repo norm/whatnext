@@ -10,7 +10,8 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(printf '\033[1m\033[35m%s\033[0m' "$(sed -e 's/^        //' <<"        EOF"
         example/projects/obelisk.md:
-            # Project Obelisk / OVERDUE 31y 2m
+            # Project Obelisk / Discovery / OVERDUE 31y 2m
+            Mess with Jackson
             - [<] watch archaeologists discover (needs time machine)
         EOF
     )")
@@ -38,7 +39,8 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         example/projects/obelisk.md:
-            # Project Obelisk / OVERDUE 31y 2m
+            # Project Obelisk / Discovery / OVERDUE 31y 2m
+            Mess with Jackson
             - [<] watch archaeologists discover (needs time machine)
         EOF
     )

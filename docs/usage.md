@@ -12,11 +12,13 @@ tasks.md:
     # Get S Done / OVERDUE 1m 3w
     - [ ] come up with better projects
 projects/obelisk.md:
-    # Project Obelisk / OVERDUE 31y 2m
+    # Project Obelisk / Discovery / OVERDUE 31y 2m
+    Mess with Jackson
     - [<] watch archaeologists discover (needs time machine)
 
 projects/obelisk.md:
     # Project Obelisk / HIGH
+    Something something star gate
     - [ ] bury obelisk in desert
 
 tasks.md:
@@ -29,6 +31,7 @@ tasks.md:
 
 projects/obelisk.md:
     # Project Obelisk
+    Something something star gate
     - [/] carve runes into obelisk
     - [ ] research into runic meaning
 ```
@@ -58,6 +61,7 @@ Any argument(s) can be used to filter the output:
 (computer)% whatnext research
 projects/obelisk.md:
     # Project Obelisk
+    Something something star gate
     - [ ] research into runic meaning
 
 (computer)% whatnext research question
@@ -67,6 +71,7 @@ tasks.md:
 
 projects/obelisk.md:
     # Project Obelisk
+    Something something star gate
     - [ ] research into runic meaning
 ```
 
@@ -80,11 +85,13 @@ tasks.md:
     # Get S Done / OVERDUE 1m 3w
     - [ ] come up with better projects
 projects/obelisk.md:
-    # Project Obelisk / OVERDUE 31y 2m
+    # Project Obelisk / Discovery / OVERDUE 31y 2m
+    Mess with Jackson
     - [<] watch archaeologists discover (needs time machine)
 
 projects/obelisk.md:
     # Project Obelisk / HIGH
+    Something something star gate
     - [ ] bury obelisk in desert
 ```
 
@@ -107,11 +114,13 @@ To show a random selection of tasks rather than by priority, use `5r`.
         # Get S Done / OVERDUE 1m 3w
         - [ ] come up with better projects
     projects/obelisk.md:
-        # Project Obelisk / OVERDUE 31y 2m
+        # Project Obelisk / Discovery / OVERDUE 31y 2m
+        Mess with Jackson
         - [<] watch archaeologists discover (needs time machine)
 
     projects/obelisk.md:
         # Project Obelisk / HIGH
+        Something something star gate
         - [ ] bury obelisk in desert
 
     tasks.md:
@@ -124,6 +133,7 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
     projects/obelisk.md:
         # Project Obelisk
+        Something something star gate
         - [/] carve runes into obelisk
         - [ ] research into runic meaning
 

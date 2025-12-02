@@ -28,7 +28,8 @@ class TestColourOutput:
         output = format_tasks(tasks, width=80)
         expected = dedent("""\
             example/projects/obelisk.md:
-                # Project Obelisk / OVERDUE 31y 2m
+                # Project Obelisk / Discovery / OVERDUE 31y 2m
+                Mess with Jackson
                 - [<] watch archaeologists discover (needs time machine)""")
         assert output == expected
 
@@ -41,7 +42,8 @@ class TestColourOutput:
         output = format_tasks(tasks, width=80, use_colour=True)
         expected = dedent("""\
             \x1b[1m\x1b[35mexample/projects/obelisk.md:
-                # Project Obelisk / OVERDUE 31y 2m
+                # Project Obelisk / Discovery / OVERDUE 31y 2m
+                Mess with Jackson
                 - [<] watch archaeologists discover (needs time machine)\x1b[0m""")
         assert output == expected
 
@@ -83,7 +85,8 @@ class TestColourOutput:
         task = f"{cyan}watch archaeologists discover (needs time machine){reset}"
         expected = dedent(f"""\
             example/projects/obelisk.md:
-                # Project Obelisk
+                # Project Obelisk / Discovery
+                Mess with Jackson
                 - [<] {task}""")
         assert output == expected
 
@@ -99,5 +102,41 @@ class TestColourOutput:
         expected = dedent(f"""\
             example/projects/obelisk.md:
                 # Project Obelisk
+                Something something star gate
                 - [/] {yellow}carve runes into obelisk{reset}""")
+        assert output == expected
+
+
+class TestAnnotationOutput:
+    obelisk = MarkdownFile(
+        source="example/projects/obelisk.md",
+        today=date(1990, 1, 1),
+    )
+
+    def test_annotation_shown_with_tasks(self):
+        tasks = collect_tasks(
+            [self.obelisk],
+            include_all=False,
+            states={State.IN_PROGRESS},
+        )
+        output = format_tasks(tasks, width=80)
+        expected = dedent("""\
+            example/projects/obelisk.md:
+                # Project Obelisk
+                Something something star gate
+                - [/] carve runes into obelisk""")
+        assert output == expected
+
+    def test_annotation_not_shown_without_tasks(self):
+        tasks = collect_tasks(
+            [self.obelisk],
+            include_all=False,
+            states={State.BLOCKED},
+        )
+        output = format_tasks(tasks, width=80)
+        expected = dedent("""\
+            example/projects/obelisk.md:
+                # Project Obelisk / Discovery
+                Mess with Jackson
+                - [<] watch archaeologists discover (needs time machine)""")
         assert output == expected

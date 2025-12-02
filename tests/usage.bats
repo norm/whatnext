@@ -78,6 +78,11 @@ bats_require_minimum_version 1.5.0
 
           Are "immiment" priority two weeks before (or as specified -- /2d),
           and are "overdue" priority after the date passes.
+
+        Annotations:
+          ```whatnext
+          Short notes that appear in the output
+          ```
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
