@@ -1,8 +1,9 @@
 bats_require_minimum_version 1.5.0
 
 @test "list tasks" {
-    WHATNEXT_TODAY=2025-12-25 run --separate-stderr \
-        whatnext
+    WHATNEXT_TODAY=2025-12-25 \
+        run --separate-stderr \
+            whatnext
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/deadlines.md:
@@ -67,8 +68,10 @@ bats_require_minimum_version 1.5.0
 
 
 @test "list tasks, changes width" {
-    COLUMNS=40 WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext
+    COLUMNS=40 \
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/prioritisation.md:
@@ -121,9 +124,10 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "list all tasks" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --all
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --all
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/prioritisation.md:
@@ -184,9 +188,10 @@ bats_require_minimum_version 1.5.0
 @test "list tasks with --dir" {
     cp -r . "$BATS_TEST_TMPDIR/project"
 
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --dir "$BATS_TEST_TMPDIR/project"
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --dir "$BATS_TEST_TMPDIR/project"
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         docs/prioritisation.md:
@@ -236,8 +241,9 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
     [ -z "$stderr" ]
 
-    WHATNEXT_QUIET=1 run --separate-stderr \
-        whatnext
+    WHATNEXT_QUIET=1 \
+        run --separate-stderr \
+            whatnext
     [ $status -eq 0 ]
     [ -z "$stderr" ]
 }

@@ -134,9 +134,10 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "arg matching dir restricts input" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            example
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                example
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         projects/obelisk.md:
@@ -154,20 +155,22 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 
     # if you need disambiguation
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            ./example
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                ./example
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "args match multiple dirs" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --config /dev/null \
-            --all \
-            example \
-            archive
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --config /dev/null \
+                --all \
+                example \
+                archive
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         example/projects/obelisk.md:
@@ -262,26 +265,29 @@ bats_require_minimum_version 1.5.0
         EOF
     )
 
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --config /dev/null \
-            example
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --config /dev/null \
+                example
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --config /dev/null \
-            example \
-            example
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --config /dev/null \
+                example \
+                example
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --config /dev/null \
-            example \
-            example/../example
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --config /dev/null \
+                example \
+                example/../example
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }

@@ -1,9 +1,10 @@
 bats_require_minimum_version 1.5.0
 
 @test "summarise all states" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                      C/D/B/P/O
@@ -21,9 +22,11 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "summarise all states, narrow" {
-    COLUMNS=40 WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary
+    COLUMNS=40 \
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                     C/D/B/P/O
@@ -41,10 +44,11 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "summarise open tasks" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary \
-            --open
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --open
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            O/~
@@ -62,10 +66,11 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "summarise partial tasks" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary \
-            --partial
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --partial
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            P/~
@@ -83,10 +88,11 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "summarise blocked tasks" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary \
-            --blocked
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --blocked
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            B/~
@@ -104,10 +110,11 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "summarise done tasks" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary \
-            --done
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --done
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            D/~
@@ -125,10 +132,11 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "summarise cancelled tasks" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary \
-            --cancelled
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --cancelled
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            C/~
@@ -146,11 +154,12 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "summarise multiple states" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary \
-            --open \
-            --cancelled
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --open \
+                --cancelled
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                          C/O/~
@@ -168,10 +177,11 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "summarise high priority tasks" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary \
-            --priority high
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --priority high
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            H/~
@@ -188,10 +198,11 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "summarise medium priority tasks" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary \
-            --priority medium
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --priority medium
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                            M/~
@@ -208,11 +219,12 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "summarise multiple priority levels" {
-    WHATNEXT_TODAY=2025-01-01 run --separate-stderr \
-        whatnext \
-            --summary \
-            --priority high \
-            --priority normal
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --priority high \
+                --priority normal
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                          H/N/~
