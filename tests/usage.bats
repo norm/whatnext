@@ -6,7 +6,7 @@ bats_require_minimum_version 1.5.0
             -h
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
+        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [--relative] [-a]
                         [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d]
                         [-c] [--priority LEVEL] [--color] [--no-color]
                         [match ...]
@@ -22,7 +22,7 @@ bats_require_minimum_version 1.5.0
             --help
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
+        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [--relative] [-a]
                         [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d]
                         [-c] [--priority LEVEL] [--color] [--no-color]
                         [match ...]
@@ -43,6 +43,8 @@ bats_require_minimum_version 1.5.0
           --version         show program's version number and exit
           --dir DIR         Directory to search (default: WHATNEXT_DIR, or '.')
           -s, --summary     Show summary of task counts per file
+          --relative        Show selected states relative to all others (use with
+                            --summary)
           -a, --all         Include all tasks and files, not just incomplete
           --config CONFIG   Path to config file (default: WHATNEXT_CONFIG, or
                             '.whatnext' in --dir)

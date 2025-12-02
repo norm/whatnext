@@ -167,6 +167,8 @@ To show a random selection of tasks rather than by priority, use `5r`.
     ░░░░░░░░░░░░░░░░░░░░░░░░░░           0/0/0/0/3  tasks.md
     ▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░  0/0/1/1/2  projects/obelisk.md
     ▚▚▚▚▚▚▚▚▚██████████████████████████  1/3/0/0/0  archived/projects/tangerine.md
+                                         ─────────
+                                         1/3/1/1/5  11 total
 
     ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
     ```
@@ -179,10 +181,12 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
     ```bash
     (computer)% whatnext --summary --blocked
-                                               B/~
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░            0/3  tasks.md
-    ▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/3  projects/obelisk.md
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/4  archived/projects/tangerine.md
+                                              B/ ~
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░            0/ 3  tasks.md
+    ▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/ 3  projects/obelisk.md
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/ 4  archived/projects/tangerine.md
+                                              ────
+                                              1/10  11 total
 
     ▚ Blocked  ░ (Cancelled/Done/Partial/Open)
     ```
@@ -195,6 +199,8 @@ To show a random selection of tasks rather than by priority, use `5r`.
                                                           H/~
     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░               0/3  tasks.md
     ▚▚▚▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/3  projects/obelisk.md
+                                                          ───
+                                                          1/6  7 total
 
     ▚ High  ░ (Overdue/Imminent/Medium/Normal)
     ```

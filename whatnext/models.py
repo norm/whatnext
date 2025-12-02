@@ -459,7 +459,7 @@ class MarkdownFile:
             )
         return result
 
-    def grouped_tasks(self, states=None, search_terms=None, priorities=None):
+    def filtered_tasks(self, states=None, search_terms=None, priorities=None):
         tasks = self.tasks
         if states:
             tasks = [task for task in tasks if task.state in states]
@@ -477,6 +477,10 @@ class MarkdownFile:
                 if heading_matches or task_matches:
                     filtered.append(task)
             tasks = filtered
+        return tasks
+
+    def grouped_tasks(self, states=None, search_terms=None, priorities=None):
+        tasks = self.filtered_tasks(states, search_terms, priorities)
         return (
             self.sort_by_state(t for t in tasks if t.priority == Priority.OVERDUE),
             self.sort_by_state(t for t in tasks if t.priority == Priority.HIGH),

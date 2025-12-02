@@ -19,6 +19,8 @@ Focused task selection:
 Annotations, including a ` ```whatnext ` fenced block allows notes that appear
 in context in the output.
 
+Include totals in summaries.
+
 
 ## [v0.5] - 2025-12-01
 

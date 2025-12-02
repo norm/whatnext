@@ -44,7 +44,7 @@ def is_ignored(filepath, ignore_patterns):
     return False
 
 
-def find_markdown_files(paths, today, ignore_patterns=None, include_all=False):
+def find_markdown_files(paths, today, ignore_patterns=None, quiet=False):
     if ignore_patterns is None:
         ignore_patterns = []
     if isinstance(paths, str):
@@ -70,8 +70,10 @@ def find_markdown_files(paths, today, ignore_patterns=None, include_all=False):
                 abs_path = os.path.abspath(path)
                 if abs_path not in task_files:
                     file = MarkdownFile(source=path, today=today)
-                    tasks = file.tasks if include_all else file.incomplete
-                    if tasks:
+                    if not quiet:
+                        for warning in file.warnings:
+                            print(warning, file=sys.stderr)
+                    if file.tasks:
                         task_files[abs_path] = file
             continue
 
@@ -86,8 +88,10 @@ def find_markdown_files(paths, today, ignore_patterns=None, include_all=False):
                     if is_ignored(relative_path, ignore_patterns):
                         continue
                     file = MarkdownFile(source=filepath, base_dir=base_dir, today=today)
-                    tasks = file.tasks if include_all else file.incomplete
-                    if tasks:
+                    if not quiet:
+                        for warning in file.warnings:
+                            print(warning, file=sys.stderr)
+                    if file.tasks:
                         task_files[abs_path] = file
 
     # files are examined depth-last as a lightweight prioritisation
@@ -100,48 +104,17 @@ def find_markdown_files(paths, today, ignore_patterns=None, include_all=False):
     )
 
 
-def collect_tasks(
-    task_files,
-    include_all,
-    search_terms=None,
-    states=None,
-    priorities=None,
-    limit=None,
-    randomise=False,
-):
-    if not states:
-        if include_all:
-            states = set(State)
-        else:
-            states = {State.IN_PROGRESS, State.OPEN, State.BLOCKED}
-
+def flatten_by_priority(filtered_data):
     groups = [[] for _ in Priority]
-    for file in task_files:
-        for priority_index, tasks in enumerate(
-            file.grouped_tasks(
-                states=states,
-                search_terms=search_terms,
-                priorities=priorities,
-            )
-        ):
-            groups[priority_index].extend(tasks)
+    for file, tasks in filtered_data:
+        # Sort by state within each heading, preserving heading order
+        sorted_tasks = file.sort_by_state(tasks)
+        for task in sorted_tasks:
+            groups[task.priority.value].append(task)
 
-    if randomise:
-        all_tasks = []
-        for group in groups:
-            all_tasks.extend(group)
-        random.shuffle(all_tasks)
-        if limit is not None:
-            all_tasks = all_tasks[:limit]
-        return all_tasks
-
-    # Non-random: return tasks in priority order, respecting limit
     result = []
     for group in groups:
-        for task in group:
-            if limit is not None and len(result) >= limit:
-                return result
-            result.append(task)
+        result.extend(group)
     return result
 
 
@@ -284,6 +257,11 @@ Annotations:
         help="Show summary of task counts per file",
     )
     parser.add_argument(
+        "--relative",
+        action="store_true",
+        help="Show selected states relative to all others (use with --summary)",
+    )
+    parser.add_argument(
         "-a", "--all",
         action="store_true",
         help="Include all tasks and files, not just incomplete",
@@ -303,6 +281,7 @@ Annotations:
     parser.add_argument(
         "-q", "--quiet",
         action="store_true",
+        default=os.environ.get("WHATNEXT_QUIET") == "1",
         help="Suppress warnings (or set WHATNEXT_QUIET)",
     )
     parser.add_argument(
@@ -341,12 +320,13 @@ Annotations:
     parser.add_argument(
         "--color",
         action="store_true",
-        default=None,
+        default=os.environ.get("WHATNEXT_COLOR") == "1",
         help="Force colour output (or WHATNEXT_COLOR=1)",
     )
     parser.add_argument(
         "--no-color",
         action="store_true",
+        default=os.environ.get("WHATNEXT_COLOR") == "0",
         help="Disable colour output (or WHATNEXT_COLOR=0)",
     )
     parser.add_argument(
@@ -367,11 +347,9 @@ Annotations:
     limit = None
     randomise = False
     for target in args.match:
-        if target.isdigit():
-            limit = int(target)
-        elif re.match(r'^\d+r$', target):
-            limit = int(target[:-1])
-            randomise = True
+        if match := re.match(r'^(\d+)(r?)$', target):
+            limit = int(match.group(1))
+            randomise = bool(match.group(2))
         elif os.path.isdir(target) or os.path.isfile(target):
             paths.append(target)
         else:
@@ -382,24 +360,16 @@ Annotations:
 
     config = load_config(args.config, args.dir)
     ignore_patterns = config.get("ignore", []) + args.ignore
+    quiet = args.quiet
 
-    include_all = args.all or args.summary
     if "WHATNEXT_TODAY" in os.environ:
         today = date.fromisoformat(os.environ["WHATNEXT_TODAY"])
     else:
         today = date.today()
-    task_files = find_markdown_files(paths, today, ignore_patterns, include_all)
-
-    quiet = args.quiet or os.environ.get("WHATNEXT_QUIET") == "1"
-    if not quiet:
-        for file in task_files:
-            for warning in file.warnings:
-                print(warning, file=sys.stderr)
+    task_files = find_markdown_files(paths, today, ignore_patterns, quiet)
 
     if not task_files:
         return
-
-    width = get_terminal_width()
 
     states = set()
     if args.open:
@@ -412,6 +382,14 @@ Annotations:
         states.add(State.COMPLETE)
     if args.cancelled:
         states.add(State.CANCELLED)
+    if args.all:
+        states = {
+            State.OPEN, State.IN_PROGRESS, State.BLOCKED,
+            State.COMPLETE, State.CANCELLED,
+        }
+    elif not states:
+        # default view is incomplete tasks
+        states = {State.OPEN, State.IN_PROGRESS, State.BLOCKED}
 
     if args.priority:
         priorities = {
@@ -420,34 +398,46 @@ Annotations:
     else:
         priorities = None
 
-    if getattr(args, "no_color", False):
+    if args.no_color:
         use_colour = False
     elif args.color:
-        use_colour = True
-    elif os.environ.get("WHATNEXT_COLOR") == "0":
-        use_colour = False
-    elif os.environ.get("WHATNEXT_COLOR") == "1":
         use_colour = True
     else:
         use_colour = sys.stdout.isatty()
 
+    if args.summary and args.relative:
+        # relative summary mode includes all tasks,
+        # filters used only for visualisation
+        filtered_data = [
+            (f, f.filtered_tasks(None, search_terms, None))
+            for f in task_files
+        ]
+    else:
+        filtered_data = [
+            (f, f.filtered_tasks(states, search_terms, priorities))
+            for f in task_files
+        ]
+
     if args.summary:
-        if not states:
-            states = set(State)
-        print(format_summary(
-            task_files,
-            width,
+        output = format_summary(
+            filtered_data,
+            get_terminal_width(),
             states,
             priorities,
-        ))
-    else:
-        tasks = collect_tasks(
-            task_files,
-            args.all,
-            search_terms or None,
-            states or None,
-            priorities,
-            limit,
-            randomise,
+            use_colour,
+            args.relative,
+            sum(len(f.tasks) for f in task_files),
         )
-        print(format_tasks(tasks, width, use_colour))
+    else:
+        tasks = flatten_by_priority(filtered_data)
+        if randomise:
+            random.shuffle(tasks)
+        if limit:
+            tasks = tasks[:limit]
+        output = format_tasks(
+            tasks,
+            get_terminal_width(),
+            use_colour,
+        )
+
+    print(output)

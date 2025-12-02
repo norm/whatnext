@@ -1,7 +1,10 @@
+import random
 from datetime import date
 
-from whatnext.cli import collect_tasks, find_markdown_files
+from whatnext.cli import flatten_by_priority, find_markdown_files
 from whatnext.models import MarkdownFile, Priority, State
+
+ACTIVE_STATES = {State.IN_PROGRESS, State.OPEN, State.BLOCKED}
 
 
 class TestLimit:
@@ -11,7 +14,8 @@ class TestLimit:
     )
 
     def test_limit_of_one(self):
-        tasks = collect_tasks([self.obelisk], include_all=False, limit=1)
+        filtered = [(self.obelisk, self.obelisk.filtered_tasks(states=ACTIVE_STATES))]
+        tasks = flatten_by_priority(filtered)[:1]
         assert [t.as_dict() for t in tasks] == [
             {
                 "heading": "# Project Obelisk / Discovery",
@@ -25,7 +29,8 @@ class TestLimit:
         ]
 
     def test_limit_spans_priority_groups(self):
-        tasks = collect_tasks([self.obelisk], include_all=False, limit=3)
+        filtered = [(self.obelisk, self.obelisk.filtered_tasks(states=ACTIVE_STATES))]
+        tasks = flatten_by_priority(filtered)[:3]
         assert [t.as_dict() for t in tasks] == [
             {
                 "heading": "# Project Obelisk / Discovery",
@@ -59,13 +64,14 @@ class TestLimit:
 
 class TestRandomSelection:
     today = date(2025, 12, 25)
-    example_files = find_markdown_files("example", today, include_all=True)
+    example_files = find_markdown_files("example", today)
+
+    def _filter_active(self, files):
+        return [(f, f.filtered_tasks(states=ACTIVE_STATES)) for f in files]
 
     def test_randomise(self):
-        all_tasks = collect_tasks(
-            self.example_files,
-            include_all=False,
-        )
+        filtered = self._filter_active(self.example_files)
+        all_tasks = flatten_by_priority(filtered)
         assert len(all_tasks) > 1
 
         first_task = all_tasks[0].text
@@ -73,12 +79,10 @@ class TestRandomSelection:
 
         # this should exit long before 10,000 iterations, that's just safety
         for _ in range(10000):
-            randomised = collect_tasks(
-                self.example_files,
-                include_all=False,
-                limit=1,
-                randomise=True,
-            )
+            filtered = self._filter_active(self.example_files)
+            tasks = flatten_by_priority(filtered)
+            random.shuffle(tasks)
+            randomised = tasks[:1]
             if randomised[0].text != first_task:
                 found_different = True
                 break
@@ -86,21 +90,16 @@ class TestRandomSelection:
         assert found_different
 
     def test_randomise_selects_from_full_pool(self):
-        all_tasks = collect_tasks(
-            self.example_files,
-            include_all=False,
-        )
+        filtered = self._filter_active(self.example_files)
+        all_tasks = flatten_by_priority(filtered)
         expected = {task.text for task in all_tasks}
 
         # in theory this can still fail because random
         seen = set()
         for _ in range(10000):
-            tasks = collect_tasks(
-                self.example_files,
-                include_all=False,
-                limit=1,
-                randomise=True,
-            )
+            filtered = self._filter_active(self.example_files)
+            tasks = flatten_by_priority(filtered)
+            random.shuffle(tasks)
             seen.add(tasks[0].text)
 
         assert seen == expected
