@@ -7,6 +7,8 @@ import shutil
 import sys
 import toml
 
+from termcolor import colored
+
 from whatnext.models import MarkdownFile, Priority, State
 from whatnext.summary import format_summary
 
@@ -103,6 +105,7 @@ def format_tasks(
     search_terms=None,
     states=None,
     priorities=None,
+    use_colour=False,
 ):
     if not states:
         if include_all:
@@ -122,23 +125,49 @@ def format_tasks(
             groups[priority_index].extend(tasks)
 
     output = ""
-    for tasks in groups:
+    for priority_index, tasks in enumerate(groups):
         if not tasks:
             continue
+        group_output = ""
         current_file = None
         current_heading = None
         for task in tasks:
             if task.file != current_file:
-                output += f"{task.file.display_path}:\n"
+                group_output += f"{task.file.display_path}:\n"
                 current_file = task.file
                 current_heading = None
             if task.heading and task.heading != current_heading:
                 for line in task.wrapped_heading(width):
-                    output += f"{line}\n"
+                    group_output += f"{line}\n"
                 current_heading = task.heading
-            for line in task.wrapped_task(width):
-                output += f"{line}\n"
-        output += "\n"
+            text_colour = None
+            in_coloured_block = priority_index in (
+                Priority.OVERDUE.value,
+                Priority.IMMINENT.value,
+            )
+            if use_colour and not in_coloured_block:
+                if task.state == State.BLOCKED:
+                    text_colour = "cyan"
+                elif task.state == State.IN_PROGRESS:
+                    text_colour = "yellow"
+            for line in task.wrapped_task(width, text_colour=text_colour):
+                group_output += f"{line}\n"
+        group_output = group_output.rstrip("\n")
+        if use_colour:
+            if priority_index == Priority.OVERDUE.value:
+                group_output = colored(
+                    group_output,
+                    "magenta",
+                    attrs=["bold"],
+                    force_color=True,
+                )
+            elif priority_index == Priority.IMMINENT.value:
+                group_output = colored(
+                    group_output,
+                    "green",
+                    force_color=True,
+                )
+        output += group_output + "\n\n"
 
     return output.rstrip()
 
@@ -270,6 +299,17 @@ Deadlines:
         help="Show only tasks of this priority (can be specified multiple times)",
     )
     parser.add_argument(
+        "--color",
+        action="store_true",
+        default=None,
+        help="Force colour output (or WHATNEXT_COLOR=1)",
+    )
+    parser.add_argument(
+        "--no-color",
+        action="store_true",
+        help="Disable colour output (or WHATNEXT_COLOR=0)",
+    )
+    parser.add_argument(
         "match",
         nargs="*",
         help="Only include results from matching file(s), dir(s) or where "
@@ -329,6 +369,17 @@ Deadlines:
     else:
         priorities = None
 
+    if getattr(args, "no_color", False):
+        use_colour = False
+    elif args.color:
+        use_colour = True
+    elif os.environ.get("WHATNEXT_COLOR") == "0":
+        use_colour = False
+    elif os.environ.get("WHATNEXT_COLOR") == "1":
+        use_colour = True
+    else:
+        use_colour = sys.stdout.isatty()
+
     if args.summary:
         if not states:
             states = set(State)
@@ -346,4 +397,5 @@ Deadlines:
             search_terms or None,
             states or None,
             priorities,
+            use_colour,
         ))

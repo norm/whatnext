@@ -4,6 +4,8 @@ import os
 import re
 import textwrap
 
+from termcolor import colored
+
 
 class Priority(Enum):
     def __new__(cls, config):
@@ -104,8 +106,11 @@ class Task:
             "imminent": self.imminent,
         }
 
-    def wrapped_task(self, width=80, indent="    "):
-        text = f"- [{self.state.markers[0]}] " + " ".join(self.text.split())
+    def wrapped_task(self, width=80, indent="    ", text_colour=None):
+        task_text = " ".join(self.text.split())
+        if text_colour:
+            task_text = colored(task_text, text_colour, force_color=True)
+        text = f"- [{self.state.markers[0]}] " + task_text
         if width is None or len(indent + text) <= width:
             return [indent + text]
         return textwrap.wrap(

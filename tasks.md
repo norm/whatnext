@@ -63,7 +63,7 @@ which will start to fail if it is removed.)
 # future enhancements
 
 - [X] usage needs to document priority and deadline formats
-- [ ] colour-code the output
+- [X] colour-code the output
 - [ ] pick tasks at random
 - [ ] some way to mark a section of Markdown for inclusion in the default
       output

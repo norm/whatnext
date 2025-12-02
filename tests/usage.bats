@@ -8,7 +8,7 @@ bats_require_minimum_version 1.5.0
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
                         [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d]
-                        [-c] [--priority LEVEL]
+                        [-c] [--priority LEVEL] [--color] [--no-color]
                         [match ...]
         EOF
     )
@@ -24,7 +24,7 @@ bats_require_minimum_version 1.5.0
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-a]
                         [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d]
-                        [-c] [--priority LEVEL]
+                        [-c] [--priority LEVEL] [--color] [--no-color]
                         [match ...]
 
         List tasks found in Markdown files
@@ -52,6 +52,8 @@ bats_require_minimum_version 1.5.0
           -c, --cancelled   Show only cancelled tasks
           --priority LEVEL  Show only tasks of this priority (can be specified
                             multiple times)
+          --color           Force colour output (or WHATNEXT_COLOR=1)
+          --no-color        Disable colour output (or WHATNEXT_COLOR=0)
 
         Task States:
           - [ ] Open
