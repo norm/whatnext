@@ -167,11 +167,24 @@ def main():
         description="List tasks found in Markdown files",
         epilog="""\
 Task States:
-  - [ ]     Open (shown by default)
-  - [/]     In progress (shown by default)
-  - [<]     Blocked (shown by default)
-  - [X]     Done (hidden by default)
-  - [#]     Cancelled (hidden by default)
+  - [ ] Open
+  - [/] In progress
+  - [<] Blocked
+  - [X] Done (hidden by default)
+  - [#] Cancelled (hidden by default)
+
+Task Priority:
+  - [ ] _Underscore means medium priority_
+  - [ ] **Double asterisk means high priority**
+
+  Headers can also be emphasised to set priority for all tasks beneath.
+
+Deadlines:
+  - [ ] Celebrate the New Year @2025-12-31
+  - [ ] Get Halloween candy @2025-10-31/3w
+
+  Are "immiment" priority two weeks before (or as specified -- /2d),
+  and are "overdue" priority after the date passes.
 """,
         add_help=False,
         formatter_class=CapitalisedHelpFormatter,
