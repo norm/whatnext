@@ -70,6 +70,27 @@ projects/obelisk.md:
     - [ ] research into runic meaning
 ```
 
+## Limiting output
+
+To show only a subset of tasks, pass a number as an argument:
+
+```bash
+(computer)% whatnext 3
+tasks.md:
+    # Get S Done / OVERDUE 1m 3w
+    - [ ] come up with better projects
+projects/obelisk.md:
+    # Project Obelisk / OVERDUE 31y 2m
+    - [<] watch archaeologists discover (needs time machine)
+
+projects/obelisk.md:
+    # Project Obelisk / HIGH
+    - [ ] bury obelisk in desert
+```
+
+Tasks are shown in priority order, so the limit returns the most urgent first.
+The limit can be combined with other arguments.
+
 
 ## Arguments
 

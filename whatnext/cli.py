@@ -106,6 +106,7 @@ def format_tasks(
     states=None,
     priorities=None,
     use_colour=False,
+    limit=None,
 ):
     if not states:
         if include_all:
@@ -125,13 +126,18 @@ def format_tasks(
             groups[priority_index].extend(tasks)
 
     output = ""
+    task_count = 0
     for priority_index, tasks in enumerate(groups):
         if not tasks:
             continue
+        if limit is not None and task_count >= limit:
+            break
         group_output = ""
         current_file = None
         current_heading = None
         for task in tasks:
+            if limit is not None and task_count >= limit:
+                break
             if task.file != current_file:
                 group_output += f"{task.file.display_path}:\n"
                 current_file = task.file
@@ -152,6 +158,7 @@ def format_tasks(
                     text_colour = "yellow"
             for line in task.wrapped_task(width, text_colour=text_colour):
                 group_output += f"{line}\n"
+            task_count += 1
         group_output = group_output.rstrip("\n")
         if use_colour:
             if priority_index == Priority.OVERDUE.value:
@@ -180,6 +187,11 @@ class CapitalisedHelpFormatter(argparse.RawDescriptionHelpFormatter):
 
     def start_section(self, heading):
         super().start_section(heading.capitalize() if heading else heading)
+
+    def _split_lines(self, text, width):
+        if '\n' in text:
+            return text.splitlines()
+        return super()._split_lines(text, width)
 
 
 class ShortHelpAction(argparse.Action):
@@ -312,16 +324,22 @@ Deadlines:
     parser.add_argument(
         "match",
         nargs="*",
-        help="Only include results from matching file(s), dir(s) or where "
-             "\"match\" is in the task text or heading",
+        help="filter results:\n"
+             "    [file/dir] - only include results from files within\n"
+             "    [string]   - only include tasks with this string in the\n"
+             "                 task text, or header grouping\n"
+             "    [n]        - limit the number of results to a max of n",
     )
     args = parser.parse_args()
 
     # build the search space
     paths = []
     search_terms = []
+    limit = None
     for target in args.match:
-        if os.path.isdir(target) or os.path.isfile(target):
+        if target.isdigit():
+            limit = int(target)
+        elif os.path.isdir(target) or os.path.isfile(target):
             paths.append(target)
         else:
             search_terms.append(target.lower())
@@ -398,4 +416,5 @@ Deadlines:
             states or None,
             priorities,
             use_colour,
+            limit,
         ))

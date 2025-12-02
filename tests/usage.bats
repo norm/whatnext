@@ -30,8 +30,11 @@ bats_require_minimum_version 1.5.0
         List tasks found in Markdown files
 
         Positional arguments:
-          match             Only include results from matching file(s), dir(s) or
-                            where "match" is in the task text or heading
+          match             filter results:
+                                [file/dir] - only include results from files within
+                                [string]   - only include tasks with this string in the
+                                             task text, or header grouping
+                                [n]        - limit the number of results to a max of n
 
         Options:
           -h                Show the usage reminder and exit

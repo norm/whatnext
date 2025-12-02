@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Output is now colour-coded by default, override with `--color/--no-color`
 or by setting `WHATNEXT_COLOR`.
 
+Focused task selection:
+
+- `whatnext 5` will only show five highest status tasks.
+
 
 ## [v0.5] - 2025-12-01
 

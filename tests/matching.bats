@@ -326,6 +326,10 @@ bats_require_minimum_version 1.5.0
             - [ ] research into runic meaning
             - [ ] question entire existence
             - [ ] research into runic meaning
+            # Usage / Limiting output
+            - [ ] come up with better projects
+            - [ ] bury obelisk in desert
+            - [<] watch archaeologists discover (needs time machine)
             # Usage / Arguments
             - [/] carve runes into obelisk
             - [ ] come up with better projects
@@ -390,6 +394,10 @@ bats_require_minimum_version 1.5.0
             - [ ] research into runic meaning
             - [ ] question entire existence
             - [ ] research into runic meaning
+            # Usage / Limiting output
+            - [ ] come up with better projects
+            - [ ] bury obelisk in desert
+            - [<] watch archaeologists discover (needs time machine)
             # Usage / Arguments
             - [/] carve runes into obelisk
             - [ ] come up with better projects
@@ -414,6 +422,8 @@ bats_require_minimum_version 1.5.0
         docs/usage.md:
             # Usage
             - [/] carve runes into obelisk
+            - [ ] bury obelisk in desert
+            # Usage / Limiting output
             - [ ] bury obelisk in desert
             # Usage / Arguments
             - [/] carve runes into obelisk

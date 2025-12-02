@@ -519,3 +519,47 @@ bats_require_minimum_version 1.5.0
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
+
+@test "numeric argument limits output" {
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                5
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/prioritisation.md:
+            # Prioritisation / HIGH
+            - [ ] super-urgent task
+            # do these first / HIGH
+            - [ ] inherently high priority task, because of the header
+            - [ ] no extra priority, still listed second
+
+        docs/prioritisation.md:
+            # Prioritisation / MEDIUM
+            - [ ] semi-urgent task
+
+        docs/basics.md:
+            # Indicating the state of a task
+            - [/] in progress, this task is partially complete
+        EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "limits combine" {
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --blocked \
+                5
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        docs/basics.md:
+            # Indicating the state of a task
+            - [<] blocked, this task needs more input
+        EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}

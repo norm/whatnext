@@ -64,6 +64,7 @@ which will start to fail if it is removed.)
 
 - [X] usage needs to document priority and deadline formats
 - [X] colour-code the output
+- [X] {n} most important tasks
 - [ ] pick tasks at random
 - [ ] some way to mark a section of Markdown for inclusion in the default
       output
