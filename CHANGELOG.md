@@ -1,11 +1,14 @@
 # Changelog
 
 
-## [v1.1] - unreleased
+## [v1.1] - 2025-12-04
 
 Fixed relative summaries to include all tasks, not just some.
 
 Removed slashes from summary columns for cleaner output.
+
+Added `-e`/`--edit` flag to open task files in your editor at the line number
+of the first matching task.
 
 
 ## [v1.0] - 2025-12-02

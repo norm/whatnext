@@ -75,5 +75,5 @@ which will start to fail if it is removed.)
 
 - [X] fix tasks missing from `--summary --relative`
 - [X] remove slashes from columns in summary, its just visual noise
-- [ ] `-e`/`--edit` to open matching task files in editor at the line
+- [X] `-e`/`--edit` to open matching task files in editor at the line
       number of the first match

@@ -6,6 +6,7 @@ import os
 import random
 import re
 import shutil
+import subprocess
 import sys
 import toml
 
@@ -34,6 +35,13 @@ def get_terminal_width():
     if width < 40:
         width = 80
     return width
+
+
+def get_editor():
+    for var in ("WHATNEXT_EDITOR", "VISUAL", "EDITOR"):
+        if value := os.environ.get(var):
+            return value
+    return "vi"
 
 
 def load_config(config_path=None, directory="."):
@@ -263,6 +271,12 @@ Annotations:
         help="Show summary of task counts per file",
     )
     parser.add_argument(
+        "-e", "--edit",
+        action="store_true",
+        help="Open matching files in your editor "
+             "(WHATNEXT_EDITOR, VISUAL, EDITOR, or vi)",
+    )
+    parser.add_argument(
         "--relative",
         action="store_true",
         help="Show selected states relative to all others (use with --summary)",
@@ -353,8 +367,10 @@ Annotations:
         if match := re.match(r'^(\d+)(r?)$', target):
             limit = int(match.group(1))
             randomise = bool(match.group(2))
-        elif os.path.isdir(target) or os.path.isfile(target):
-            paths.append(target)
+            continue
+        target_path = os.path.join(args.dir, target)
+        if os.path.isdir(target_path) or os.path.isfile(target_path):
+            paths.append(target_path)
         else:
             search_terms.append(target.lower())
 
@@ -434,6 +450,17 @@ Annotations:
             random.shuffle(tasks)
         if limit:
             tasks = tasks[:limit]
+        if args.edit:
+            seen_files = set()
+            files_to_edit = []
+            for task in tasks:
+                if task.file.path not in seen_files:
+                    seen_files.add(task.file.path)
+                    files_to_edit.append((task.line, task.file.path))
+            editor = get_editor()
+            for line, filepath in files_to_edit:
+                subprocess.run([editor, f"+{line}", filepath])
+
         output = format_tasks(
             tasks,
             get_terminal_width(),

@@ -87,6 +87,7 @@ class Task:
         due=None,
         imminent=None,
         annotation=None,
+        line=None,
     ):
         self.file = file
         self.heading = heading
@@ -96,6 +97,7 @@ class Task:
         self.due = due
         self.imminent = imminent
         self.annotation = annotation
+        self.line = line
 
     def as_dict(self):
         return {
@@ -287,9 +289,9 @@ class MarkdownFile:
 
     def extract_tasks(self):
         tasks = []
-        for heading, lines, start_line, priority, annotation in self.sections():
+        for heading, lines, priority, annotation in self.sections():
             tasks.extend(
-                self.tasks_in_section(heading, lines, start_line, priority, annotation)
+                self.tasks_in_section(heading, lines, priority, annotation)
             )
         return tasks
 
@@ -304,7 +306,6 @@ class MarkdownFile:
         priority = Priority.NORMAL
         annotation_parts = []
         lines = []
-        start_line = 1
         results = []
 
         # stack stores (level, text, priority) -- explicit level needed for
@@ -338,7 +339,7 @@ class MarkdownFile:
             if match := self.HEADING_PATTERN.match(line):
                 if lines:
                     annotation = " ".join(" ".join(annotation_parts).split()) or None
-                    results.append((heading, lines, start_line, priority, annotation))
+                    results.append((heading, lines, priority, annotation))
                     lines = []
                     annotation_parts = []
                 level = len(match.group(1))
@@ -351,13 +352,12 @@ class MarkdownFile:
                     self.strip_emphasis(text) for _, text, _ in stack
                 )
                 priority = min((p for _, _, p in stack), key=lambda p: p.value)
-                start_line = line_index + 1
             else:
-                lines.append(line)
+                lines.append((line_index, line))
 
         if lines:
             annotation = " ".join(" ".join(annotation_parts).split()) or None
-            results.append((heading, lines, start_line, priority, annotation))
+            results.append((heading, lines, priority, annotation))
 
         return results
 
@@ -393,34 +393,43 @@ class MarkdownFile:
             priority = Priority.NORMAL
 
         return Task(
-            self, heading, display_text, state, priority, due, imminent_date, annotation
+            self,
+            heading,
+            display_text,
+            state,
+            priority,
+            due,
+            imminent_date,
+            annotation,
+            line_index,
         )
 
     def tasks_in_section(
-        self, heading, lines, start_line, heading_priority, annotation
+        self, heading, lines, heading_priority, annotation
     ):
         prefix_width = len("- [.] ")
         tasks = []
         index = -1
         while (index := index + 1) < len(lines):
-            if match := self.TASK_PATTERN.match(lines[index]):
+            line_number, line_content = lines[index]
+            if match := self.TASK_PATTERN.match(line_content):
+                task_line = line_number
                 marker = match.group(2)
-                text = lines[index].lstrip()
+                text = line_content.lstrip()
                 indent = len(match.group(1)) + prefix_width
                 while (
                     index + 1 < len(lines)
-                    and self.is_continuation(lines[index + 1], indent)
+                    and self.is_continuation(lines[index + 1][1], indent)
                 ):
                     index += 1
-                    text += " " + lines[index].strip()
+                    text += " " + lines[index][1].strip()
                 task_content = text[prefix_width:]
-                line_index = start_line + index
                 task = self.parse_task(
                     heading,
                     heading_priority,
                     marker,
                     task_content,
-                    line_index,
+                    task_line,
                     annotation,
                 )
                 if task is not None:

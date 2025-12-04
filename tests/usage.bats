@@ -6,9 +6,9 @@ bats_require_minimum_version 1.5.0
             -h
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [--relative] [-a]
-                        [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d]
-                        [-c] [--priority LEVEL] [--color | --no-color]
+        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-e] [--relative]
+                        [-a] [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b]
+                        [-d] [-c] [--priority LEVEL] [--color | --no-color]
                         [match ...]
         EOF
     )
@@ -22,9 +22,9 @@ bats_require_minimum_version 1.5.0
             --help
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [--relative] [-a]
-                        [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d]
-                        [-c] [--priority LEVEL] [--color | --no-color]
+        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-e] [--relative]
+                        [-a] [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b]
+                        [-d] [-c] [--priority LEVEL] [--color | --no-color]
                         [match ...]
 
         List tasks found in Markdown files
@@ -43,6 +43,8 @@ bats_require_minimum_version 1.5.0
           --version            show program's version number and exit
           --dir DIR            Directory to search (default: WHATNEXT_DIR, or '.')
           -s, --summary        Show summary of task counts per file
+          -e, --edit           Open matching files in your editor (WHATNEXT_EDITOR,
+                               VISUAL, EDITOR, or vi)
           --relative           Show selected states relative to all others (use with
                                --summary)
           -a, --all            Include all tasks and files, not just incomplete
