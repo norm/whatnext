@@ -20,7 +20,6 @@ class Priority(Enum):
     MEDIUM = {"value": 2, "abbrev": "M", "label": "Medium"}
     IMMINENT = {"value": 3, "abbrev": "I", "label": "Imminent"}
     NORMAL = {"value": 4, "abbrev": "N", "label": "Normal"}
-    FINISHED = {"value": 5, "abbrev": "F", "label": "Finished"}
 
 
 class State(Enum):
@@ -174,6 +173,8 @@ class Task:
             heading = f"{self.heading} / OVERDUE {self.format_overdue_duration()}"
         elif self.priority == Priority.IMMINENT:
             heading = f"{self.heading} / IMMINENT {self.format_imminent_countdown()}"
+        elif self.priority is None:
+            heading = f"{self.heading} / FINISHED"
         elif self.priority != Priority.NORMAL:
             heading = f"{self.heading} / {self.priority.label.upper()}"
         if width is None or len(indent + heading) <= width:
@@ -375,7 +376,7 @@ class MarkdownFile:
         display_text = " ".join(display_text.split())
 
         if state in {State.COMPLETE, State.CANCELLED}:
-            priority = Priority.FINISHED
+            priority = None
         elif due is None:
             task_priority = self.parse_priority(cleaned_text)
             priority = min(heading_priority, task_priority, key=lambda p: p.value)
@@ -487,5 +488,5 @@ class MarkdownFile:
             self.sort_by_state(t for t in tasks if t.priority == Priority.MEDIUM),
             self.sort_by_state(t for t in tasks if t.priority == Priority.IMMINENT),
             self.sort_by_state(t for t in tasks if t.priority == Priority.NORMAL),
-            self.sort_by_state(t for t in tasks if t.priority == Priority.FINISHED),
+            self.sort_by_state(t for t in tasks if t.priority is None),
         )

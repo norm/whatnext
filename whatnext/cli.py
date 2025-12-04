@@ -14,6 +14,16 @@ from termcolor import colored
 from whatnext.models import MarkdownFile, Priority, State
 from whatnext.summary import format_summary
 
+STATE_COLOURS = {
+    State.BLOCKED: "cyan",
+    State.IN_PROGRESS: "yellow",
+}
+
+PRIORITY_COLOURS = {
+    Priority.OVERDUE: ("magenta", ["bold"]),
+    Priority.IMMINENT: ("green", None),
+}
+
 
 def get_terminal_width():
     columns_env = os.environ.get("COLUMNS")
@@ -105,12 +115,15 @@ def find_markdown_files(paths, today, ignore_patterns=None, quiet=False):
 
 
 def flatten_by_priority(filtered_data):
-    groups = [[] for _ in Priority]
+    groups = [[] for _ in range(len(Priority) + 1)]
     for file, tasks in filtered_data:
         # Sort by state within each heading, preserving heading order
         sorted_tasks = file.sort_by_state(tasks)
         for task in sorted_tasks:
-            groups[task.priority.value].append(task)
+            if task.priority is None:
+                groups[-1].append(task)
+            else:
+                groups[task.priority.value].append(task)
 
     result = []
     for group in groups:
@@ -119,60 +132,53 @@ def flatten_by_priority(filtered_data):
 
 
 def format_tasks(tasks, width, use_colour=False):
-    # Group tasks by priority for display
-    groups = [[] for _ in Priority]
+    output = []
+    current_priority = None
+    current_file = None
+    current_heading = None
+
     for task in tasks:
-        groups[task.priority.value].append(task)
+        if task.priority != current_priority:
+            if output:
+                output.append("")
+            current_priority = task.priority
+            current_file = None
+            current_heading = None
 
-    output = ""
-    for priority_index, group_tasks in enumerate(groups):
-        if not group_tasks:
-            continue
-        group_output = ""
-        current_file = None
-        current_heading = None
-        for task in group_tasks:
-            if task.file != current_file:
-                group_output += f"{task.file.display_path}:\n"
-                current_file = task.file
-                current_heading = None
-            if task.heading and task.heading != current_heading:
-                for line in task.wrapped_heading(width):
-                    group_output += f"{line}\n"
-                current_heading = task.heading
-                if task.annotation:
-                    for line in task.wrapped_annotation(width):
-                        group_output += f"{line}\n"
-            text_colour = None
-            in_coloured_block = priority_index in (
-                Priority.OVERDUE.value,
-                Priority.IMMINENT.value,
-            )
-            if use_colour and not in_coloured_block:
-                if task.state == State.BLOCKED:
-                    text_colour = "cyan"
-                elif task.state == State.IN_PROGRESS:
-                    text_colour = "yellow"
-            for line in task.wrapped_task(width, text_colour=text_colour):
-                group_output += f"{line}\n"
-        group_output = group_output.rstrip("\n")
+        text_colour = None
+        block_colour = None
+        block_attrs = None
         if use_colour:
-            if priority_index == Priority.OVERDUE.value:
-                group_output = colored(
-                    group_output,
-                    "magenta",
-                    attrs=["bold"],
-                    force_color=True,
-                )
-            elif priority_index == Priority.IMMINENT.value:
-                group_output = colored(
-                    group_output,
-                    "green",
-                    force_color=True,
-                )
-        output += group_output + "\n\n"
+            if task.priority in PRIORITY_COLOURS:
+                block_colour, block_attrs = PRIORITY_COLOURS[task.priority]
+            else:
+                text_colour = STATE_COLOURS.get(task.state)
 
-    return output.rstrip()
+        # collect this task's output for block_colour
+        lines = []
+        if task.file != current_file:
+            lines.append(f"{task.file.display_path}:")
+            current_file = task.file
+            current_heading = None
+
+        if task.heading and task.heading != current_heading:
+            lines.extend(task.wrapped_heading(width))
+            current_heading = task.heading
+            if task.annotation:
+                lines.extend(task.wrapped_annotation(width))
+
+        lines.extend(task.wrapped_task(width, text_colour=text_colour))
+
+        if block_colour:
+            lines = [
+                colored(line, block_colour, attrs=block_attrs, force_color=True)
+                for line in lines
+            ]
+
+        # now it becomes part of the output
+        output.extend(lines)
+
+    return "\n".join(output)
 
 
 class CapitalisedHelpFormatter(argparse.RawDescriptionHelpFormatter):

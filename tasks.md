@@ -69,3 +69,11 @@ which will start to fail if it is removed.)
 - [X] some way to mark a section of Markdown for inclusion in the default
       output
 - [X] add totals to summaries
+
+
+# version 1.1 - bug fixes, improvements and editing files
+
+- [X] fix tasks missing from `--summary --relative`
+- [ ] remove slashes from columns in summary, its just visual noise
+- [ ] `-e`/`--edit` to open matching task files in editor at the line
+      number of the first match

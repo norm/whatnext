@@ -42,11 +42,13 @@ class TestColourOutput:
         )]
         tasks = flatten_by_priority(filtered)
         output = format_tasks(tasks, width=80, use_colour=True)
-        expected = dedent("""\
-            \x1b[1m\x1b[35mexample/projects/obelisk.md:
-                # Project Obelisk / Discovery / OVERDUE 31y 2m
-                Mess with Jackson
-                - [<] watch archaeologists discover (needs time machine)\x1b[0m""")
+        m = "\x1b[1m\x1b[35m"
+        r = "\x1b[0m"
+        expected = dedent(f"""\
+            {m}example/projects/obelisk.md:{r}
+            {m}    # Project Obelisk / Discovery / OVERDUE 31y 2m{r}
+            {m}    Mess with Jackson{r}
+            {m}    - [<] watch archaeologists discover (needs time machine){r}""")
         assert output == expected
 
     def test_imminent_tasks_output(self):
@@ -73,10 +75,12 @@ class TestColourOutput:
         )]
         tasks = flatten_by_priority(filtered)
         output = format_tasks(tasks, width=80, use_colour=True)
-        expected = dedent("""\
-            \x1b[32mexample/tasks.md:
-                # Get S Done / IMMINENT 11d
-                - [ ] start third project\x1b[0m""")
+        g = "\x1b[32m"
+        r = "\x1b[0m"
+        expected = dedent(f"""\
+            {g}example/tasks.md:{r}
+            {g}    # Get S Done / IMMINENT 11d{r}
+            {g}    - [ ] start third project{r}""")
         assert output == expected
 
     def test_blocked_task_text_is_cyan(self):

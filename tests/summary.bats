@@ -46,6 +46,32 @@ bats_require_minimum_version 1.5.0
     )
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
+
+    # should be functionally equivalent...
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --cancelled \
+                --done \
+                --blocked \
+                --partial \
+                --open
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+
+    # ...and order of args is irrelevant, desired ordering is applied
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --summary \
+                --open \
+                --blocked \
+                --done \
+                --partial \
+                --cancelled
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
 }
 
 @test "summarise all states, resized" {
@@ -266,13 +292,13 @@ bats_require_minimum_version 1.5.0
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                           H/ ~
         ░░░░░░░░░░░░                                      0/ 2  docs/annotations.md
-        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        0/ 5  docs/basics.md
+        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        0/ 7  docs/basics.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                    0/ 5  docs/deadlines.md
-        ██████████████████░░░░░░░░░░░░░░░░░░  3/ 3  docs/prioritisation.md
+        ██████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  3/ 5  docs/prioritisation.md
         ░░░░░░                                            0/ 1  tests/headerless.md
-                                        0/ 0  archive/done/tasks.md
+        ░░░░░░░░░░░░░░░░░░                                0/ 3  archive/done/tasks.md
                                                           ────
-                                                          3/16  26, of 26 total
+                                                          3/23  26, of 26 total
 
         █ High  ░ (Overdue/Imminent/Medium/Normal)
         EOF
@@ -292,13 +318,13 @@ bats_require_minimum_version 1.5.0
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                           M/ ~
         ░░░░░░░░░░░░                                      0/ 2  docs/annotations.md
-        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        0/ 5  docs/basics.md
+        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        0/ 7  docs/basics.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                    0/ 5  docs/deadlines.md
-        ██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/ 5  docs/prioritisation.md
+        ██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/ 7  docs/prioritisation.md
         ░░░░░░                                            0/ 1  tests/headerless.md
-                                        0/ 0  archive/done/tasks.md
+        ░░░░░░░░░░░░░░░░░░                                0/ 3  archive/done/tasks.md
                                                           ────
-                                                          1/18  26, of 26 total
+                                                          1/25  26, of 26 total
 
         █ Medium  ░ (Overdue/Imminent/High/Normal)
         EOF
@@ -319,13 +345,13 @@ bats_require_minimum_version 1.5.0
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                         H/ N/~
         ░░░░░░░░░░░░                                    0/ 2/0  docs/annotations.md
-        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        0/ 5/0  docs/basics.md
+        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░        0/ 5/2  docs/basics.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                   0/ 5/0  docs/deadlines.md
-        █████████████████░░░░░░░░░░░░░░░░░  3/ 2/1  docs/prioritisation.md
+        █████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  3/ 2/3  docs/prioritisation.md
         ░░░░░░                                          0/ 1/0  tests/headerless.md
-                                       0/ 0/0  archive/done/tasks.md
+        ░░░░░░░░░░░░░░░░░                               0/ 0/3  archive/done/tasks.md
                                                         ──────
-                                                        3/15/1  26, of 26 total
+                                                        3/15/8  26, of 26 total
 
         █ High  ░ Normal  ░ (Overdue/Imminent/Medium)
         EOF

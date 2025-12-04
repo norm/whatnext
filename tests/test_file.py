@@ -45,7 +45,7 @@ class TestFileParsing:
             "heading": None,
             "state": State.COMPLETE,
             "text": "complete, this task has been finished",
-            "priority": Priority.FINISHED,
+            "priority": None,
             "due": None,
             "imminent": None,
             "annotation": None,
@@ -60,7 +60,7 @@ class TestFileParsing:
             "heading": None,
             "state": State.CANCELLED,
             "text": "cancelled, this task has been scratched",
-            "priority": Priority.FINISHED,
+            "priority": None,
             "due": None,
             "imminent": None,
             "annotation": None,
@@ -221,7 +221,7 @@ class TestFileParsing:
             "heading": "# do these first / grouped, but still highest priority",
             "state": State.COMPLETE,
             "text": "header priority cascades down",
-            "priority": Priority.FINISHED,
+            "priority": None,
             "due": None,
             "imminent": None,
             "annotation": None,
@@ -230,7 +230,7 @@ class TestFileParsing:
             "heading": "# more tasks",
             "state": State.CANCELLED,
             "text": "normal priority, new header resets that",
-            "priority": Priority.FINISHED,
+            "priority": None,
             "due": None,
             "imminent": None,
             "annotation": None,
@@ -508,13 +508,13 @@ class TestGroupedTasksBasics:
                     "# Indicating the state of a task",
                     "complete, this task has been finished",
                     State.COMPLETE,
-                    Priority.FINISHED
+                    None
                 ),
                 (
                     "# Indicating the state of a task",
                     "cancelled, this task has been scratched",
                     State.CANCELLED,
-                    Priority.FINISHED
+                    None
                 ),
             ],
         )
@@ -585,13 +585,13 @@ class TestGroupedTasksBasics:
                     "# Indicating the state of a task",
                     "complete, this task has been finished",
                     State.COMPLETE,
-                    Priority.FINISHED
+                    None
                 ),
                 (
                     "# Indicating the state of a task",
                     "cancelled, this task has been scratched",
                     State.CANCELLED,
-                    Priority.FINISHED
+                    None
                 ),
             ],
         )
@@ -669,13 +669,13 @@ class TestGroupedTasksPrioritisation:
                     "# do these first / grouped, but still highest priority",
                     "header priority cascades down",
                     State.COMPLETE,
-                    Priority.FINISHED
+                    None
                 ),
                 (
                     "# more tasks",
                     "normal priority, new header resets that",
                     State.CANCELLED,
-                    Priority.FINISHED
+                    None
                 ),
             ],
         )
@@ -731,13 +731,13 @@ class TestGroupedTasksPrioritisation:
                     "# do these first / grouped, but still highest priority",
                     "header priority cascades down",
                     State.COMPLETE,
-                    Priority.FINISHED
+                    None
                 ),
                 (
                     "# more tasks",
                     "normal priority, new header resets that",
                     State.CANCELLED,
-                    Priority.FINISHED
+                    None
                 ),
             ],
         )
@@ -759,7 +759,7 @@ class TestGroupedTasksPrioritisation:
                     "# do these first / grouped, but still highest priority",
                     "header priority cascades down",
                     State.COMPLETE,
-                    Priority.FINISHED
+                    None
                 ),
             ],
         )

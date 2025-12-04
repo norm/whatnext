@@ -1,6 +1,11 @@
 # Changelog
 
 
+## [v1.1] - unreleased
+
+Fixed relative summaries to include all tasks, not just some.
+
+
 ## [v1.0] - 2025-12-02
 
 Output is now colour-coded by default, override with `--color/--no-color`

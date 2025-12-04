@@ -163,46 +163,55 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
     ```bash
     (computer)% whatnext --summary
-                                         C/D/B/P/O
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░           0/0/0/0/3  tasks.md
-    ▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░  0/0/1/1/2  projects/obelisk.md
-    ▚▚▚▚▚▚▚▚▚██████████████████████████  1/3/0/0/0  archived/projects/tangerine.md
-                                         ─────────
-                                         1/3/1/1/5  11 total
+                                                        B/P/O
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              0/0/3  tasks.md
+    ▚▚▚▚▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░  1/1/2  projects/obelisk.md
+                                                        ─────
+                                                        1/1/5  7, of 11 total
 
-    ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
+    ▚ Blocked  ▓ Partial  ░ Open
     ```
 
     When there are multiple files, the progress bars are sized relative to the
     task file with the most tasks.
 
-    Summary can be combined with a task state filter, to highlight just
-    that state compared to the rest:
+    By default it only summarises the incomplete tasks, add `--all` to see
+    the full state of your task files:
+
+    ```bash
+    (computer)% whatnext --summary --all
+                                         C/D/B/P/O
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░           0/0/0/0/3  tasks.md
+    ▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░  0/0/1/1/2  projects/obelisk.md
+    ▚▚▚▚▚▚▚▚▚██████████████████████████  1/3/0/0/0  archived/projects/tangerine.md
+                                         ─────────
+                                         1/3/1/1/5  11, of 11 total
+
+    ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
+    ```
+
+    Individual states and priorities can be summarised alone:
 
     ```bash
     (computer)% whatnext --summary --blocked
-                                              B/ ~
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░            0/ 3  tasks.md
-    ▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/ 3  projects/obelisk.md
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/ 4  archived/projects/tangerine.md
-                                              ────
-                                              1/10  11 total
+                                                            B
+    ██████████████████████████████████████████████████████  1  projects/obelisk.md
 
-    ▚ Blocked  ░ (Cancelled/Done/Partial/Open)
+    █ Blocked
     ```
 
-    Summary can also be combined with a priority filter, to show the
-    distribution of priorities among outstanding tasks:
+    or as part of the whole with `--relative`:
 
     ```bash
-    (computer)% whatnext --summary --priority high
-                                                          H/~
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░               0/3  tasks.md
-    ▚▚▚▚▚▚▚▚▚▚▚▚▚░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/3  projects/obelisk.md
-                                                          ───
-                                                          1/6  7 total
+    (computer)% whatnext --summary --relative --priority high
+                                              H/ ~
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░            0/ 3  tasks.md
+    ██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/ 3  projects/obelisk.md
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/ 4  archived/projects/tangerine.md
+                                              ────
+                                              1/10  11, of 11 total
 
-    ▚ High  ░ (Overdue/Imminent/Medium/Normal)
+    █ High  ░ (Overdue/Imminent/Medium/Normal)
     ```
 
 -   `-q` / `--quiet` — suppress warnings (or `$WHATNEXT_QUIET=1`).

@@ -75,15 +75,20 @@ def calculate_totals(file_counts):
     return total
 
 
-def get_count_parts(counts, selected_in_order, remainder):
-    parts = [counts.get(s, 0) for s in selected_in_order]
-    if remainder:
-        parts.append(sum(counts.get(s, 0) for s in remainder))
+def get_count_parts(counts, selected_in_order, has_remainder):
+    parts = [counts.get(item, 0) for item in selected_in_order]
+    if has_remainder:
+        parts.append(
+            sum(
+                count for key, count in counts.items()
+                    if key not in selected_in_order
+            )
+        )
     return parts
 
 
 def format_counts(parts, col_widths):
-    return "/".join(str(v).rjust(w) for v, w in zip(parts, col_widths))
+    return "/".join(str(value).rjust(width) for value, width in zip(parts, col_widths))
 
 
 def build_bar(counts, total, width, char_map, bar_order):
@@ -97,6 +102,15 @@ def build_bar(counts, total, width, char_map, bar_order):
         end_pos = round(width * cumulative / total)
         parts.append(char_map[item] * (end_pos - bar_pos))
         bar_pos = end_pos
+
+    remainder = sum(
+        count for key, count in counts.items()
+            if key not in bar_order
+    )
+    if remainder:
+        cumulative += remainder
+        end_pos = round(width * cumulative / total)
+        parts.append(SHADING[-1] * (end_pos - bar_pos))
     return "".join(parts)
 
 
@@ -126,24 +140,22 @@ def format_summary(
     if not file_tasks:
         return ""
 
-    # Build counts for each file
     file_counts = [
         Counter(getattr(task, count_attr) for task in tasks)
         for _, tasks in file_tasks
     ]
-
-    # Only show remainder column if there are actually tasks in remainder states
-    has_remainder = remainder and any(
-        counts.get(s, 0) for counts in file_counts for s in remainder
+    has_remainder = any(
+        key not in selected_in_order
+            for counts in file_counts
+                for key in counts
     )
     total_counts = calculate_totals(file_counts) if len(file_tasks) > 1 else None
 
     # Calculate column widths
     all_counts = file_counts + ([total_counts] if total_counts else [])
-    remainder_for_counts = remainder if has_remainder else []
     all_parts = [
-        get_count_parts(c, selected_in_order, remainder_for_counts)
-        for c in all_counts
+        get_count_parts(counts, selected_in_order, has_remainder)
+            for counts in all_counts
     ]
     num_cols = len(all_parts[0])
     col_widths = [
@@ -169,7 +181,7 @@ def format_summary(
         if use_colour:
             bar = colored(bar, "blue", force_color=True)
         padding = " " * (bar_width - file_bar_width)
-        parts = get_count_parts(counts, selected_in_order, remainder_for_counts)
+        parts = get_count_parts(counts, selected_in_order, has_remainder)
         count_str = format_counts(parts, col_widths)
         lines.append(
             f"{bar}{padding}{gap}{count_str.rjust(count_width)}{gap}"
@@ -177,7 +189,7 @@ def format_summary(
         )
 
     if total_counts:
-        parts = get_count_parts(total_counts, selected_in_order, remainder_for_counts)
+        parts = get_count_parts(total_counts, selected_in_order, has_remainder)
         total_str = format_counts(parts, col_widths)
         displayed_total = sum(total_counts.values())
         if all_tasks_total is None:
