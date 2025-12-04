@@ -163,11 +163,11 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
     ```bash
     (computer)% whatnext --summary
-                                                        B/P/O
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              0/0/3  tasks.md
-    ▚▚▚▚▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░  1/1/2  projects/obelisk.md
+                                                        B P O
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              0 0 3  tasks.md
+    ▚▚▚▚▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░  1 1 2  projects/obelisk.md
                                                         ─────
-                                                        1/1/5  7, of 11 total
+                                                        1 1 5  7, of 11 total
 
     ▚ Blocked  ▓ Partial  ░ Open
     ```
@@ -180,12 +180,12 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
     ```bash
     (computer)% whatnext --summary --all
-                                         C/D/B/P/O
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░           0/0/0/0/3  tasks.md
-    ▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░  0/0/1/1/2  projects/obelisk.md
-    ▚▚▚▚▚▚▚▚▚██████████████████████████  1/3/0/0/0  archived/projects/tangerine.md
+                                         C D B P O
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░           0 0 0 0 3  tasks.md
+    ▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░  0 0 1 1 2  projects/obelisk.md
+    ▚▚▚▚▚▚▚▚▚██████████████████████████  1 3 0 0 0  archived/projects/tangerine.md
                                          ─────────
-                                         1/3/1/1/5  11, of 11 total
+                                         1 3 1 1 5  11, of 11 total
 
     ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
     ```
@@ -204,12 +204,12 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
     ```bash
     (computer)% whatnext --summary --relative --priority high
-                                              H/ ~
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░            0/ 3  tasks.md
-    ██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1/ 3  projects/obelisk.md
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0/ 4  archived/projects/tangerine.md
+                                              H  ~
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░            0  3  tasks.md
+    ██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1  3  projects/obelisk.md
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0  4  archived/projects/tangerine.md
                                               ────
-                                              1/10  11, of 11 total
+                                              1 10  11, of 11 total
 
     █ High  ░ (Overdue/Imminent/Medium/Normal)
     ```

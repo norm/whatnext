@@ -57,7 +57,7 @@ def make_header(selected_in_order, has_remainder, col_widths=None):
             part.rjust(width)
                 for part, width in zip(parts, col_widths)
         ]
-    return "/".join(parts)
+    return " ".join(parts)
 
 
 def make_legend(
@@ -103,7 +103,7 @@ def get_count_parts(counts, selected_in_order, has_remainder):
 
 
 def format_counts(parts, col_widths):
-    return "/".join(str(value).rjust(width) for value, width in zip(parts, col_widths))
+    return " ".join(str(value).rjust(width) for value, width in zip(parts, col_widths))
 
 
 def build_bar(counts, total, width, char_map, bar_order):

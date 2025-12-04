@@ -40,15 +40,15 @@ class TestPriorityVisualisationMap:
 class TestPriorityHeader:
     def test_high_priority_header(self):
         header = make_header([Priority.HIGH], has_remainder=True)
-        assert header == "H/~"
+        assert header == "H ~"
 
     def test_medium_priority_header(self):
         header = make_header([Priority.MEDIUM], has_remainder=True)
-        assert header == "M/~"
+        assert header == "M ~"
 
     def test_normal_priority_header(self):
         header = make_header([Priority.NORMAL], has_remainder=True)
-        assert header == "N/~"
+        assert header == "N ~"
 
 
 class TestPriorityLegend:

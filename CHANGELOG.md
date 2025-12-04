@@ -5,6 +5,8 @@
 
 Fixed relative summaries to include all tasks, not just some.
 
+Removed slashes from summary columns for cleaner output.
+
 
 ## [v1.0] - 2025-12-02
 
