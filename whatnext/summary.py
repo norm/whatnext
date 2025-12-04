@@ -30,11 +30,15 @@ SHADING_INDICES = {
 
 
 def build_visualisation_map(selected, display_order):
-    selected_in_order = [s for s in display_order if s in selected]
+    selected_in_order = [
+        item
+            for item in display_order
+                if item in selected
+    ]
     indices = SHADING_INDICES.get(len(selected_in_order), [0, 1, 2, 3, 4])
     char_map = {}
-    for i, item in enumerate(selected_in_order):
-        char_map[item] = SHADING[indices[i]]
+    for index, item in enumerate(selected_in_order):
+        char_map[item] = SHADING[indices[index]]
     for item in display_order:
         if item not in char_map:
             char_map[item] = SHADING[-1]
@@ -42,11 +46,17 @@ def build_visualisation_map(selected, display_order):
 
 
 def make_header(selected_in_order, has_remainder, col_widths=None):
-    parts = [s.abbrev for s in selected_in_order]
+    parts = [
+        item.abbrev
+            for item in selected_in_order
+    ]
     if has_remainder:
         parts.append("~")
     if col_widths:
-        parts = [p.rjust(w) for p, w in zip(parts, col_widths)]
+        parts = [
+            part.rjust(width)
+                for part, width in zip(parts, col_widths)
+        ]
     return "/".join(parts)
 
 
@@ -54,13 +64,17 @@ def make_legend(
     char_map, selected_in_order, display_order, has_remainder, use_colour=False
 ):
     parts = []
-    for s in selected_in_order:
-        char = char_map[s]
+    for item in selected_in_order:
+        char = char_map[item]
         if use_colour:
             char = colored(char, "blue", force_color=True)
-        parts.append(f"{char} {s.label}")
+        parts.append(f"{char} {item.label}")
     if has_remainder:
-        unselected = [s.label for s in display_order if s not in selected_in_order]
+        unselected = [
+            state.label
+                for state in display_order
+                    if state not in selected_in_order
+        ]
         char = SHADING[-1]
         if use_colour:
             char = colored(char, "blue", force_color=True)
@@ -80,8 +94,9 @@ def get_count_parts(counts, selected_in_order, has_remainder):
     if has_remainder:
         parts.append(
             sum(
-                count for key, count in counts.items()
-                    if key not in selected_in_order
+                count
+                    for key, count in counts.items()
+                        if key not in selected_in_order
             )
         )
     return parts
@@ -92,11 +107,10 @@ def format_counts(parts, col_widths):
 
 
 def build_bar(counts, total, width, char_map, bar_order):
-    if total == 0:
-        return ""
     parts = []
     cumulative = 0
     bar_pos = 0
+
     for item in bar_order:
         cumulative += counts.get(item, 0)
         end_pos = round(width * cumulative / total)
@@ -133,16 +147,27 @@ def format_summary(
         count_attr = "state"
 
     char_map, selected_in_order = build_visualisation_map(selected, display_order)
-    remainder = [s for s in display_order if s not in selected]
+    remainder = [
+        item
+            for item in display_order
+                if item not in selected
+    ]
     bar_order = selected_in_order + remainder
 
-    file_tasks = [(f, tasks) for f, tasks in file_tasks if tasks]
+    file_tasks = [
+        (file, tasks)
+            for file, tasks in file_tasks
+                if tasks
+    ]
     if not file_tasks:
         return ""
 
     file_counts = [
-        Counter(getattr(task, count_attr) for task in tasks)
-        for _, tasks in file_tasks
+        Counter(
+            getattr(task, count_attr)
+                for task in tasks
+        )
+            for _, tasks in file_tasks
     ]
     has_remainder = any(
         key not in selected_in_order
@@ -151,7 +176,7 @@ def format_summary(
     )
     total_counts = calculate_totals(file_counts) if len(file_tasks) > 1 else None
 
-    # Calculate column widths
+    # calculate column widths
     all_counts = file_counts + ([total_counts] if total_counts else [])
     all_parts = [
         get_count_parts(counts, selected_in_order, has_remainder)
@@ -159,20 +184,34 @@ def format_summary(
     ]
     num_cols = len(all_parts[0])
     col_widths = [
-        max(len(str(parts[col])) for parts in all_parts)
-        for col in range(num_cols)
+        max(
+            len(str(parts[col]))
+                for parts in all_parts
+        )
+            for col in range(num_cols)
     ]
 
-    # Calculate layout dimensions
+    # calculate space taken
     gap = "  "
     count_width = len(format_counts(all_parts[0], col_widths))
-    widest_file = max(len(file.display_path) for file, _ in file_tasks)
-    bar_width = max(10, width - count_width - widest_file - len(gap) * 3)
-    widest_task_count = max(len(tasks) for _, tasks in file_tasks)
+    widest_file = max(
+        len(file.display_path)
+            for file, _ in file_tasks
+    )
+    bar_width = max(
+        10,
+        width - count_width - widest_file - len(gap) * 3,
+    )
+    widest_task_count = max(
+        len(tasks)
+            for _, tasks in file_tasks
+    )
 
-    # Build output
+    # build output
     header = make_header(selected_in_order, has_remainder, col_widths)
-    lines = [header.rjust(bar_width + len(gap) + count_width)]
+    lines = [
+        header.rjust(bar_width + len(gap) + count_width)
+    ]
 
     for (file, tasks), counts in zip(file_tasks, file_counts):
         task_count = len(tasks)
@@ -182,9 +221,9 @@ def format_summary(
             bar = colored(bar, "blue", force_color=True)
         padding = " " * (bar_width - file_bar_width)
         parts = get_count_parts(counts, selected_in_order, has_remainder)
-        count_str = format_counts(parts, col_widths)
+        count = format_counts(parts, col_widths)
         lines.append(
-            f"{bar}{padding}{gap}{count_str.rjust(count_width)}{gap}"
+            f"{bar}{padding}{gap}{count.rjust(count_width)}{gap}"
             f"{file.display_path}"
         )
 

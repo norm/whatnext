@@ -319,21 +319,18 @@ Annotations:
         "--priority",
         action="append",
         default=[],
-        choices=[p.name.lower() for p in Priority],
+        choices=[
+            priority.name.lower()
+                for priority in Priority
+        ],
         metavar="LEVEL",
         help="Show only tasks of this priority (can be specified multiple times)",
     )
     parser.add_argument(
         "--color",
-        action="store_true",
-        default=os.environ.get("WHATNEXT_COLOR") == "1",
-        help="Force colour output (or WHATNEXT_COLOR=1)",
-    )
-    parser.add_argument(
-        "--no-color",
-        action="store_true",
-        default=os.environ.get("WHATNEXT_COLOR") == "0",
-        help="Disable colour output (or WHATNEXT_COLOR=0)",
+        action=argparse.BooleanOptionalAction,
+        default={"1": True, "0": False}.get(os.environ.get("WHATNEXT_COLOR")),
+        help="Force colour output (or WHATNEXT_COLOR=1/0)",
     )
     parser.add_argument(
         "match",
@@ -397,31 +394,25 @@ Annotations:
         # default view is incomplete tasks
         states = {State.OPEN, State.IN_PROGRESS, State.BLOCKED}
 
-    if args.priority:
-        priorities = {
-            Priority[p.upper()] for p in args.priority
-        }
-    else:
-        priorities = None
+    priorities = {
+        Priority[priority.upper()]
+            for priority in args.priority
+    }
 
-    if args.no_color:
-        use_colour = False
-    elif args.color:
-        use_colour = True
-    else:
-        use_colour = sys.stdout.isatty()
+    if args.color is None:
+        args.color = sys.stdout.isatty()
 
     if args.summary and args.relative:
         # relative summary mode includes all tasks,
         # filters used only for visualisation
         filtered_data = [
-            (f, f.filtered_tasks(None, search_terms, None))
-            for f in task_files
+            (file, file.filtered_tasks(None, search_terms, None))
+                for file in task_files
         ]
     else:
         filtered_data = [
-            (f, f.filtered_tasks(states, search_terms, priorities))
-            for f in task_files
+            (file, file.filtered_tasks(states, search_terms, priorities))
+                for file in task_files
         ]
 
     if args.summary:
@@ -430,9 +421,12 @@ Annotations:
             get_terminal_width(),
             states,
             priorities,
-            use_colour,
+            args.color,
             args.relative,
-            sum(len(f.tasks) for f in task_files),
+            sum(
+                len(file.tasks)
+                    for file in task_files
+            ),
         )
     else:
         tasks = flatten_by_priority(filtered_data)
@@ -443,7 +437,7 @@ Annotations:
         output = format_tasks(
             tasks,
             get_terminal_width(),
-            use_colour,
+            args.color,
         )
 
     print(output)

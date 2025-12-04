@@ -16,7 +16,10 @@ class TestLimit:
     def test_limit_of_one(self):
         filtered = [(self.obelisk, self.obelisk.filtered_tasks(states=ACTIVE_STATES))]
         tasks = flatten_by_priority(filtered)[:1]
-        assert [t.as_dict() for t in tasks] == [
+        assert [
+            task.as_dict()
+                for task in tasks
+        ] == [
             {
                 "heading": "# Project Obelisk / Discovery",
                 "state": State.BLOCKED,
@@ -31,7 +34,10 @@ class TestLimit:
     def test_limit_spans_priority_groups(self):
         filtered = [(self.obelisk, self.obelisk.filtered_tasks(states=ACTIVE_STATES))]
         tasks = flatten_by_priority(filtered)[:3]
-        assert [t.as_dict() for t in tasks] == [
+        assert [
+            task.as_dict()
+                for task in tasks
+        ] == [
             {
                 "heading": "# Project Obelisk / Discovery",
                 "state": State.BLOCKED,
@@ -67,7 +73,10 @@ class TestRandomSelection:
     example_files = find_markdown_files("example", today)
 
     def _filter_active(self, files):
-        return [(f, f.filtered_tasks(states=ACTIVE_STATES)) for f in files]
+        return [
+            (file, file.filtered_tasks(states=ACTIVE_STATES))
+                for file in files
+        ]
 
     def test_randomise(self):
         filtered = self._filter_active(self.example_files)

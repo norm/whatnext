@@ -446,7 +446,8 @@ class MarkdownFile:
             State.BLOCKED,
         }
         return self.sort_by_state(
-            task for task in self.tasks if task.state in outstanding_states
+            task for task in self.tasks
+                if task.state in outstanding_states
         )
 
     def sort_by_state(self, tasks):
@@ -456,16 +457,25 @@ class MarkdownFile:
         result = []
         for heading in by_heading:
             result.extend(
-                sorted(by_heading[heading], key=lambda t: t.state.sort_order)
+                sorted(
+                    by_heading[heading],
+                    key=lambda task: task.state.sort_order
+                )
             )
         return result
 
     def filtered_tasks(self, states=None, search_terms=None, priorities=None):
         tasks = self.tasks
         if states:
-            tasks = [task for task in tasks if task.state in states]
+            tasks = [
+                task for task in tasks
+                    if task.state in states
+            ]
         if priorities:
-            tasks = [task for task in tasks if task.priority in priorities]
+            tasks = [
+                task for task in tasks
+                    if task.priority in priorities
+            ]
         if search_terms:
             filtered = []
             for task in tasks:
@@ -483,10 +493,28 @@ class MarkdownFile:
     def grouped_tasks(self, states=None, search_terms=None, priorities=None):
         tasks = self.filtered_tasks(states, search_terms, priorities)
         return (
-            self.sort_by_state(t for t in tasks if t.priority == Priority.OVERDUE),
-            self.sort_by_state(t for t in tasks if t.priority == Priority.HIGH),
-            self.sort_by_state(t for t in tasks if t.priority == Priority.MEDIUM),
-            self.sort_by_state(t for t in tasks if t.priority == Priority.IMMINENT),
-            self.sort_by_state(t for t in tasks if t.priority == Priority.NORMAL),
-            self.sort_by_state(t for t in tasks if t.priority is None),
+            self.sort_by_state(
+                task for task in tasks
+                    if task.priority == Priority.OVERDUE
+            ),
+            self.sort_by_state(
+                task for task in tasks
+                    if task.priority == Priority.HIGH
+            ),
+            self.sort_by_state(
+                task for task in tasks
+                    if task.priority == Priority.MEDIUM
+            ),
+            self.sort_by_state(
+                task for task in tasks
+                    if task.priority == Priority.IMMINENT
+            ),
+            self.sort_by_state(
+                task for task in tasks
+                    if task.priority == Priority.NORMAL
+            ),
+            self.sort_by_state(
+                task for task in tasks
+                    if task.priority is None
+            ),
         )

@@ -454,18 +454,22 @@ class TestFileParsing:
         }
 
 
-def tasks(grouped_tasks):
-    return tuple(
-        [(t.heading, t.text, t.state, t.priority) for t in group]
-        for group in grouped_tasks
-    )
+class GroupedTasksTestCase:
+    def tasks(self, grouped_tasks):
+        return tuple(
+            [
+                (task.heading, task.text, task.state, task.priority)
+                for task in group
+            ]
+            for group in grouped_tasks
+        )
 
 
-class TestGroupedTasksBasics:
+class TestGroupedTasksBasics(GroupedTasksTestCase):
     file = MarkdownFile(source="docs/basics.md", today=date.today())
 
     def test_no_args_returns_all_grouped_by_priority(self):
-        assert tasks(self.file.grouped_tasks()) == (
+        assert self.tasks(self.file.grouped_tasks()) == (
             [],
             [],
             [],
@@ -520,7 +524,7 @@ class TestGroupedTasksBasics:
         )
 
     def test_state_two_selected(self):
-        assert tasks(
+        assert self.tasks(
             self.file.grouped_tasks(states={State.IN_PROGRESS, State.BLOCKED})
         ) == (
             [],
@@ -545,7 +549,7 @@ class TestGroupedTasksBasics:
         )
 
     def test_search_terms(self):
-        assert tasks(self.file.grouped_tasks(search_terms=["multiline"])) == (
+        assert self.tasks(self.file.grouped_tasks(search_terms=["multiline"])) == (
             [],
             [],
             [],
@@ -569,7 +573,7 @@ class TestGroupedTasksBasics:
         )
 
     def test_search_terms_and_state(self):
-        assert tasks(
+        assert self.tasks(
             self.file.grouped_tasks(
                 states={State.COMPLETE, State.CANCELLED},
                 search_terms=["task"],
@@ -597,7 +601,7 @@ class TestGroupedTasksBasics:
         )
 
     def test_search_terms_and_state_no_overlap(self):
-        assert tasks(
+        assert self.tasks(
             self.file.grouped_tasks(
                 states={State.COMPLETE},
                 search_terms=["lorem"],
@@ -605,21 +609,21 @@ class TestGroupedTasksBasics:
         ) == ([], [], [], [], [], [])
 
     def test_priority_high(self):
-        assert tasks(
+        assert self.tasks(
             self.file.grouped_tasks(priorities={Priority.HIGH})
         ) == ([], [], [], [], [], [])
 
     def test_priority_high_and_medium(self):
-        assert tasks(
+        assert self.tasks(
             self.file.grouped_tasks(priorities={Priority.HIGH, Priority.MEDIUM})
         ) == ([], [], [], [], [], [])
 
 
-class TestGroupedTasksPrioritisation:
+class TestGroupedTasksPrioritisation(GroupedTasksTestCase):
     file = MarkdownFile(source="docs/prioritisation.md", today=date.today())
 
     def test_no_args_returns_all_grouped_by_priority(self):
-        assert tasks(self.file.grouped_tasks()) == (
+        assert self.tasks(self.file.grouped_tasks()) == (
             [],
             [
                 (
@@ -681,7 +685,7 @@ class TestGroupedTasksPrioritisation:
         )
 
     def test_state_two_selected(self):
-        assert tasks(
+        assert self.tasks(
             self.file.grouped_tasks(states={State.IN_PROGRESS, State.BLOCKED})
         ) == (
             [],
@@ -700,7 +704,7 @@ class TestGroupedTasksPrioritisation:
         )
 
     def test_search_terms(self):
-        assert tasks(self.file.grouped_tasks(search_terms=["priority"])) == (
+        assert self.tasks(self.file.grouped_tasks(search_terms=["priority"])) == (
             [],
             [
                 (
@@ -743,7 +747,7 @@ class TestGroupedTasksPrioritisation:
         )
 
     def test_search_terms_and_state(self):
-        assert tasks(
+        assert self.tasks(
             self.file.grouped_tasks(
                 states={State.COMPLETE},
                 search_terms=["header"],
@@ -765,7 +769,7 @@ class TestGroupedTasksPrioritisation:
         )
 
     def test_search_terms_and_state_no_overlap(self):
-        assert tasks(
+        assert self.tasks(
             self.file.grouped_tasks(
                 states={State.COMPLETE},
                 search_terms=["urgent"],
@@ -773,7 +777,7 @@ class TestGroupedTasksPrioritisation:
         ) == ([], [], [], [], [], [])
 
     def test_priority_high(self):
-        assert tasks(
+        assert self.tasks(
             self.file.grouped_tasks(priorities={Priority.HIGH})
         ) == (
             [],
@@ -804,7 +808,7 @@ class TestGroupedTasksPrioritisation:
         )
 
     def test_priority_high_and_medium(self):
-        assert tasks(
+        assert self.tasks(
             self.file.grouped_tasks(priorities={Priority.HIGH, Priority.MEDIUM})
         ) == (
             [],
@@ -842,10 +846,10 @@ class TestGroupedTasksPrioritisation:
         )
 
 
-class TestGroupedTasksDeadlines:
+class TestGroupedTasksDeadlines(GroupedTasksTestCase):
     def test_outside_all_windows_all_normal(self):
         file = MarkdownFile(source="docs/deadlines.md", today=date(2025, 1, 1))
-        assert tasks(file.grouped_tasks()) == (
+        assert self.tasks(file.grouped_tasks()) == (
             [],
             [],
             [],
@@ -887,7 +891,7 @@ class TestGroupedTasksDeadlines:
 
     def test_inside_window_becomes_imminent(self):
         file = MarkdownFile(source="docs/deadlines.md", today=date(2025, 12, 2))
-        assert tasks(file.grouped_tasks()) == (
+        assert self.tasks(file.grouped_tasks()) == (
             [],
             [],
             [],
@@ -930,7 +934,7 @@ class TestGroupedTasksDeadlines:
 
     def test_emphasis_applies_inside_window(self):
         file = MarkdownFile(source="docs/deadlines.md", today=date(2025, 12, 24))
-        assert tasks(file.grouped_tasks()) == (
+        assert self.tasks(file.grouped_tasks()) == (
             [
                 (
                     "# version 0.5",
@@ -975,7 +979,7 @@ class TestGroupedTasksDeadlines:
 
     def test_high_emphasis_on_deadline_day(self):
         file = MarkdownFile(source="docs/deadlines.md", today=date(2025, 12, 25))
-        assert tasks(file.grouped_tasks()) == (
+        assert self.tasks(file.grouped_tasks()) == (
             [
                 (
                     "# version 0.5",
@@ -1020,7 +1024,7 @@ class TestGroupedTasksDeadlines:
 
     def test_past_deadline_becomes_overdue(self):
         file = MarkdownFile(source="docs/deadlines.md", today=date(2025, 12, 26))
-        assert tasks(file.grouped_tasks()) == (
+        assert self.tasks(file.grouped_tasks()) == (
             [
                 (
                     "# version 0.5",
