@@ -1,10 +1,13 @@
 # Changelog
 
 
-## [v1.2] - UNRELEASED
+## [v1.2] - 2026-01-08
 
 Files, sections, or individual tasks can be deferred using `@after` to hide
 them until other tasks are complete.
+
+Added `--guide` to show a short Markdown formatting reference, separating
+it out of the `--help` usage.
 
 
 ## [v1.1] - 2025-12-04

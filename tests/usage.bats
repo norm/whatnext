@@ -6,9 +6,10 @@ bats_require_minimum_version 1.5.0
             -h
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-e] [--relative]
-                        [-a] [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b]
-                        [-d] [-c] [--priority LEVEL] [--color | --no-color]
+        Usage: whatnext [-h] [--help] [--version] [--guide] [--dir DIR] [-s] [-e]
+                        [--relative] [-a] [--config CONFIG] [--ignore PATTERN] [-q]
+                        [-o] [-p] [-b] [-d] [-c] [--priority LEVEL]
+                        [--color | --no-color]
                         [match ...]
         EOF
     )
@@ -22,9 +23,10 @@ bats_require_minimum_version 1.5.0
             --help
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        Usage: whatnext [-h] [--help] [--version] [--dir DIR] [-s] [-e] [--relative]
-                        [-a] [--config CONFIG] [--ignore PATTERN] [-q] [-o] [-p] [-b]
-                        [-d] [-c] [--priority LEVEL] [--color | --no-color]
+        Usage: whatnext [-h] [--help] [--version] [--guide] [--dir DIR] [-s] [-e]
+                        [--relative] [-a] [--config CONFIG] [--ignore PATTERN] [-q]
+                        [-o] [-p] [-b] [-d] [-c] [--priority LEVEL]
+                        [--color | --no-color]
                         [match ...]
 
         List tasks found in Markdown files
@@ -41,6 +43,7 @@ bats_require_minimum_version 1.5.0
           -h                   Show the usage reminder and exit
           --help               Show this help message and exit
           --version            show program's version number and exit
+          --guide              Show the Markdown formatting guide and exit
           --dir DIR            Directory to search (default: WHATNEXT_DIR, or '.')
           -s, --summary        Show summary of task counts per file
           -e, --edit           Open matching files in your editor (WHATNEXT_EDITOR,
@@ -62,39 +65,18 @@ bats_require_minimum_version 1.5.0
                                multiple times)
           --color, --no-color  Force colour output (or WHATNEXT_COLOR=1/0)
 
-        Task States:
-          - [ ] Open
-          - [/] In progress
-          - [<] Blocked
-          - [X] Done (hidden by default)
-          - [#] Cancelled (hidden by default)
-
-        Task Priority:
-          - [ ] _Underscore means medium priority_
-          - [ ] **Double asterisk means high priority**
-
-          Headers can also be emphasised to set priority for all tasks beneath.
-
-        Deadlines:
-          - [ ] Celebrate the New Year @2025-12-31
-          - [ ] Get Halloween candy @2025-10-31/3w
-
-          Are "immiment" priority two weeks before (or as specified -- /2d),
-          and are "overdue" priority after the date passes.
-
-        Annotations:
-          ```whatnext
-          Short notes that appear in the output
-          ```
-
-        Deferring:
-          - [ ] rewrite in Rust @after
-          - [ ] stage three @after stage_one.md stage_two.md
-
-          Files, sections, or individual tasks with @after [file ...]
-          are hidden until other tasks are complete.
+        Use --guide for Markdown formatting help.
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "--guide returns formatting guide" {
+    run --separate-stderr \
+        whatnext \
+            --guide
+
+    diff -u whatnext/guide.txt <(echo "$output")
     [ $status -eq 0 ]
 }

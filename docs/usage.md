@@ -242,6 +242,8 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
 -   `-h` / `--help` — show a short or full usage reminder.
 
+-   `--guide` — show the Markdown formatting guide and exit.
+
 -   `--version` — show the version and exit.
 
 

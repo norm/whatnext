@@ -1,7 +1,13 @@
 # What next?
 
-Document your tasks in Markdown files, using an expanded version of the
-original [GitHub task list notation][sn]:
+I like to keep tasks in Markdown files. That way they can be interspersed
+within instructions, serving as reminders, FIXMEs, and other todos.
+
+All the features for enhancing your task lists are discussed in detail in
+[the documentation](docs/index.md).
+
+Document your tasks using an expanded version of the original
+[GitHub task list notation][sn]:
 
 ```markdown
 - [ ] open, this task is outstanding
@@ -10,11 +16,14 @@ original [GitHub task list notation][sn]:
 - [#] cancelled, this task has been scratched
 - [<] blocked, this task needs more input
 
-- [ ] _a little more important_
-- [ ] **a lot more important**
+- [ ] _an important task_
+
+# **Make apple pie from scratch**
+- [ ] invent the universe
+
+# Things for later
 
 - [ ] get NYE fireworks tickets @2025-12-31
-
 - [ ] but in the end it doesn't even matter @after
 ```
 
@@ -46,22 +55,6 @@ README.md:
     - [ ] open, this task is outstanding
     - [<] blocked, this task needs more input
 ```
-
-More detail to be found:
-
-- [The basics of task formatting](docs/basics.md)
-- [Adding prioritisation](docs/prioritisation.md)
-- [Adding deadlines](docs/deadlines.md)
-- [Annotating tasks](docs/annotations.md)
-- [Deferring tasks](docs/deferring.md)
-- [whatnext usage and arguments](docs/usage.md)
-- [The `.whatnext` file](docs/dotwhatnext.md)
-
-
-## The reason
-
-I like to keep tasks in Markdown files. That way they can be interspersed
-within instructions, serving as reminders, FIXMEs, and other todos.
 
 
 [sn]: https://blog.github.com/2013-01-09-task-lists-in-gfm-issues-pulls-comments/

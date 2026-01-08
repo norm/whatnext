@@ -2,6 +2,7 @@ import argparse
 from datetime import date
 import fnmatch
 import importlib.metadata
+import importlib.resources
 import os
 import random
 import re
@@ -311,42 +312,21 @@ class ShortHelpAction(argparse.Action):
         parser.exit()
 
 
+class GuideAction(argparse.Action):
+    def __init__(self, option_strings, dest, **kwargs):
+        super().__init__(option_strings, dest, nargs=0, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        import whatnext
+        guide = importlib.resources.files(whatnext).joinpath("guide.txt")
+        print(guide.read_text(), end="")
+        parser.exit()
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="List tasks found in Markdown files",
-        epilog="""\
-Task States:
-  - [ ] Open
-  - [/] In progress
-  - [<] Blocked
-  - [X] Done (hidden by default)
-  - [#] Cancelled (hidden by default)
-
-Task Priority:
-  - [ ] _Underscore means medium priority_
-  - [ ] **Double asterisk means high priority**
-
-  Headers can also be emphasised to set priority for all tasks beneath.
-
-Deadlines:
-  - [ ] Celebrate the New Year @2025-12-31
-  - [ ] Get Halloween candy @2025-10-31/3w
-
-  Are "immiment" priority two weeks before (or as specified -- /2d),
-  and are "overdue" priority after the date passes.
-
-Annotations:
-  ```whatnext
-  Short notes that appear in the output
-  ```
-
-Deferring:
-  - [ ] rewrite in Rust @after
-  - [ ] stage three @after stage_one.md stage_two.md
-
-  Files, sections, or individual tasks with @after [file ...]
-  are hidden until other tasks are complete.
-""",
+        epilog="Use --guide for Markdown formatting help.",
         add_help=False,
         formatter_class=CapitalisedHelpFormatter,
     )
@@ -364,6 +344,11 @@ Deferring:
         "--version",
         action="version",
         version=f"whatnext version v{importlib.metadata.version('whatnext')}",
+    )
+    parser.add_argument(
+        "--guide",
+        action=GuideAction,
+        help="Show the Markdown formatting guide and exit",
     )
     parser.add_argument(
         "--dir",
