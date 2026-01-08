@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [v1.2] - UNRELEASED
+
+Files, sections, or individual tasks can be deferred using `@after` to hide
+them until other tasks are complete.
+
+
 ## [v1.1] - 2025-12-04
 
 Fixed relative summaries to include all tasks, not just some.

@@ -86,6 +86,13 @@ bats_require_minimum_version 1.5.0
           ```whatnext
           Short notes that appear in the output
           ```
+
+        Deferring:
+          - [ ] rewrite in Rust @after
+          - [ ] stage three @after stage_one.md stage_two.md
+
+          Files, sections, or individual tasks with @after [file ...]
+          are hidden until other tasks are complete.
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")

@@ -63,6 +63,7 @@ setup() {
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         +17 example/projects/obelisk.md
         +5 example/tasks.md
+        +7 example/projects/curtain.md
         +3 example/archived/projects/tangerine.md
         EOF
     )

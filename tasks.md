@@ -77,3 +77,9 @@ which will start to fail if it is removed.)
 - [X] remove slashes from columns in summary, its just visual noise
 - [X] `-e`/`--edit` to open matching task files in editor at the line
       number of the first match
+
+# version 1.2 - deferring tasks
+
+- [X] tasks, sections, and files marked `@after` should not appear in the
+      default output until all other tasks are complete
+- [ ] `--guide` to output just what the Markdown formatting is

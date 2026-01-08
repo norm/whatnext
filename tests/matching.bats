@@ -145,6 +145,9 @@ bats_require_minimum_version 1.5.0
             Mess with Jackson
             - [<] watch archaeologists discover (needs time machine)
 
+        projects/curtain.md:
+            # Project Curtain / Final bow
+            - [ ] Take a bow
         projects/obelisk.md:
             # Project Obelisk
             Something something star gate
@@ -188,6 +191,14 @@ bats_require_minimum_version 1.5.0
             # Get S Done
             - [ ] come up with better projects
             - [ ] start third project
+        example/projects/curtain.md:
+            # Project Curtain / Final bow
+            - [ ] Take a bow
+            # Project Curtain / Safety
+            - [ ] Lower the safety curtain
+            # Project Curtain / Close the theatre
+            - [ ] Escort everyone out
+            - [ ] Shut up shop
         example/projects/obelisk.md:
             # Project Obelisk
             Something something star gate
@@ -263,6 +274,9 @@ bats_require_minimum_version 1.5.0
             # Get S Done
             - [ ] come up with better projects
             - [ ] start third project
+        projects/curtain.md:
+            # Project Curtain / Final bow
+            - [ ] Take a bow
         projects/obelisk.md:
             # Project Obelisk
             Something something star gate
@@ -327,6 +341,7 @@ bats_require_minimum_version 1.5.0
             - [ ] bury obelisk in desert
             - [ ] question entire existence
             - [ ] start third project
+            - [ ] Take a bow
             - [ ] research into runic meaning
             - [<] watch archaeologists discover (needs time machine)
             # Usage / Matching
@@ -343,6 +358,10 @@ bats_require_minimum_version 1.5.0
             - [ ] bury obelisk in desert
             - [ ] question entire existence
             - [ ] start third project
+            - [ ] Take a bow
+            - [ ] Lower the safety curtain
+            - [ ] Escort everyone out
+            - [ ] Shut up shop
             - [ ] research into runic meaning
             - [<] watch archaeologists discover (needs time machine)
         tests/headerless.md:
@@ -395,6 +414,7 @@ bats_require_minimum_version 1.5.0
             - [ ] bury obelisk in desert
             - [ ] question entire existence
             - [ ] start third project
+            - [ ] Take a bow
             - [ ] research into runic meaning
             - [<] watch archaeologists discover (needs time machine)
             # Usage / Matching
@@ -411,6 +431,10 @@ bats_require_minimum_version 1.5.0
             - [ ] bury obelisk in desert
             - [ ] question entire existence
             - [ ] start third project
+            - [ ] Take a bow
+            - [ ] Lower the safety curtain
+            - [ ] Escort everyone out
+            - [ ] Shut up shop
             - [ ] research into runic meaning
             - [<] watch archaeologists discover (needs time machine)
         EOF

@@ -29,6 +29,9 @@ tasks.md:
     # Get S Done / IMMINENT 11d
     - [ ] start third project
 
+projects/curtain.md:
+    # Project Curtain / Final bow
+    - [ ] Take a bow
 projects/obelisk.md:
     # Project Obelisk
     Something something star gate
@@ -131,6 +134,14 @@ To show a random selection of tasks rather than by priority, use `5r`.
         # Get S Done / IMMINENT 11d
         - [ ] start third project
 
+    projects/curtain.md:
+        # Project Curtain / Final bow
+        - [ ] Take a bow
+        # Project Curtain / Safety
+        - [ ] Lower the safety curtain
+        # Project Curtain / Close the theatre
+        - [ ] Escort everyone out
+        - [ ] Shut up shop
     projects/obelisk.md:
         # Project Obelisk
         Something something star gate
@@ -165,9 +176,10 @@ To show a random selection of tasks rather than by priority, use `5r`.
     (computer)% whatnext --summary
                                                         B P O
     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              0 0 3  tasks.md
+    ░░░░░░░░░░░░                                        0 0 1  projects/curtain.md
     ▚▚▚▚▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░  1 1 2  projects/obelisk.md
                                                         ─────
-                                                        1 1 5  7, of 11 total
+                                                        1 1 6  8, of 15 total
 
     ▚ Blocked  ▓ Partial  ░ Open
     ```
@@ -182,10 +194,11 @@ To show a random selection of tasks rather than by priority, use `5r`.
     (computer)% whatnext --summary --all
                                          C D B P O
     ░░░░░░░░░░░░░░░░░░░░░░░░░░           0 0 0 0 3  tasks.md
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0 0 0 0 4  projects/curtain.md
     ▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░  0 0 1 1 2  projects/obelisk.md
     ▚▚▚▚▚▚▚▚▚██████████████████████████  1 3 0 0 0  archived/projects/tangerine.md
                                          ─────────
-                                         1 3 1 1 5  11, of 11 total
+                                         1 3 1 1 9  15, of 15 total
 
     ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
     ```
@@ -206,10 +219,11 @@ To show a random selection of tasks rather than by priority, use `5r`.
     (computer)% whatnext --summary --relative --priority high
                                               H  ~
     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░            0  3  tasks.md
+    ░░░░░░░░░░                                0  1  projects/curtain.md
     ██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1  3  projects/obelisk.md
     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0  4  archived/projects/tangerine.md
                                               ────
-                                              1 10  11, of 11 total
+                                              1 11  12, of 15 total
 
     █ High  ░ (Overdue/Imminent/Medium/Normal)
     ```

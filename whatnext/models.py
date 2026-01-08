@@ -88,6 +88,7 @@ class Task:
         imminent=None,
         annotation=None,
         line=None,
+        deferred=None,
     ):
         self.file = file
         self.heading = heading
@@ -98,6 +99,7 @@ class Task:
         self.imminent = imminent
         self.annotation = annotation
         self.line = line
+        self.deferred = deferred
 
     def as_dict(self):
         return {
@@ -214,6 +216,19 @@ class MarkdownFile:
     """, re.VERBOSE)
     ANNOTATION_START = re.compile(r"^```whatnext\s*$")
     ANNOTATION_END = re.compile(r"^```\s*$")
+    AFTER_PATTERN = re.compile(r"""
+        ^
+            (.+?)           # text before @after (non-greedy)
+            \s+             # whitespace before @after
+            @after          # literal @after
+            (?:             # optional files group
+                \s+         # whitespace before files
+                (.+)        # file names (space-separated)
+            )?
+            \s*             # trailing whitespace
+        $
+    """, re.VERBOSE)
+    FILE_AFTER_PATTERN = re.compile(r"^@after(?:\s+(.+))?\s*$")
     DEFAULT_URGENCY = timedelta(weeks=2)
 
     def __init__(
@@ -266,6 +281,17 @@ class MarkdownFile:
         return (due, imminent, cleaned)
 
     @staticmethod
+    def parse_after(text):
+        match = MarkdownFile.AFTER_PATTERN.match(text)
+        if not match:
+            return (None, text)
+        cleaned = match.group(1).strip()
+        files_str = match.group(2)
+        if files_str:
+            return (files_str.split(), cleaned)
+        return ([], cleaned)
+
+    @staticmethod
     def parse_priority(text):
         if text.startswith("**") and text.endswith("**") and len(text) > 4:
             return Priority.HIGH
@@ -289,9 +315,9 @@ class MarkdownFile:
 
     def extract_tasks(self):
         tasks = []
-        for heading, lines, priority, annotation in self.sections():
+        for heading, lines, priority, annotation, deferred in self.sections():
             tasks.extend(
-                self.tasks_in_section(heading, lines, priority, annotation)
+                self.tasks_in_section(heading, lines, priority, annotation, deferred)
             )
         return tasks
 
@@ -304,16 +330,28 @@ class MarkdownFile:
     def sections(self):
         heading = None
         priority = Priority.NORMAL
+        deferred = None
         annotation_parts = []
         lines = []
         results = []
 
-        # stack stores (level, text, priority) -- explicit level needed for
-        # skipped headings (# -> ### -> ##, where position != depth)
+        # stack stores (level, text, priority, deferred) -- explicit level needed
+        # for skipped headings (# -> ### -> ##, where position != depth)
         stack = []
 
         in_annotation = False
         annotation_delimiter = None
+
+        # first pass: scan for file-level @after
+        file_deferred = None
+        for line in self.read_lines():
+            if match := self.FILE_AFTER_PATTERN.match(line):
+                files_str = match.group(1)
+                if files_str:
+                    file_deferred = files_str.split()
+                else:
+                    file_deferred = []
+                break
 
         for line_index, line in enumerate(self.read_lines(), 1):
             if in_annotation:
@@ -336,33 +374,50 @@ class MarkdownFile:
                 annotation_delimiter = re.match(r'^(`+)', line).group(1)
                 in_annotation = True
                 continue
+            if self.FILE_AFTER_PATTERN.match(line):
+                continue
             if match := self.HEADING_PATTERN.match(line):
                 if lines:
                     annotation = " ".join(" ".join(annotation_parts).split()) or None
-                    results.append((heading, lines, priority, annotation))
+                    results.append((heading, lines, priority, annotation, deferred))
                     lines = []
                     annotation_parts = []
                 level = len(match.group(1))
                 while stack and stack[-1][0] >= level:
                     stack.pop()
                 heading_text = match.group(2)
-                heading_priority = self.parse_priority(heading_text)
-                stack.append((level, heading_text, heading_priority))
+                heading_deferred, cleaned_heading = self.parse_after(heading_text)
+                heading_priority = self.parse_priority(cleaned_heading)
+                stack.append((
+                    level, cleaned_heading, heading_priority, heading_deferred
+                ))
                 heading = "# " + " / ".join(
-                    self.strip_emphasis(text) for _, text, _ in stack
+                    self.strip_emphasis(text) for _, text, _, _ in stack
                 )
-                priority = min((p for _, _, p in stack), key=lambda p: p.value)
+                priority = min((p for _, _, p, _ in stack), key=lambda p: p.value)
+                # find the most specific (deepest) deferred setting
+                deferred = file_deferred
+                for _, _, _, stack_deferred in stack:
+                    if stack_deferred is not None:
+                        deferred = stack_deferred
             else:
                 lines.append((line_index, line))
 
         if lines:
             annotation = " ".join(" ".join(annotation_parts).split()) or None
-            results.append((heading, lines, priority, annotation))
+            results.append((heading, lines, priority, annotation, deferred))
 
         return results
 
     def parse_task(
-        self, heading, heading_priority, marker, task_content, line_index, annotation
+        self,
+        heading,
+        heading_priority,
+        marker,
+        task_content,
+        line_index,
+        annotation,
+        section_deferred,
     ):
         state = State.from_marker(marker)
         if state is None:
@@ -371,9 +426,15 @@ class MarkdownFile:
                 f"in '{task_content}', {self.display_path} line {line_index}"
             )
             return None
-        due, imminent_date, cleaned_text = self.parse_deadline(task_content)
+
+        # parse @after first, then deadline from remaining text
+        task_deferred, after_cleaned = self.parse_after(task_content)
+        due, imminent_date, cleaned_text = self.parse_deadline(after_cleaned)
         display_text = self.strip_emphasis(cleaned_text)
         display_text = " ".join(display_text.split())
+
+        # task-level @after overrides section-level
+        deferred = task_deferred if task_deferred is not None else section_deferred
 
         if state in {State.COMPLETE, State.CANCELLED}:
             priority = None
@@ -402,10 +463,11 @@ class MarkdownFile:
             imminent_date,
             annotation,
             line_index,
+            deferred,
         )
 
     def tasks_in_section(
-        self, heading, lines, heading_priority, annotation
+        self, heading, lines, heading_priority, annotation, section_deferred
     ):
         prefix_width = len("- [.] ")
         tasks = []
@@ -431,6 +493,7 @@ class MarkdownFile:
                     task_content,
                     task_line,
                     annotation,
+                    section_deferred,
                 )
                 if task is not None:
                     tasks.append(task)

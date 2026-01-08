@@ -33,6 +33,14 @@ bats_require_minimum_version 1.5.0
             # Get S Done
             - [ ] come up with better projects
             - [ ] start third project
+        projects/curtain.md:
+            # Project Curtain / Final bow
+            - [ ] Take a bow
+            # Project Curtain / Safety
+            - [ ] Lower the safety curtain
+            # Project Curtain / Close the theatre
+            - [ ] Escort everyone out
+            - [ ] Shut up shop
         projects/obelisk.md:
             # Project Obelisk
             Something something star gate
@@ -74,6 +82,14 @@ bats_require_minimum_version 1.5.0
             # Get S Done
             - [ ] come up with better projects
             - [ ] start third project
+        projects/curtain.md:
+            # Project Curtain / Final bow
+            - [ ] Take a bow
+            # Project Curtain / Safety
+            - [ ] Lower the safety curtain
+            # Project Curtain / Close the theatre
+            - [ ] Escort everyone out
+            - [ ] Shut up shop
         projects/obelisk.md:
             # Project Obelisk
             Something something star gate

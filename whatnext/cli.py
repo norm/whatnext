@@ -25,6 +25,104 @@ PRIORITY_COLOURS = {
     Priority.IMMINENT: ("green", None),
 }
 
+COMPLETE_STATES = {State.COMPLETE, State.CANCELLED}
+
+
+class CircularDependencyError(Exception):
+    pass
+
+
+def files_by_basename(files):
+    # @after references use basenames, not full paths
+    return {
+        os.path.basename(file.path): file
+            for file in files
+    }
+
+
+def check_dependencies(files, quiet=False):
+    file_by_basename = files_by_basename(files)
+
+    dependencies = {}
+    for file in files:
+        basename = os.path.basename(file.path)
+        deps = set()
+        for task in file.tasks:
+            if task.deferred and len(task.deferred) > 0:
+                deps.update(task.deferred)
+        dependencies[basename] = deps
+
+    for file in files:
+        for task in file.tasks:
+            if not task.deferred:
+                continue
+            for dep in task.deferred:
+                if dep in file_by_basename or quiet:
+                    continue
+                print(
+                    f"WARNING: {file.display_path}: '{dep}' does not exist",
+                    file=sys.stderr,
+                )
+
+    path = []
+
+    def has_cycle(node):
+        if node in path:
+            cycle_start = path.index(node)
+            cycle = path[cycle_start:] + [node]
+            return cycle
+        if node not in dependencies:
+            return None
+        path.append(node)
+        for dep in dependencies[node]:
+            cycle = has_cycle(dep)
+            if cycle:
+                return cycle
+        path.pop()
+        return None
+
+    for basename in dependencies:
+        cycle = has_cycle(basename)
+        if cycle:
+            raise CircularDependencyError(
+                f"Circular dependency: {' -> '.join(cycle)}"
+            )
+
+
+def filter_deferred(data):
+    all_files = [file for file, tasks in data]
+    file_by_basename = files_by_basename(all_files)
+
+    # check if all non-deferred tasks across all files are complete
+    all_non_deferred_complete = True
+    for file, tasks in data:
+        for task in file.tasks:
+            if task.deferred is None and task.state not in COMPLETE_STATES:
+                all_non_deferred_complete = False
+                break
+        if not all_non_deferred_complete:
+            break
+
+    def is_file_complete(basename):
+        if basename not in file_by_basename:
+            return False
+        file = file_by_basename[basename]
+        return all(task.state in COMPLETE_STATES for task in file.tasks)
+
+    def should_show_task(task):
+        if task.deferred is None:
+            return True
+        if len(task.deferred) == 0:
+            return all_non_deferred_complete
+        return all(is_file_complete(dep) for dep in task.deferred)
+
+    result = []
+    for file, tasks in data:
+        filtered_tasks = [task for task in tasks if should_show_task(task)]
+        result.append((file, filtered_tasks))
+
+    return result
+
 
 def get_terminal_width():
     columns_env = os.environ.get("COLUMNS")
@@ -241,6 +339,13 @@ Annotations:
   ```whatnext
   Short notes that appear in the output
   ```
+
+Deferring:
+  - [ ] rewrite in Rust @after
+  - [ ] stage three @after stage_one.md stage_two.md
+
+  Files, sections, or individual tasks with @after [file ...]
+  are hidden until other tasks are complete.
 """,
         add_help=False,
         formatter_class=CapitalisedHelpFormatter,
@@ -390,6 +495,12 @@ Annotations:
     if not task_files:
         return
 
+    try:
+        check_dependencies(task_files, quiet=quiet)
+    except CircularDependencyError as error:
+        print(f"ERROR: {error}", file=sys.stderr, flush=True)
+        sys.exit(1)
+
     states = set()
     if args.open:
         states.add(State.OPEN)
@@ -430,6 +541,9 @@ Annotations:
             (file, file.filtered_tasks(states, search_terms, priorities))
                 for file in task_files
         ]
+
+    if not args.all:
+        filtered_data = filter_deferred(filtered_data)
 
     if args.summary:
         output = format_summary(

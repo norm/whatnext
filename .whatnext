@@ -3,5 +3,6 @@ ignore = [
     'README.md',
     'tasks.md',
     'example/*',
+    'tests/deferring/*',
     'docs/usage.md',
 ]
