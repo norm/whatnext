@@ -28,3 +28,9 @@ ignore = [
 If you need to store it somewhere else, or have it be a different
 filename, you can use the `--config` option, or set the location
 in the environment variable `WHATNEXT_CONFIG`.
+
+## Overriding exclusions
+
+Explicitly naming a file on the command line will show its tasks
+regardless of `@notnext` or ignore patterns. This allows you to
+query a specific file when needed without removing the exclusion.

@@ -228,13 +228,17 @@ To show a random selection of tasks rather than by priority, use `5r`.
     █ High  ░ (Overdue/Imminent/Medium/Normal)
     ```
 
+-   `-e` / `--edit` — open matching files in your editor at the first
+    task's line number. Uses `$WHATNEXT_EDITOR`, `$VISUAL`, `$EDITOR`,
+    or `vi` (in that order).
+
 -   `-q` / `--quiet` — suppress warnings (or `$WHATNEXT_QUIET=1`).
 
 -   `--ignore [pattern]` — ignore files matching the given
     [filename pattern][glob]; can be specified multiple times
     or put in the config file.
 
--   `--config` — path to the [config file](dotwhatnext.md), defaults
+-   `--config` — path to the [config file](exclusions.md), defaults
     to `.whatnext` or `$WHATNEXT_CONFIG`.
 
 -   `--dir` — the directory to search through for Markdown files,
@@ -245,6 +249,9 @@ To show a random selection of tasks rather than by priority, use `5r`.
 -   `--guide` — show the Markdown formatting guide and exit.
 
 -   `--version` — show the version and exit.
+
+-   `--color` / `--no-color` — force colour output on or off
+    (or `$WHATNEXT_COLOR=1` / `$WHATNEXT_COLOR=0`).
 
 
 [glob]: https://docs.python.org/3/library/fnmatch.html

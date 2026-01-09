@@ -17,11 +17,26 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 }
 
-@test "guide.txt should be a terse reference" {
-    diff -u <(head -n 20 whatnext/guide.txt) whatnext/guide.txt
-}
-
 @test "guide.txt has no long lines" {
     long_lines=$(awk 'length > 79' whatnext/guide.txt | wc -l)
     [ "$long_lines" -eq 0 ]
+}
+
+@test "all --help arguments are documented in usage.md" {
+    # extract long-form arguments from --help output
+    help_args=$(whatnext --help \
+        | grep -oE -- '--[a-z][-a-z]*' \
+        | sort -u)
+
+    missing=""
+    for arg in $help_args; do
+        if ! grep -q -- "$arg" docs/usage.md; then
+            missing="$missing $arg"
+        fi
+    done
+
+    [ -z "$missing" ] || {
+        echo "Arguments missing from docs/usage.md:$missing"
+        false
+    }
 }

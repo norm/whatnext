@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [v1.3] - UNRELEASED
+## [v1.3] - 2026-01-09
 
 Added `next` command to quickly add tasks from the command line.
 
