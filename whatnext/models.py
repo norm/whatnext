@@ -229,6 +229,7 @@ class MarkdownFile:
         $
     """, re.VERBOSE)
     FILE_AFTER_PATTERN = re.compile(r"^@after(?:\s+(.+))?\s*$")
+    NOTNEXT_PATTERN = re.compile(r"^@notnext(?:\s|$)")
     DEFAULT_URGENCY = timedelta(weeks=2)
 
     def __init__(
@@ -255,6 +256,7 @@ class MarkdownFile:
         self.base_dir = base_dir
         self.today = today
         self.warnings = []
+        self.notnext = False
         self.tasks = self.extract_tasks()
 
     @staticmethod
@@ -342,7 +344,7 @@ class MarkdownFile:
         in_annotation = False
         annotation_delimiter = None
 
-        # first pass: scan for file-level @after
+        # first pass: scan for file-level directives
         file_deferred = None
         for line in self.read_lines():
             if match := self.FILE_AFTER_PATTERN.match(line):
@@ -351,7 +353,8 @@ class MarkdownFile:
                     file_deferred = files_str.split()
                 else:
                     file_deferred = []
-                break
+            if self.NOTNEXT_PATTERN.match(line):
+                self.notnext = True
 
         for line_index, line in enumerate(self.read_lines(), 1):
             if in_annotation:

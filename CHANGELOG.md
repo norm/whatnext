@@ -5,6 +5,8 @@
 
 Added `next` command to quickly add tasks from the command line.
 
+Files can self-exclude from results using `@notnext`.
+
 
 ## [v1.2] - 2026-01-08
 

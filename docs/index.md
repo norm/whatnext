@@ -56,8 +56,8 @@ and sections can have [annotations included](annotations.md).
 If a task has a dependency on other tasks, such that it cannot be done in any
 order, you can [defer tasks](deferring.md) until all/some other tasks are complete.
 
-If you need to filter out some Markdown files for any reason, you can include
-[a `.whatnext` file](dotwhatnext.md) in the root of your project.
+If you need to exclude out some Markdown files for any reason, there are
+[two ways to do that](exclusions.md).
 
 Here's the full [whatnext usage and arguments](usage.md) guide.
 

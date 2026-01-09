@@ -1192,3 +1192,82 @@ class TestAnnotationParsing:
             "imminent": None,
             "annotation": "notes notes notes more notes what are this?",
         }
+
+
+class TestNotnextParsing:
+    def test_file_without_notnext(self):
+        file = MarkdownFile(
+            source_string="- [ ] normal task",
+            today=date(2025, 1, 1),
+        )
+        assert file.notnext is False
+
+    def test_file_with_notnext_at_start(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                @notnext
+
+                # Example tasks
+
+                - [ ] this file will not be included
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.notnext is True
+        assert len(file.tasks) == 1
+
+    def test_file_with_notnext_after_content(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Example tasks
+
+                - [ ] this file will not be included
+
+                @notnext
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.notnext is True
+
+    def test_file_with_notnext_and_explanation(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                @notnext for many reasons
+
+                # Example tasks
+
+                - [ ] this file will not be included
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.notnext is True
+        assert len(file.tasks) == 1
+
+    def test_file_with_notnext_between_sections(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Section one
+
+                - [ ] task one
+
+                @notnext ignores the whole file, not just after the marker
+
+                # Section two
+
+                - [ ] task two
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.notnext is True
+        assert len(file.tasks) == 2
+
+    def test_notnext_must_be_on_own_line(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Tasks
+
+                - [ ] something @notnext something else
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.notnext is False

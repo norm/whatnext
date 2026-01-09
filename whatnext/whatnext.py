@@ -208,6 +208,8 @@ def find_markdown_files(paths, today, ignore_patterns=None, quiet=False):
                     if not quiet:
                         for warning in file.warnings:
                             print(warning, file=sys.stderr)
+                    if file.notnext:
+                        continue
                     if file.tasks:
                         task_files[abs_path] = file
 
