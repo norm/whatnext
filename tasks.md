@@ -78,8 +78,17 @@ which will start to fail if it is removed.)
 - [X] `-e`/`--edit` to open matching task files in editor at the line
       number of the first match
 
+
 # version 1.2 - deferring tasks
 
 - [X] tasks, sections, and files marked `@after` should not appear in the
       default output until all other tasks are complete
-- [ ] `--guide` to output just what the Markdown formatting is
+- [X] `--guide` to output just what the Markdown formatting is
+
+
+# next
+
+- [ ] script to add a task to a project's files
+- [ ] more explanation in the guide, including examples of all types of
+      option, and the .whatnext file
+- [ ] a way for a file to self-exclude from summaries (vs .whatnext)
