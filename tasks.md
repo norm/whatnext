@@ -88,7 +88,7 @@ which will start to fail if it is removed.)
 
 # next
 
-- [ ] script to add a task to a project's files
+- [X] script to add a task to a project's files
 - [ ] more explanation in the guide, including examples of all types of
       option, and the .whatnext file
 - [ ] a way for a file to self-exclude from summaries (vs .whatnext)

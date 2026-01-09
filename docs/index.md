@@ -59,7 +59,13 @@ order, you can [defer tasks](deferring.md) until all/some other tasks are comple
 If you need to filter out some Markdown files for any reason, you can include
 [a `.whatnext` file](dotwhatnext.md) in the root of your project.
 
-And here's the full [whatnext usage and arguments](usage.md) guide.
+Here's the full [whatnext usage and arguments](usage.md) guide.
+
+
+## and how do I add tasks?
+
+Well, they're Markdown files, manage them however you like. But if you really
+need a quick way to add a task from the CLI, check out [next](next.md).
 
 
 [th]: https://culturedcode.com/things/

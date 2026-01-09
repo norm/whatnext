@@ -1,6 +1,11 @@
 # Changelog
 
 
+## [v1.3] - UNRELEASED
+
+Added `next` command to quickly add tasks from the command line.
+
+
 ## [v1.2] - 2026-01-08
 
 Files, sections, or individual tasks can be deferred using `@after` to hide

@@ -1,6 +1,6 @@
 from datetime import date
 
-from whatnext.cli import get_editor
+from whatnext.whatnext import get_editor
 from whatnext.models import MarkdownFile
 
 

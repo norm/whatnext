@@ -56,5 +56,12 @@ README.md:
     - [<] blocked, this task needs more input
 ```
 
+Also provided, `next` to add tasks to files.
+
+```bash
+# by default, adds to $HOME/tasks.md
+(computer)% next Add more features to whatnext
+Updated tasks.md
+```
 
 [sn]: https://blog.github.com/2013-01-09-task-lists-in-gfm-issues-pulls-comments/

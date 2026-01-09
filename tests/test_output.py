@@ -1,7 +1,7 @@
 from datetime import date
 from textwrap import dedent
 
-from whatnext.cli import flatten_by_priority, format_tasks
+from whatnext.whatnext import flatten_by_priority, format_tasks
 from whatnext.models import MarkdownFile, Priority, State
 
 ACTIVE_STATES = {State.IN_PROGRESS, State.OPEN, State.BLOCKED}

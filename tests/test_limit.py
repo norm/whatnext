@@ -1,7 +1,7 @@
 import random
 from datetime import date
 
-from whatnext.cli import flatten_by_priority, find_markdown_files
+from whatnext.whatnext import flatten_by_priority, find_markdown_files
 from whatnext.models import MarkdownFile, Priority, State
 
 ACTIVE_STATES = {State.IN_PROGRESS, State.OPEN, State.BLOCKED}

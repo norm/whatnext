@@ -4,7 +4,7 @@ from textwrap import dedent
 import pytest
 
 from whatnext.models import MarkdownFile, Priority, State
-from whatnext.cli import (
+from whatnext.whatnext import (
     filter_deferred,
     check_dependencies,
     CircularDependencyError,
