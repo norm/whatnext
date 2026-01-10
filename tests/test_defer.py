@@ -136,8 +136,6 @@ class TestAfterParsingFileLevel:
             source_string=dedent("""\
                 @after
 
-                # Tasks
-
                 - [ ] all tasks in file are deferred
             """),
             today=date(2025, 1, 1),

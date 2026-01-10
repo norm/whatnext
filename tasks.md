@@ -86,9 +86,10 @@ which will start to fail if it is removed.)
 - [X] `--guide` to output just what the Markdown formatting is
 
 
-# next
+# version 1.3
 
 - [X] script to add a task to a project's files
 - [X] more explanation in the guide, including examples of all types of
       option, and the .whatnext file
 - [X] a way for a file to self-exclude from summaries (vs .whatnext)
+- [X] fix file-level `@after` being ignored when file has no headings

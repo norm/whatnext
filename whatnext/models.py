@@ -332,7 +332,6 @@ class MarkdownFile:
     def sections(self):
         heading = None
         priority = Priority.NORMAL
-        deferred = None
         annotation_parts = []
         lines = []
         results = []
@@ -355,6 +354,8 @@ class MarkdownFile:
                     file_deferred = []
             if self.NOTNEXT_PATTERN.match(line):
                 self.notnext = True
+
+        deferred = file_deferred
 
         for line_index, line in enumerate(self.read_lines(), 1):
             if in_annotation:
