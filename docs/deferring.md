@@ -12,6 +12,9 @@ are done, so you can indicate that these tasks _should not show up_ yet:
 `@after` on a line by itself applies to the whole file, on a header it
 applies to the section, and on a task only applies to that task.
 
+If you need to include it without it being parsed, either surround it in
+backticks (` `@after` `) or put a backslash before (`\@after`).
+
 
 ## After ... what?
 

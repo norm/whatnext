@@ -453,6 +453,38 @@ class TestFileParsing:
             "annotation": None,
         }
 
+    def test_backticks_prevent_deadline_parsing(self):
+        file = MarkdownFile(
+            source_string="- [ ] document `@2025-12-15` format",
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].text == "document `@2025-12-15` format"
+        assert file.tasks[0].due is None
+
+    def test_backslash_prevents_deadline_parsing(self):
+        file = MarkdownFile(
+            source_string=r"- [ ] document \@2025-12-15 format",
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].text == r"document \@2025-12-15 format"
+        assert file.tasks[0].due is None
+
+    def test_backticks_with_urgency_not_parsed(self):
+        file = MarkdownFile(
+            source_string="- [ ] use `@2025-12-15/2w` syntax",
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].text == "use `@2025-12-15/2w` syntax"
+        assert file.tasks[0].due is None
+
+    def test_backslash_with_urgency_not_parsed(self):
+        file = MarkdownFile(
+            source_string=r"- [ ] use \@2025-12-15/2w syntax",
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].text == r"use \@2025-12-15/2w syntax"
+        assert file.tasks[0].due is None
+
 
 class GroupedTasksTestCase:
     def tasks(self, grouped_tasks):

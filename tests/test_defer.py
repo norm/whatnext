@@ -64,6 +64,40 @@ class TestAfterParsingOnTasks:
         assert file.tasks[0].deferred == ["@2025-12-25"]
 
 
+class TestAfterEscapedOnTasks:
+    def test_backticks_prevent_after_parsing(self):
+        file = MarkdownFile(
+            source_string="- [ ] document `@after` usage",
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].text == "document `@after` usage"
+        assert file.tasks[0].deferred is None
+
+    def test_backslash_prevents_after_parsing(self):
+        file = MarkdownFile(
+            source_string=r"- [ ] document \@after usage",
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].text == r"document \@after usage"
+        assert file.tasks[0].deferred is None
+
+    def test_backticks_with_files_not_parsed(self):
+        file = MarkdownFile(
+            source_string="- [ ] use `@after file.md` syntax",
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].text == "use `@after file.md` syntax"
+        assert file.tasks[0].deferred is None
+
+    def test_backslash_with_files_not_parsed(self):
+        file = MarkdownFile(
+            source_string=r"- [ ] use \@after file.md syntax",
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].text == r"use \@after file.md syntax"
+        assert file.tasks[0].deferred is None
+
+
 class TestAfterParsingOnHeaders:
     def test_header_with_bare_after(self):
         file = MarkdownFile(

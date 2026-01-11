@@ -23,6 +23,9 @@ can be controlled:
 The `/1d` adjustment can be a number of days or weeks. `/0d` means the
 task will only change priority on the day itself.
 
+If you need to include it without it being parsed, either surround it in
+backticks (` `@YYYY-...` `) or put a backslash before (`\@YYYY-...`).
+
 
 # Deadlines and priorities
 

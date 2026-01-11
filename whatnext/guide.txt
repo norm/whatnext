@@ -43,6 +43,9 @@ subset. Prioritisation does not stop the task being ignored.
     # Later @after
     - [ ] **do this last**
 
+To write about @after or deadlines without them being parsed, use backticks
+(`@after`) or a backslash (\@after).
+
 Context around tasks, such as detailed decision notes and designs can be
 included in the document without showing in the task list. To include a
 short note in the summary, use special fence blocks:
