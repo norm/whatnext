@@ -53,6 +53,7 @@ def check_dependencies(files, quiet=False):
                 deps.update(task.deferred)
         dependencies[basename] = deps
 
+    warned = set()
     for file in files:
         for task in file.tasks:
             if not task.deferred:
@@ -60,6 +61,10 @@ def check_dependencies(files, quiet=False):
             for dep in task.deferred:
                 if dep in file_by_basename or quiet:
                     continue
+                key = (file.display_path, dep)
+                if key in warned:
+                    continue
+                warned.add(key)
                 print(
                     f"WARNING: {file.display_path}: '{dep}' does not exist",
                     file=sys.stderr,

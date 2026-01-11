@@ -93,3 +93,5 @@ which will start to fail if it is removed.)
       option, and the .whatnext file
 - [X] a way for a file to self-exclude from summaries (vs .whatnext)
 - [X] fix file-level `@after` being ignored when file has no headings
+- [X] fix multiple warnings for one incorrect `@after`
+- [ ] add flag to skip @after processing and show all outstanding tasks

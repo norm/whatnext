@@ -33,12 +33,28 @@ bats_require_minimum_version 1.5.0
             tests/deferring
 
     expected_stderr=$(sed -e 's/^        //' <<"        EOF"
+        WARNING: duplicate-warnings.md: 'missing-a.md' does not exist
+        WARNING: duplicate-warnings.md: 'missing-b.md' does not exist
         WARNING: missing-dep.md: 'nonexistent.md' does not exist
         ERROR: Circular dependency: circular-a.md -> circular-b.md -> circular-a.md
         EOF
     )
     diff -u <(echo "$expected_stderr") <(echo "$stderr")
     [ $status -eq 1 ]
+}
+
+@test "warnings are not duplicated" {
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/duplicate-warnings.md
+
+    expected_stderr=$(sed -e 's/^        //' <<"        EOF"
+        WARNING: tests/deferring/duplicate-warnings.md: 'missing-a.md' does not exist
+        WARNING: tests/deferring/duplicate-warnings.md: 'missing-b.md' does not exist
+        EOF
+    )
+    diff -u <(echo "$expected_stderr") <(echo "$stderr")
+    [ $status -eq 0 ]
 }
 
 @test "warning suppressed with --quiet" {
