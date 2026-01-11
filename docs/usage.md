@@ -156,6 +156,8 @@ To show a random selection of tasks rather than by priority, use `5r`.
         - [#] throw fruit at neighbours (they moved away)
     ```
 
+-   `--ignore-after` — show all tasks, ignoring `@after` constraints.
+
 -   `-o` / `--open` — show only open tasks.
 
 -   `-p` / `--partial` — show only in progress tasks.

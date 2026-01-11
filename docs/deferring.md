@@ -15,6 +15,9 @@ applies to the section, and on a task only applies to that task.
 If you need to include it without it being parsed, either surround it in
 backticks (` `@after` `) or put a backslash before (`\@after`).
 
+To ignore this when querying for tasks, use `whatnext --ignore-after`
+(plus `whatnext --all` will always show all tasks regardless).
+
 
 ## After ... what?
 
@@ -37,4 +40,3 @@ Circular dependencies (where A depends on B and B depends on A) will
 cause an error showing the cycle. Referencing a nonexistent file will
 produce a warning.
 
-Running `whatnext --all` will always show the tasks regardless.

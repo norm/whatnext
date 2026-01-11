@@ -384,6 +384,11 @@ def main():
         help="Include all tasks and files, not just incomplete",
     )
     parser.add_argument(
+        "--ignore-after",
+        action="store_true",
+        help="Show all tasks, ignoring @after constraints",
+    )
+    parser.add_argument(
         "--config",
         default=os.environ.get("WHATNEXT_CONFIG"),
         help="Path to config file (default: WHATNEXT_CONFIG, or '.whatnext' in --dir)",
@@ -534,7 +539,7 @@ def main():
                 for file in task_files
         ]
 
-    if not args.all:
+    if not args.all and not args.ignore_after:
         filtered_data = filter_deferred(filtered_data)
 
     if args.summary:

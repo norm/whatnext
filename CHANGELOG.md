@@ -5,6 +5,9 @@
 
 Fixed repeated warnings when a file has a missing `@after` dependency.
 
+Added `--ignore-after` flag to show all outstanding tasks regardless of
+`@after` constraints.
+
 
 ## [v1.3.1] - 2026-01-10
 

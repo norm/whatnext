@@ -7,9 +7,9 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--guide] [--dir DIR] [-s] [-e]
-                        [--relative] [-a] [--config CONFIG] [--ignore PATTERN] [-q]
-                        [-o] [-p] [-b] [-d] [-c] [--priority LEVEL]
-                        [--color | --no-color]
+                        [--relative] [-a] [--ignore-after] [--config CONFIG]
+                        [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d] [-c]
+                        [--priority LEVEL] [--color | --no-color]
                         [match ...]
         EOF
     )
@@ -24,9 +24,9 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--guide] [--dir DIR] [-s] [-e]
-                        [--relative] [-a] [--config CONFIG] [--ignore PATTERN] [-q]
-                        [-o] [-p] [-b] [-d] [-c] [--priority LEVEL]
-                        [--color | --no-color]
+                        [--relative] [-a] [--ignore-after] [--config CONFIG]
+                        [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d] [-c]
+                        [--priority LEVEL] [--color | --no-color]
                         [match ...]
 
         List tasks found in Markdown files
@@ -51,6 +51,7 @@ bats_require_minimum_version 1.5.0
           --relative           Show selected states relative to all others (use with
                                --summary)
           -a, --all            Include all tasks and files, not just incomplete
+          --ignore-after       Show all tasks, ignoring @after constraints
           --config CONFIG      Path to config file (default: WHATNEXT_CONFIG, or
                                '.whatnext' in --dir)
           --ignore PATTERN     Ignore files matching pattern (can be specified

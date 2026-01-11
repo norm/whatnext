@@ -66,3 +66,29 @@ bats_require_minimum_version 1.5.0
     diff -u <(echo "") <(echo "$stderr")
     [ $status -eq 0 ]
 }
+
+@test "deferred tasks hidden by default" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/regular.md:
+            - [ ] do the thing
+        EOF
+    )
+
+    run whatnext tests/deferring/regular.md tests/deferring/deferred.md
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "after can be ignored" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/deferred.md:
+            - [ ] wait for regular
+        tests/deferring/regular.md:
+            - [ ] do the thing
+        EOF
+    )
+
+    run whatnext --ignore-after tests/deferring/regular.md tests/deferring/deferred.md
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
