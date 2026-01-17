@@ -96,3 +96,11 @@ which will start to fail if it is removed.)
 - [X] fix multiple warnings for one incorrect `@after`
 - [X] ensure `@after` and deadlines that are quoted are ignored
 - [X] add flag to skip \@after processing and show all outstanding tasks
+
+# next version
+
+- [ ] usage links to example/ incorrectly
+- [ ] next doc nested list needs spacing out to render on github
+- [ ] next -a didn\'t add to end of file when registering these bugs
+- [X] bare `@after` should wait for tasks with `@after file.md`, not just
+      tasks with no `@after` at all

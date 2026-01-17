@@ -99,14 +99,18 @@ def filter_deferred(data):
     all_files = [file for file, tasks in data]
     file_by_basename = files_by_basename(all_files)
 
-    # check if all non-deferred tasks across all files are complete
-    all_non_deferred_complete = True
+    # check if all tasks (except bare @after) across all files are complete
+    # bare @after means "do this last", so it waits for everything else
+    all_other_complete = True
     for file, tasks in data:
         for task in file.tasks:
-            if task.deferred is None and task.state not in COMPLETE_STATES:
-                all_non_deferred_complete = False
+            # skip bare @after tasks - they're also waiting for "last"
+            if task.deferred is not None and len(task.deferred) == 0:
+                continue
+            if task.state not in COMPLETE_STATES:
+                all_other_complete = False
                 break
-        if not all_non_deferred_complete:
+        if not all_other_complete:
             break
 
     def is_file_complete(basename):
@@ -119,7 +123,7 @@ def filter_deferred(data):
         if task.deferred is None:
             return True
         if len(task.deferred) == 0:
-            return all_non_deferred_complete
+            return all_other_complete
         return all(is_file_complete(dep) for dep in task.deferred)
 
     result = []

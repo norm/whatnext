@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [v1.3.3] - UNRELEASED
+
+Fixed bare `@after` to wait for all incomplete tasks, including those with
+`@after file.md` dependencies.
+
+
 ## [v1.3.2] - 2026-01-11
 
 Fixed repeated warnings when a file has a missing `@after` dependency.

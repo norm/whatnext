@@ -395,20 +395,63 @@ class TestFilterDeferredAcrossFiles:
         assert len(result[0][1]) == 1
         assert len(result[1][1]) == 0
 
-    def test_bare_after_shown_when_all_files_complete(self):
-        file1 = MarkdownFile(
-            source_string="- [X] done in file 1",
-            path="file1.md",
+    def test_bare_after_waits_for_tasks_with_file_dependencies(self):
+        setup = MarkdownFile(
+            source_string="- [X] configure environment",
+            path="setup.md",
             today=date(2025, 1, 1),
         )
-        file2 = MarkdownFile(
-            source_string="- [ ] deferred task @after",
-            path="file2.md",
+        implementation = MarkdownFile(
+            source_string="- [ ] build the feature @after setup.md",
+            path="implementation.md",
             today=date(2025, 1, 1),
         )
-        data = [(file1, file1.tasks), (file2, file2.tasks)]
+        documentation = MarkdownFile(
+            source_string="- [ ] write docs @after",
+            path="documentation.md",
+            today=date(2025, 1, 1),
+        )
+        release = MarkdownFile(
+            source_string="- [ ] publish release @after",
+            path="release.md",
+            today=date(2025, 1, 1),
+        )
+        data = [
+            (setup, setup.tasks),
+            (implementation, implementation.tasks),
+            (documentation, documentation.tasks),
+            (release, release.tasks),
+        ]
         result = filter_deferred(data)
         assert len(result[1][1]) == 1
+        assert result[1][1][0].text == "build the feature"
+        assert len(result[2][1]) == 0
+        assert len(result[3][1]) == 0
+
+    def test_bare_after_shown_when_all_files_complete(self):
+        implementation = MarkdownFile(
+            source_string="- [X] build the feature",
+            path="implementation.md",
+            today=date(2025, 1, 1),
+        )
+        documentation = MarkdownFile(
+            source_string="- [ ] write docs @after",
+            path="documentation.md",
+            today=date(2025, 1, 1),
+        )
+        release = MarkdownFile(
+            source_string="- [ ] publish release @after",
+            path="release.md",
+            today=date(2025, 1, 1),
+        )
+        data = [
+            (implementation, implementation.tasks),
+            (documentation, documentation.tasks),
+            (release, release.tasks),
+        ]
+        result = filter_deferred(data)
+        assert len(result[1][1]) == 1
+        assert len(result[2][1]) == 1
 
 
 class TestFilterDeferredWithFileDependencies:
