@@ -3,7 +3,7 @@
 Without arguments, `whatnext` will show all outstanding tasks listed in any
 Markdown file in the current directory:
 
-(all examples assume you are running it in the [example](example/) directory
+(all examples assume you are running it in the [example](../example/) directory
 on December 25th 2025):
 
 ```bash
