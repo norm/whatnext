@@ -101,6 +101,17 @@ which will start to fail if it is removed.)
 
 - [ ] usage links to example/ incorrectly
 - [ ] next doc nested list needs spacing out to render on github
-- [ ] next -a didn\'t add to end of file when registering these bugs
+- [ ] next -a didn't add to end of file when registering these bugs
 - [X] bare `@after` should wait for tasks with `@after file.md`, not just
       tasks with no `@after` at all
+- [ ] next should add to tasks.md in cwd before home
+- [ ] bug in `next`:
+> (sinister ~)% next whatnext something -e something
+> usage: next [-h] [--version] [-a] [text ...]
+> next: error: unrecognized arguments: -e something
+- [ ] next should have -e too, to edit task files
+- [ ] add tasks/ expectation to docs
+- [ ] document in guide
+- [ ] improve guide to make it more obvious how priorities look, include sample output
+- [ ] show diff when adding task with next
+- [ ] what if an \@after file is queried solo on the command line?
