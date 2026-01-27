@@ -97,6 +97,7 @@ which will start to fail if it is removed.)
 - [X] ensure `@after` and deadlines that are quoted are ignored
 - [X] add flag to skip \@after processing and show all outstanding tasks
 
+
 # next version
 
 - [X] usage links to example/ incorrectly
@@ -115,3 +116,5 @@ which will start to fail if it is removed.)
 - [ ] improve guide to make it more obvious how priorities look, include sample output
 - [ ] show diff when adding task with next
 - [ ] what if an \@after file is queried solo on the command line?
+- [ ] next reads stdin to add multiple tasks at once?
+- [ ] added tasks should be wrapped to 80-wide
