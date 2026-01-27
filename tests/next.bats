@@ -4,6 +4,7 @@ function setup {
     cp -r "$BATS_TEST_DIRNAME/next/." "$BATS_TEST_TMPDIR"
     export HOME="$BATS_TEST_TMPDIR"
     export WHATNEXT_PROJECT_DIR="$BATS_TEST_TMPDIR/projects"
+    cd "$HOME"
 }
 
 @test "shows version" {
@@ -38,6 +39,7 @@ function setup {
             - if the second word matches a file
               $WHATNEXT_PROJECT_DIR/[project]/tasks/[word].md then use that
             - otherwise, use $WHATNEXT_PROJECT_DIR/[project]/tasks.md
+        - if tasks.md exists in the current directory, use that
         - otherwise, use $HOME/tasks.md
 
         With the remaining text:
@@ -147,6 +149,16 @@ function assert_task_added {
     assert_task_added \
         "$HOME/tasks.md" \
         "Updated ~/tasks.md"
+}
+
+@test "prefers tasks.md in cwd over home" {
+    cd "$WHATNEXT_PROJECT_DIR/alpha"
+    run next do something
+
+    assert_task_added \
+        "$WHATNEXT_PROJECT_DIR/alpha/tasks.md" \
+        "Updated ~/projects/alpha/tasks.md"
+    diff -u "$BATS_TEST_DIRNAME/next/tasks.md" "$HOME/tasks.md"
 }
 
 @test "adds to existing project" {

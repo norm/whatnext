@@ -4,8 +4,8 @@ Although Markdown files are easy enough to edit, sometimes you don't have your
 project's task files open in an editor and just want to quickly capture a
 thought or bug.
 
-By default `next fix that thing` will add to `tasks.md` in your home
-directory.
+By default `next fix that thing` will add to `tasks.md` in the current
+directory if it exists, otherwise `tasks.md` in your home directory.
 
 But `whatnext` is designed around projects having their own files, so there
 are shortcuts to facilitate this.
@@ -25,7 +25,8 @@ It will use the first match it finds in this order:
             (eg. `$WHATNEXT_PROJECT_DIR/[project]/tasks/[word].md`)
             it uses that file
         2.  It uses the file `[project]/tasks.md` even if it doesn't exist yet
-6.  Otherwise, it uses `$HOME/tasks.md` even if it doesn't exist yet
+6.  If `tasks.md` exists in the current directory, it uses that
+7.  Otherwise, it uses `$HOME/tasks.md` even if it doesn't exist yet
 
 For example, with `$WHATNEXT_PROJECT_DIR` set to `~/projects`:
 

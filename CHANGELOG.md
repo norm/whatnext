@@ -8,6 +8,8 @@ Fixed bare `@after` to wait for all incomplete tasks, including those with
 
 Fixed `next` rejecting task text containing flag-like arguments (e.g. `-e`).
 
+Prefer `tasks.md` in the current directory to `~/tasks.md`.
+
 
 ## [v1.3.2] - 2026-01-11
 

@@ -73,7 +73,11 @@ def resolve_tasks_file(args):
             tasks_file = os.path.join(project_path, "tasks.md")
             return tasks_file, args[1:], display_path(tasks_file)
 
-    # default ~/tasks.md
+    # prefer tasks.md in cwd, then fall back to ~/tasks.md
+    cwd_tasks = os.path.join(os.getcwd(), "tasks.md")
+    if os.path.isfile(cwd_tasks):
+        return cwd_tasks, args, display_path(cwd_tasks)
+
     tasks_file = os.path.join(os.environ["HOME"], "tasks.md")
     return tasks_file, args, display_path(tasks_file)
 
@@ -94,6 +98,7 @@ def main():
                 - if the second word matches a file
                   $WHATNEXT_PROJECT_DIR/[project]/tasks/[word].md then use that
                 - otherwise, use $WHATNEXT_PROJECT_DIR/[project]/tasks.md
+            - if tasks.md exists in the current directory, use that
             - otherwise, use $HOME/tasks.md
 
             With the remaining text:
@@ -128,11 +133,11 @@ def main():
 
     args = parsed.text
     append_only = parsed.append_only
-    tasks_file, args, display_path = resolve_tasks_file(args)
+    tasks_file, args, shown_path = resolve_tasks_file(args)
 
     task = f"- [ ] {' '.join(args)}\n"
     if not os.path.isfile(tasks_file):
-        update_file(tasks_file, 0, task, f"Created {display_path}")
+        update_file(tasks_file, 0, task, f"Created {shown_path}")
         return
 
     with open(tasks_file, "r") as handle:
@@ -141,9 +146,9 @@ def main():
     if append_only or os.environ.get("WHATNEXT_APPEND_ONLY"):
         position, found_task = rewind_insertion_point(lines, len(lines), 0)
         if found_task:
-            update_file(tasks_file, position, task, f"Updated {display_path}")
+            update_file(tasks_file, position, task, f"Updated {shown_path}")
         else:
-            update_file(tasks_file, len(lines), f"\n{task}", f"Updated {display_path}")
+            update_file(tasks_file, len(lines), f"\n{task}", f"Updated {shown_path}")
         return
 
     headers = [
@@ -153,7 +158,7 @@ def main():
     ]
 
     if not headers:
-        update_file(tasks_file, len(lines), task, f"Updated {display_path}")
+        update_file(tasks_file, len(lines), task, f"Updated {shown_path}")
         return
 
     for index, (line_num, line) in enumerate(headers):
@@ -162,7 +167,7 @@ def main():
 
         section_end = headers[index + 1][0] if index + 1 < len(headers) else len(lines)
         section_name = line.lstrip("#").strip()
-        message = f"Updated {display_path} ({section_name})"
+        message = f"Updated {shown_path} ({section_name})"
         task = f"- [ ] {' '.join(args[1:])}\n"
 
         position, found_task = rewind_insertion_point(lines, section_end, line_num + 1)
@@ -175,6 +180,6 @@ def main():
     # no matching header, insert before first header
     position, found_task = rewind_insertion_point(lines, headers[0][0], 0)
     if found_task:
-        update_file(tasks_file, position, task, f"Updated {display_path}")
+        update_file(tasks_file, position, task, f"Updated {shown_path}")
     else:
-        update_file(tasks_file, headers[0][0], f"{task}\n", f"Updated {display_path}")
+        update_file(tasks_file, headers[0][0], f"{task}\n", f"Updated {shown_path}")
