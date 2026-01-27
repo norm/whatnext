@@ -565,32 +565,3 @@ class MarkdownFile:
                     filtered.append(task)
             tasks = filtered
         return tasks
-
-    def grouped_tasks(self, states=None, search_terms=None, priorities=None):
-        tasks = self.filtered_tasks(states, search_terms, priorities)
-        return (
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority == Priority.OVERDUE
-            ),
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority == Priority.HIGH
-            ),
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority == Priority.MEDIUM
-            ),
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority == Priority.IMMINENT
-            ),
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority == Priority.NORMAL
-            ),
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority is None
-            ),
-        )

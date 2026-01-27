@@ -91,31 +91,36 @@ Uses default search (`docs/`, `archive/`, `tests/headerless.md`).
 
 `TestGroupedTasksBasics` uses `docs/basics.md`.
 
-- [ ] test_no_args_returns_all_grouped_by_priority
-- [ ] test_state_two_selected
-- [ ] test_search_terms
-- [ ] test_search_terms_and_state
-- [ ] test_search_terms_and_state_no_overlap
-- [ ] test_priority_high
-- [ ] test_priority_high_and_medium
+- [#] test_no_args_returns_all_grouped_by_priority
+- [#] test_state_two_selected
+- [#] test_search_terms
+- [#] test_search_terms_and_state
+- [#] test_search_terms_and_state_no_overlap
+- [#] test_priority_high
+- [#] test_priority_high_and_medium
 
 `TestGroupedTasksPrioritisation` uses `docs/prioritisation.md`.
 
-- [ ] test_no_args_returns_all_grouped_by_priority
-- [ ] test_state_two_selected
-- [ ] test_search_terms
-- [ ] test_search_terms_and_state
-- [ ] test_search_terms_and_state_no_overlap
-- [ ] test_priority_high
-- [ ] test_priority_high_and_medium
+- [X] test_no_args_returns_all_grouped_by_priority
+- [X] test_state_two_selected
+- [X] test_search_terms
+- [X] test_search_terms_and_state
+- [X] test_search_terms_and_state_no_overlap
+- [X] test_priority_high
+- [X] test_priority_high_and_medium
 
 `TestGroupedTasksDeadlines` uses `docs/deadlines.md`.
 
-- [ ] test_outside_all_windows_all_normal
-- [ ] test_inside_window_becomes_imminent
-- [ ] test_emphasis_applies_inside_window
-- [ ] test_high_emphasis_on_deadline_day
-- [ ] test_past_deadline_becomes_overdue
+- [X] test_outside_all_windows_all_normal
+- [X] test_inside_window_becomes_imminent
+- [X] test_emphasis_applies_inside_window
+- [X] test_high_emphasis_on_deadline_day
+- [X] test_past_deadline_becomes_overdue
+
+All three classes moved to `tests/test_grouping.py`. `TestGroupedTasksBasics`
+dropped as a redundant weaker version of the prioritisation tests.
+`TestGroupedTasksPrioritisation` uses `example/projects/harvest.md`.
+`TestGroupedTasksDeadlines` uses `example/projects/tinsel.md`.
 
 
 # wrap-up
