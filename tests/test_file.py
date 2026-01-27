@@ -1103,8 +1103,17 @@ class TestAnnotationParsing:
             source="example/projects/obelisk.md",
             today=date(2025, 1, 1),
         )
-        assert len(file.tasks) == 4
+        assert len(file.tasks) == 5
         assert file.tasks[0].as_dict() == {
+            "heading": "# Project Obelisk",
+            "state": State.COMPLETE,
+            "text": "secure desert burial site",
+            "priority": None,
+            "due": None,
+            "imminent": None,
+            "annotation": "Something something star gate",
+        }
+        assert file.tasks[1].as_dict() == {
             "heading": "# Project Obelisk",
             "state": State.OPEN,
             "text": "research into runic meaning",
@@ -1113,7 +1122,7 @@ class TestAnnotationParsing:
             "imminent": None,
             "annotation": "Something something star gate",
         }
-        assert file.tasks[1].as_dict() == {
+        assert file.tasks[2].as_dict() == {
             "heading": "# Project Obelisk",
             "state": State.IN_PROGRESS,
             "text": "carve runes into obelisk",
@@ -1122,7 +1131,7 @@ class TestAnnotationParsing:
             "imminent": None,
             "annotation": "Something something star gate",
         }
-        assert file.tasks[2].as_dict() == {
+        assert file.tasks[3].as_dict() == {
             "heading": "# Project Obelisk",
             "state": State.OPEN,
             "text": "bury obelisk in desert",
@@ -1131,7 +1140,7 @@ class TestAnnotationParsing:
             "imminent": date(2025, 12, 22),
             "annotation": "Something something star gate",
         }
-        assert file.tasks[3].as_dict() == {
+        assert file.tasks[4].as_dict() == {
             "heading": "# Project Obelisk / Discovery",
             "state": State.BLOCKED,
             "text": "watch archaeologists discover (needs time machine)",

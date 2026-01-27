@@ -46,6 +46,6 @@ class TestTaskLineNumber:
             source="example/projects/obelisk.md",
             today=date(2025, 1, 1),
         )
-        assert len(file.tasks) == 4
+        assert len(file.tasks) == 5
         lines = [task.line for task in file.tasks]
-        assert lines == [7, 8, 9, 17]
+        assert lines == [7, 8, 9, 10, 18]
