@@ -425,3 +425,22 @@ function assert_task_added {
     [ "$output" = "Updated ~/append.md" ]
     [ $status -eq 0 ]
 }
+
+@test "append adds to end of file not after last task" {
+    expected_content=$(sed -e 's/^        //' <<"        EOF"
+        # Done
+
+        - [X] completed task
+
+        # Next
+
+        - [ ] do something
+        EOF
+    )
+
+    run next -a append-after.md do something
+
+    diff -u <(echo "$expected_content") "$HOME/append-after.md"
+    [ "$output" = "Updated ~/append-after.md" ]
+    [ $status -eq 0 ]
+}

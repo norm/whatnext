@@ -144,11 +144,13 @@ def main():
         lines = handle.readlines()
 
     if append_only or os.environ.get("WHATNEXT_APPEND_ONLY"):
-        position, found_task = rewind_insertion_point(lines, len(lines), 0)
-        if found_task:
+        position = len(lines)
+        while position > 0 and lines[position - 1].strip() == "":
+            position -= 1
+        if position > 0 and lines[position - 1].startswith("- ["):
             update_file(tasks_file, position, task, f"Updated {shown_path}")
         else:
-            update_file(tasks_file, len(lines), f"\n{task}", f"Updated {shown_path}")
+            update_file(tasks_file, position, f"\n{task}", f"Updated {shown_path}")
         return
 
     headers = [

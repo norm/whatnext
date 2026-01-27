@@ -101,7 +101,7 @@ which will start to fail if it is removed.)
 
 - [ ] usage links to example/ incorrectly
 - [ ] next doc nested list needs spacing out to render on github
-- [ ] next -a didn't add to end of file when registering these bugs
+- [X] next -a didn't add to end of file when registering these bugs
 - [X] bare `@after` should wait for tasks with `@after file.md`, not just
       tasks with no `@after` at all
 - [X] next should add to tasks.md in cwd before home
