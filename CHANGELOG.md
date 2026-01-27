@@ -6,6 +6,8 @@
 Fixed bare `@after` to wait for all incomplete tasks, including those with
 `@after file.md` dependencies.
 
+Fixed `next` rejecting task text containing flag-like arguments (e.g. `-e`).
+
 
 ## [v1.3.2] - 2026-01-11
 

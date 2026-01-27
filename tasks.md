@@ -105,7 +105,7 @@ which will start to fail if it is removed.)
 - [X] bare `@after` should wait for tasks with `@after file.md`, not just
       tasks with no `@after` at all
 - [ ] next should add to tasks.md in cwd before home
-- [ ] bug in `next`:
+- [X] bug in `next`:
 > (sinister ~)% next whatnext something -e something
 > usage: next [-h] [--version] [-a] [text ...]
 > next: error: unrecognized arguments: -e something

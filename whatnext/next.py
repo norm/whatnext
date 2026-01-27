@@ -118,7 +118,7 @@ def main():
     )
     parser.add_argument(
         "text",
-        nargs="*",
+        nargs=argparse.REMAINDER,
         help="task text to add",
     )
     parsed = parser.parse_args()

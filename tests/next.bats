@@ -15,7 +15,7 @@ function setup {
 
 @test "shows usage" {
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        usage: next [-h] [--version] [-a] [text ...]
+        usage: next [-h] [--version] [-a] ...
 
         Add a task to a Markdown (.md file) task list.
 
@@ -374,6 +374,23 @@ function assert_task_added {
     )
 
     run next -a do something
+
+    diff -u <(echo "$expected_content") "$HOME/tasks.md"
+    [ "$output" = "Updated ~/tasks.md" ]
+    [ $status -eq 0 ]
+}
+
+@test "flag-like text is not parsed as arguments" {
+    expected_content=$(sed -e 's/^        //' <<"        EOF"
+        - [ ] something -e something
+
+        # Tasks
+
+        - [ ] existing task
+        EOF
+    )
+
+    run next something -e something
 
     diff -u <(echo "$expected_content") "$HOME/tasks.md"
     [ "$output" = "Updated ~/tasks.md" ]
