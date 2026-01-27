@@ -100,7 +100,7 @@ which will start to fail if it is removed.)
 # next version
 
 - [ ] usage links to example/ incorrectly
-- [ ] next doc nested list needs spacing out to render on github
+- [X] next doc nested list needs spacing out to render on github
 - [X] next -a didn't add to end of file when registering these bugs
 - [X] bare `@after` should wait for tasks with `@after file.md`, not just
       tasks with no `@after` at all

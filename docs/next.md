@@ -21,10 +21,12 @@ It will use the first match it finds in this order:
 3.  It uses a matching filename in `$WHATNEXT_PROJECT_DIR`
 4.  It uses a matching filename in `$HOME`
 5.  If it matches a project directory in `$WHATNEXT_PROJECT_DIR`:
-        1.  ...and the _second word_ matches an existing tasks file
-            (eg. `$WHATNEXT_PROJECT_DIR/[project]/tasks/[word].md`)
-            it uses that file
-        2.  It uses the file `[project]/tasks.md` even if it doesn't exist yet
+
+    1.  ...and the _second word_ matches an existing tasks file
+        (eg. `$WHATNEXT_PROJECT_DIR/[project]/tasks/[word].md`)
+        it uses that file
+    2.  It uses the file `[project]/tasks.md` even if it doesn't exist yet
+
 6.  If `tasks.md` exists in the current directory, it uses that
 7.  Otherwise, it uses `$HOME/tasks.md` even if it doesn't exist yet
 
