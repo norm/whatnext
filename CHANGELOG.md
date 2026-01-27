@@ -1,17 +1,17 @@
 # Changelog
 
 
-## [v1.3.3] - UNRELEASED
+## [v1.4] - UNRELEASED
 
-Fixed bare `@after` to wait for all incomplete tasks, including those with
-`@after file.md` dependencies.
-
-Fixed `next` rejecting task text containing flag-like arguments (e.g. `-e`).
+`next` now shows a diff of the change made to the task file.
 
 Prefer `tasks.md` in the current directory to `~/tasks.md`.
 
-Fixed `next -a` inserting after the last task instead of at the end of the
-file.
+**Fixes:**
+- Bare `@after` waiting for all incomplete tasks, including those with
+  `@after file.md` dependencies.
+- `next` rejecting task text containing flag-like arguments (e.g. `-e`).
+- `next -a` inserting after the last task instead of at the end of the file.
 
 
 ## [v1.3.2] - 2026-01-11

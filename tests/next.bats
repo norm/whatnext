@@ -84,9 +84,18 @@ function setup {
 
     run next something.txt do something
 
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/tasks.md:
+        +- [ ] something.txt do something
+        +
+         # Tasks
+         
+	EOF
+    )
+
     diff -u "$BATS_TEST_DIRNAME/next/something.txt" "$HOME/something.txt"
     diff -u <(echo "$expected_content") "$HOME/tasks.md"
-    [ "$output" = "Updated ~/tasks.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -100,16 +109,25 @@ function setup {
         EOF
     )
 
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/tasks.md:
+        +- [ ] nonexistent.md do something
+        +
+         # Tasks
+         
+	EOF
+    )
+
     run next nonexistent.md do something
 
     diff -u <(echo "$expected_content") "$HOME/tasks.md"
-    [ "$output" = "Updated ~/tasks.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 function assert_task_added {
     local tasks_file="$1"
-    local expected_output="$2"
+    local expected_message="$2"
 
     expected_content=$(sed -e 's/^        //' <<"        EOF"
         - [ ] do something
@@ -120,8 +138,17 @@ function assert_task_added {
         EOF
     )
 
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        ${expected_message}:
+        +- [ ] do something
+        +
+         # Tasks
+         
+	EOF
+    )
+
     diff -u <(echo "$expected_content") "$tasks_file"
-    [ "$output" = "$expected_output" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -187,12 +214,20 @@ function assert_task_added {
         - [ ] existing task
         EOF
     )
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/tasks.md:
+        +- [ ] alpha do something
+        +
+         # Tasks
+         
+	EOF
+    )
     unset WHATNEXT_PROJECT_DIR
 
     run next alpha do something
 
     diff -u <(echo "$expected_content") "$HOME/tasks.md"
-    [ "$output" = "Updated ~/tasks.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -218,11 +253,16 @@ function assert_task_added {
         - [ ] do something
         EOF
     )
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Created ~/projects/beta/tasks.md:
+        +- [ ] do something
+	EOF
+    )
 
     run next beta do something
 
     diff -u <(echo "$expected_content") "$WHATNEXT_PROJECT_DIR/beta/tasks.md"
-    [ "$output" = "Created ~/projects/beta/tasks.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -232,10 +272,16 @@ function assert_task_added {
         EOF
     )
 
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Created ~/projects/beta/tasks.md:
+        +- [ ] things do something
+	EOF
+    )
+
     run next beta things do something
 
     diff -u <(echo "$expected_content") "$WHATNEXT_PROJECT_DIR/beta/tasks.md"
-    [ "$output" = "Created ~/projects/beta/tasks.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -298,10 +344,18 @@ function assert_task_added {
         EOF
     )
 
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/empty.md:
+         
+         
+        +- [ ] do something
+	EOF
+    )
+
     run next empty.md do something
 
     diff -u <(echo "$expected_content") "$HOME/empty.md"
-    [ "$output" = "Updated ~/empty.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -354,8 +408,16 @@ function assert_task_added {
     run next insert.md fourth Another task.
     run next insert.md last last task
 
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/insert.md (Last):
+         
+         - [ ] second to last task
+        +- [ ] last task
+	EOF
+    )
+
     diff -u <(echo "$expected_content") "$HOME/insert.md"
-    [ "$output" = "Updated ~/insert.md (Last)" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -367,12 +429,19 @@ function assert_task_added {
         - [ ] do something
         EOF
     )
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/tasks.md:
+         
+         - [ ] existing task
+        +- [ ] do something
+	EOF
+    )
     export WHATNEXT_APPEND_ONLY=1
 
     run next do something
 
     diff -u <(echo "$expected_content") "$HOME/tasks.md"
-    [ "$output" = "Updated ~/tasks.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -385,10 +454,18 @@ function assert_task_added {
         EOF
     )
 
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/tasks.md:
+         
+         - [ ] existing task
+        +- [ ] do something
+	EOF
+    )
+
     run next -a do something
 
     diff -u <(echo "$expected_content") "$HOME/tasks.md"
-    [ "$output" = "Updated ~/tasks.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -402,10 +479,19 @@ function assert_task_added {
         EOF
     )
 
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/tasks.md:
+        +- [ ] something -e something
+        +
+         # Tasks
+         
+	EOF
+    )
+
     run next something -e something
 
     diff -u <(echo "$expected_content") "$HOME/tasks.md"
-    [ "$output" = "Updated ~/tasks.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -419,10 +505,19 @@ function assert_task_added {
         EOF
     )
 
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/append.md:
+         
+         This is where things get added.
+        +
+        +- [ ] do something
+	EOF
+    )
+
     run next -a append.md do something
 
     diff -u <(echo "$expected_content") "$HOME/append.md"
-    [ "$output" = "Updated ~/append.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
@@ -438,9 +533,46 @@ function assert_task_added {
         EOF
     )
 
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/append-after.md:
+         
+         # Next
+        +
+        +- [ ] do something
+	EOF
+    )
+
     run next -a append-after.md do something
 
     diff -u <(echo "$expected_content") "$HOME/append-after.md"
-    [ "$output" = "Updated ~/append-after.md" ]
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "output shows diff on create" {
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Created ~/projects/beta/tasks.md:
+        +- [ ] do something
+	EOF
+    )
+
+    run next beta do something
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "output shows diff on update" {
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/tasks.md:
+         
+         - [ ] existing task
+        +- [ ] do something
+	EOF
+    )
+
+    run next -a do something
+
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }

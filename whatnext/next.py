@@ -1,4 +1,5 @@
 import argparse
+import difflib
 from importlib.metadata import version
 import os
 from textwrap import dedent
@@ -21,13 +22,21 @@ def rewind_insertion_point(lines, position, min_position):
 def update_file(file, line, content, message):
     try:
         with open(file, "r") as handle:
-            lines = handle.readlines()
+            old_lines = handle.readlines()
     except FileNotFoundError:
-        lines = []
-    lines.insert(line, content)
+        old_lines = []
+    new_lines = old_lines.copy()
+    for i, content_line in enumerate(content.splitlines(True)):
+        new_lines.insert(line + i, content_line)
     with open(file, "w") as handle:
-        handle.writelines(lines)
-    print(message)
+        handle.writelines(new_lines)
+    diff_lines = [
+        diff_line
+            for diff_line in difflib.unified_diff(old_lines, new_lines, n=2)
+                if not diff_line.startswith(("---", "+++", "@@"))
+    ]
+    print(f"{message}:")
+    print("".join(diff_lines), end="")
 
 
 def display_path(path):

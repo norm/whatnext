@@ -34,13 +34,19 @@ For example, with `$WHATNEXT_PROJECT_DIR` set to `~/projects`:
 
 ```bash
 (computer)% next buy milk
-Updated ~/tasks.md
+Updated ~/tasks.md:
+ - [ ] existing task
++- [ ] buy milk
 
 (computer)% next alpha fix restart bug
-Updated ~/projects/alpha/tasks.md
+Updated ~/projects/alpha/tasks.md:
+ - [ ] existing task
++- [ ] fix restart bug
 
 (computer)% next alpha backlog add some tests, dammit
-Updated ~/projects/alpha/tasks/backlog.md
+Updated ~/projects/alpha/tasks/backlog.md:
+ - [ ] existing task
++- [ ] add some tests, dammit
 ```
 
 

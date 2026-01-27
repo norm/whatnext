@@ -5,6 +5,7 @@ ignore = [
     'example/*',
     'tests/deferring/*',
     'tests/next/*',
+    'docs/next.md',
     'docs/usage.md',
     'docs/deferring.md',
 ]
