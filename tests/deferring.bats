@@ -79,6 +79,20 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 }
 
+@test "bare @after tasks shown when file queried directly" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/bare-after.md:
+            - [ ] do this last
+        EOF
+    )
+
+    # nothing else is outstanding (as nothing else was loaded),
+    # so the contents should be shown
+    run whatnext tests/deferring/bare-after.md
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
 @test "after can be ignored" {
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         tests/deferring/deferred.md:

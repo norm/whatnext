@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [v1.4] - UNRELEASED
+## [v1.4] - 2026-01-27
 
 `next` now shows a diff of the change made to the task file.
 
