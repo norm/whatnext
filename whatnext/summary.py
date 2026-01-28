@@ -178,10 +178,16 @@ def format_summary(
     for item in remainder:
         char_map[item] = shades[-1]
 
-    total_counts = calculate_totals(file_counts) if len(file_tasks) > 1 else None
+    if len(file_tasks) > 1:
+        total_counts = calculate_totals(file_counts)
+    else:
+        total_counts = None
 
     # calculate column widths
-    all_counts = file_counts + ([total_counts] if total_counts else [])
+    if total_counts:
+        all_counts = file_counts + [total_counts]
+    else:
+        all_counts = file_counts
     all_parts = [
         get_count_parts(counts, selected_in_order, has_remainder)
             for counts in all_counts

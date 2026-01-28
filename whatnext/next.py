@@ -176,7 +176,10 @@ def main():
         if line.lstrip("#").strip().lower() != args[0].lower():
             continue
 
-        section_end = headers[index + 1][0] if index + 1 < len(headers) else len(lines)
+        if index + 1 < len(headers):
+            section_end = headers[index + 1][0]
+        else:
+            section_end = len(lines)
         section_name = line.lstrip("#").strip()
         message = f"Updated {shown_path} ({section_name})"
         task = f"- [ ] {' '.join(args[1:])}\n"

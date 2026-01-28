@@ -190,7 +190,10 @@ def find_markdown_files(paths, today, ignore_patterns=None, quiet=False):
     task_files = {}
 
     for path in paths:
-        base_dir = "." if multiple else path
+        if multiple:
+            base_dir = "."
+        else:
+            base_dir = path
 
         if os.path.isfile(path):
             if path.endswith(".md"):

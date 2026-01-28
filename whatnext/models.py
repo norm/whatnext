@@ -487,7 +487,10 @@ class MarkdownFile:
         display_text = " ".join(display_text.split())
 
         # task-level @after overrides section-level
-        deferred = task_deferred if task_deferred is not None else section_deferred
+        if task_deferred is not None:
+            deferred = task_deferred
+        else:
+            deferred = section_deferred
 
         if state in {State.COMPLETE, State.CANCELLED}:
             priority = None
