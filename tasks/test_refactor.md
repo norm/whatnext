@@ -10,15 +10,15 @@ tests.
 
 Uses `docs/deadlines.md`.
 
-- [ ] "before any deadline window, all tasks normal priority"
-- [ ] "within 3w window, book Christmas delivery becomes imminent"
-- [ ] "within default 2w window, complete and release becomes imminent"
-- [ ] "on deadline day, 0d task becomes high"
-- [ ] "past deadline, task becomes overdue"
-- [ ] "filter by overdue priority"
-- [ ] "filter by medium priority"
-- [ ] "filter by imminent priority"
-- [ ] "deadline date stripped from output"
+- [X] "before any deadline window, all tasks normal priority"
+- [X] "within 3w window, book Christmas delivery becomes imminent"
+- [X] "within default 2w window, complete and release becomes imminent"
+- [X] "on deadline day, 0d task becomes high"
+- [X] "past deadline, task becomes overdue"
+- [X] "filter by overdue priority"
+- [X] "filter by medium priority"
+- [X] "filter by imminent priority"
+- [X] "deadline date stripped from output"
 
 
 # tests/list.bats

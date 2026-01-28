@@ -1,23 +1,16 @@
 bats_require_minimum_version 1.5.0
 
-# docs/deadlines.md contains:
-#   - [ ] complete and release @2025-12-05              (imminent from Nov 21)
-#   - [ ] book Christmas delivery @2025-12-23/3w        (imminent from Dec 2)
-#   - [ ] _prep the make-ahead gravy_ @2025-12-25/1d    (medium from Dec 24)
-#   - [ ] **roast the potatoes** @2025-12-25/0d         (high on Dec 25 only)
-#   - [ ] prep sprouts @2025-12-25                      (imminent from Dec 11)
-
 @test "before any deadline window, all tasks normal priority" {
     WHATNEXT_TODAY=2025-01-01 \
         run --separate-stderr \
             whatnext \
-                docs/deadlines.md
+                example/projects/tinsel.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/deadlines.md:
-            # version 0.5
-            - [ ] complete and release
-            # Christmas dinner
+        example/projects/tinsel.md:
+            # Project Tinsel
+            - [ ] send Christmas cards
+            # Project Tinsel / Christmas dinner
             - [ ] book Christmas delivery
             - [ ] prep the make-ahead gravy
             - [ ] roast the potatoes
@@ -30,21 +23,21 @@ bats_require_minimum_version 1.5.0
 
 @test "within 3w window, book Christmas delivery becomes imminent" {
     # Dec 2 is exactly 3 weeks before Dec 23
-    # "complete and release" is also imminent (Nov 21 was 2 weeks before Dec 5)
+    # "send Christmas cards" is also imminent (Nov 21 was 2 weeks before Dec 5)
     WHATNEXT_TODAY=2025-12-02 \
         run --separate-stderr \
             whatnext \
-                docs/deadlines.md
+                example/projects/tinsel.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/deadlines.md:
-            # version 0.5 / IMMINENT 3d
-            - [ ] complete and release
-            # Christmas dinner / IMMINENT 3w
+        example/projects/tinsel.md:
+            # Project Tinsel / IMMINENT 3d
+            - [ ] send Christmas cards
+            # Project Tinsel / Christmas dinner / IMMINENT 3w
             - [ ] book Christmas delivery
 
-        docs/deadlines.md:
-            # Christmas dinner
+        example/projects/tinsel.md:
+            # Project Tinsel / Christmas dinner
             - [ ] prep the make-ahead gravy
             - [ ] roast the potatoes
             - [ ] prep sprouts
@@ -54,20 +47,20 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 }
 
-@test "within default 2w window, complete and release becomes imminent" {
+@test "within default 2w window, send Christmas cards becomes imminent" {
     # Nov 21 is exactly 2 weeks before Dec 5
     WHATNEXT_TODAY=2025-11-21 \
         run --separate-stderr \
             whatnext \
-                docs/deadlines.md
+                example/projects/tinsel.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/deadlines.md:
-            # version 0.5 / IMMINENT 2w
-            - [ ] complete and release
+        example/projects/tinsel.md:
+            # Project Tinsel / IMMINENT 2w
+            - [ ] send Christmas cards
 
-        docs/deadlines.md:
-            # Christmas dinner
+        example/projects/tinsel.md:
+            # Project Tinsel / Christmas dinner
             - [ ] book Christmas delivery
             - [ ] prep the make-ahead gravy
             - [ ] roast the potatoes
@@ -82,25 +75,25 @@ bats_require_minimum_version 1.5.0
     WHATNEXT_TODAY=2025-12-25 \
         run --separate-stderr \
             whatnext \
-                docs/deadlines.md
+                example/projects/tinsel.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/deadlines.md:
-            # version 0.5 / OVERDUE 2w 6d
-            - [ ] complete and release
-            # Christmas dinner / OVERDUE 2d
+        example/projects/tinsel.md:
+            # Project Tinsel / OVERDUE 2w 6d
+            - [ ] send Christmas cards
+            # Project Tinsel / Christmas dinner / OVERDUE 2d
             - [ ] book Christmas delivery
 
-        docs/deadlines.md:
-            # Christmas dinner / HIGH
+        example/projects/tinsel.md:
+            # Project Tinsel / Christmas dinner / HIGH
             - [ ] roast the potatoes
 
-        docs/deadlines.md:
-            # Christmas dinner / MEDIUM
+        example/projects/tinsel.md:
+            # Project Tinsel / Christmas dinner / MEDIUM
             - [ ] prep the make-ahead gravy
 
-        docs/deadlines.md:
-            # Christmas dinner / IMMINENT TODAY
+        example/projects/tinsel.md:
+            # Project Tinsel / Christmas dinner / IMMINENT TODAY
             - [ ] prep sprouts
         EOF
     )
@@ -112,19 +105,19 @@ bats_require_minimum_version 1.5.0
     WHATNEXT_TODAY=2025-12-06 \
         run --separate-stderr \
             whatnext \
-                docs/deadlines.md
+                example/projects/tinsel.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/deadlines.md:
-            # version 0.5 / OVERDUE 1d
-            - [ ] complete and release
+        example/projects/tinsel.md:
+            # Project Tinsel / OVERDUE 1d
+            - [ ] send Christmas cards
 
-        docs/deadlines.md:
-            # Christmas dinner / IMMINENT 2w 3d
+        example/projects/tinsel.md:
+            # Project Tinsel / Christmas dinner / IMMINENT 2w 3d
             - [ ] book Christmas delivery
 
-        docs/deadlines.md:
-            # Christmas dinner
+        example/projects/tinsel.md:
+            # Project Tinsel / Christmas dinner
             - [ ] prep the make-ahead gravy
             - [ ] roast the potatoes
             - [ ] prep sprouts
@@ -139,12 +132,12 @@ bats_require_minimum_version 1.5.0
         run --separate-stderr \
             whatnext \
                 --priority overdue \
-                docs/deadlines.md
+                example/projects/tinsel.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/deadlines.md:
-            # version 0.5 / OVERDUE 1d
-            - [ ] complete and release
+        example/projects/tinsel.md:
+            # Project Tinsel / OVERDUE 1d
+            - [ ] send Christmas cards
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -156,11 +149,11 @@ bats_require_minimum_version 1.5.0
         run --separate-stderr \
             whatnext \
                 --priority medium \
-                docs/deadlines.md
+                example/projects/tinsel.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/deadlines.md:
-            # Christmas dinner / MEDIUM
+        example/projects/tinsel.md:
+            # Project Tinsel / Christmas dinner / MEDIUM
             - [ ] prep the make-ahead gravy
         EOF
     )
@@ -173,11 +166,11 @@ bats_require_minimum_version 1.5.0
         run --separate-stderr \
             whatnext \
                 --priority imminent \
-                docs/deadlines.md
+                example/projects/tinsel.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/deadlines.md:
-            # Christmas dinner / IMMINENT 2w 3d
+        example/projects/tinsel.md:
+            # Project Tinsel / Christmas dinner / IMMINENT 2w 3d
             - [ ] book Christmas delivery
         EOF
     )
@@ -189,7 +182,7 @@ bats_require_minimum_version 1.5.0
     WHATNEXT_TODAY=2025-01-01 \
         run --separate-stderr \
             whatnext \
-                docs/deadlines.md
+                example/projects/tinsel.md
 
     [[ ! "$output" =~ @2025 ]]
     [ $status -eq 0 ]
