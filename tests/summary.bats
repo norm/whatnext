@@ -272,16 +272,16 @@ function setup {
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                 C  O ~
-        ░░░░░░░░░░░░░░                          0  3 0  tasks.md
-        ░░░░░                                   0  1 0  projects/curtain.md
-        █████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1  5 2  projects/harvest.md
-        ░░░░░░░░░░░░░░░░░░░░░░░░                0  2 3  projects/obelisk.md
-        ░░░░░░░░░░░░░░░░░░░░░░░░                0  5 0  projects/tinsel.md
-        █████░░░░░░░░░░░░░░                     1  0 3  archived/projects/tangerine.md
+        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓                          0  3 0  tasks.md
+        ▓▓▓▓▓                                   0  1 0  projects/curtain.md
+        ▚▚▚▚▚▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░  1  5 2  projects/harvest.md
+        ▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░                0  2 3  projects/obelisk.md
+        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                0  5 0  projects/tinsel.md
+        ▚▚▚▚▚░░░░░░░░░░░░░░                     1  0 3  archived/projects/tangerine.md
                                                 ──────
                                                 2 16 8  26, of 29 total
 
-        █ Cancelled  ░ Open  ░ (Done/Blocked/Partial)
+        ▚ Cancelled  ▓ Open  ░ (Done/Blocked/Partial)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -351,16 +351,16 @@ function setup {
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
                                                H  N  ~
-        ░░░░░░░░░░░░░░                         0  2  1  tasks.md
-        ░░░░░                                  0  1  0  projects/curtain.md
-        ██████████████░░░░░░░░░░░░░░░░░░░░░░░  3  2  3  projects/harvest.md
-        ░░░░░░░░░░░░░░░░░░░░░░░                0  3  2  projects/obelisk.md
-        ░░░░░░░░░░░░░░░░░░░░░░░                0  5  0  projects/tinsel.md
+        ▓▓▓▓▓▓▓▓▓░░░░░                         0  2  1  tasks.md
+        ▓▓▓▓▓                                  0  1  0  projects/curtain.md
+        ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░  3  2  3  projects/harvest.md
+        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░                0  3  2  projects/obelisk.md
+        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                0  5  0  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░                     0  0  4  archived/projects/tangerine.md
                                                ───────
                                                3 13 10  26, of 29 total
 
-        █ High  ░ Normal  ░ (Overdue/Imminent/Medium)
+        ▚ High  ▓ Normal  ░ (Overdue/Imminent/Medium)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")

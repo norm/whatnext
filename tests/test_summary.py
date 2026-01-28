@@ -2,39 +2,27 @@ from collections import Counter
 
 from whatnext.models import Priority, State
 from whatnext.summary import (
-    build_visualisation_map,
     calculate_totals,
     make_header,
     make_legend,
     PRIORITY_DISPLAY_ORDER,
+    shade_selection,
     SHADING,
 )
 
 
-class TestPriorityVisualisationMap:
-    def test_single_priority_selected(self):
-        char_map, selected_in_order = build_visualisation_map(
-            {Priority.HIGH},
-            PRIORITY_DISPLAY_ORDER,
-        )
-        assert selected_in_order == [Priority.HIGH]
-        assert char_map[Priority.HIGH] == SHADING[1]
-        assert char_map[Priority.OVERDUE] == SHADING[-1]
-        assert char_map[Priority.IMMINENT] == SHADING[-1]
-        assert char_map[Priority.MEDIUM] == SHADING[-1]
-        assert char_map[Priority.NORMAL] == SHADING[-1]
+class TestShadeSelection:
+    def test_one_shade(self):
+        shades = shade_selection(1)
+        assert shades == [SHADING[1]]
 
-    def test_all_priorities_selected(self):
-        char_map, selected_in_order = build_visualisation_map(
-            set(Priority),
-            PRIORITY_DISPLAY_ORDER,
-        )
-        assert selected_in_order == list(PRIORITY_DISPLAY_ORDER)
-        assert char_map[Priority.OVERDUE] == SHADING[0]
-        assert char_map[Priority.IMMINENT] == SHADING[1]
-        assert char_map[Priority.HIGH] == SHADING[2]
-        assert char_map[Priority.MEDIUM] == SHADING[3]
-        assert char_map[Priority.NORMAL] == SHADING[4]
+    def test_five_shades(self):
+        shades = shade_selection(5)
+        assert shades == [SHADING[0], SHADING[1], SHADING[2], SHADING[3], SHADING[4]]
+
+    def test_three_shades(self):
+        shades = shade_selection(3)
+        assert shades == [SHADING[0], SHADING[2], SHADING[4]]
 
 
 class TestPriorityHeader:

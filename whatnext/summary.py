@@ -29,20 +29,9 @@ SHADING_INDICES = {
 }
 
 
-def build_visualisation_map(selected, display_order):
-    selected_in_order = [
-        item
-            for item in display_order
-                if item in selected
-    ]
-    indices = SHADING_INDICES.get(len(selected_in_order), [0, 1, 2, 3, 4])
-    char_map = {}
-    for index, item in enumerate(selected_in_order):
-        char_map[item] = SHADING[indices[index]]
-    for item in display_order:
-        if item not in char_map:
-            char_map[item] = SHADING[-1]
-    return char_map, selected_in_order
+def shade_selection(num_shades):
+    indices = SHADING_INDICES.get(num_shades, [0, 1, 2, 3, 4])
+    return [SHADING[i] for i in indices]
 
 
 def make_header(selected_in_order, has_remainder, col_widths=None):
@@ -71,14 +60,14 @@ def make_legend(
         parts.append(f"{char} {item.label}")
     if has_remainder:
         unselected = [
-            state.label
+            state
                 for state in display_order
                     if state not in selected_in_order
         ]
-        char = SHADING[-1]
+        char = char_map[unselected[0]]
         if use_colour:
             char = colored(char, "blue", force_color=True)
-        parts.append(f"{char} ({'/'.join(unselected)})")
+        parts.append(f"{char} ({'/'.join(state.label for state in unselected)})")
     return "  ".join(parts)
 
 
@@ -146,7 +135,11 @@ def format_summary(
         selected = selected_states
         count_attr = "state"
 
-    char_map, selected_in_order = build_visualisation_map(selected, display_order)
+    selected_in_order = [
+        item
+            for item in display_order
+                if item in selected
+    ]
     remainder = [
         item
             for item in display_order
@@ -174,6 +167,17 @@ def format_summary(
             for counts in file_counts
                 for key in counts
     )
+
+    num_groups = len(selected_in_order)
+    if has_remainder:
+        num_groups += 1
+    shades = shade_selection(num_groups)
+    char_map = {}
+    for index, item in enumerate(selected_in_order):
+        char_map[item] = shades[index]
+    for item in remainder:
+        char_map[item] = shades[-1]
+
     total_counts = calculate_totals(file_counts) if len(file_tasks) > 1 else None
 
     # calculate column widths

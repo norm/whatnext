@@ -6,6 +6,9 @@
 **Breaking change:** `whatnext` now ignores tasks and headers within
 quoting elements -- blockquotes, code fences, and indented text.
 
+**Fixes:**
+- bug in relative summaries was reusing characters for different states
+
 
 ## [v1.4] - 2026-01-27
 
