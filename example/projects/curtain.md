@@ -13,6 +13,11 @@
 
 ## Close the theatre
 
+> - [ ] check the fire exits
+> @after
+>
+>
+
 After _absolutely everything else_ is done:
 
 - [ ] Escort everyone out

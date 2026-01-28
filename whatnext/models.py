@@ -110,6 +110,8 @@ class Task:
             "due": self.due,
             "imminent": self.imminent,
             "annotation": self.annotation,
+            "line": self.line,
+            "deferred": self.deferred,
         }
 
     def wrapped_task(self, width=80, indent="    ", text_colour=None):
@@ -214,8 +216,8 @@ class MarkdownFile:
             \s*
         $
     """, re.VERBOSE)
-    ANNOTATION_START = re.compile(r"^```whatnext\s*$")
-    ANNOTATION_END = re.compile(r"^```\s*$")
+    ANNOTATION_INFO = "whatnext"
+    FENCE_PATTERN = re.compile(r"^(`{3,}|~{3,})")
     AFTER_PATTERN = re.compile(r"""
         ^
             (.+?)           # text before @after (non-greedy)
@@ -323,29 +325,68 @@ class MarkdownFile:
             )
         return tasks
 
+    @staticmethod
+    def is_fence_close(line, delimiter):
+        return (
+            line.startswith(delimiter)
+            and not line.strip()[len(delimiter):]
+        )
+
     def read_lines(self):
         if self._lines is not None:
             return self._lines
         with open(self.path) as handle:
             return [line.rstrip("\n") for line in handle]
 
-    def sections(self):
-        heading = None
-        priority = Priority.NORMAL
-        annotation_parts = []
+    def relevant_content(self):
         lines = []
-        results = []
+        in_fence = False
+        fence_delimiter = None
+        is_annotation = False
+        in_task = False
 
-        # stack stores (level, text, priority, deferred) -- explicit level needed
-        # for skipped headings (# -> ### -> ##, where position != depth)
-        stack = []
+        for line_index, line in enumerate(self.read_lines(), 1):
+            if in_fence:
+                if is_annotation:
+                    lines.append((line_index, line))
+                if self.is_fence_close(line, fence_delimiter):
+                    in_fence = False
+                    fence_delimiter = None
+                    is_annotation = False
+                continue
+            if fence_match := self.FENCE_PATTERN.match(line):
+                fence_delimiter = fence_match.group(1)
+                in_fence = True
+                info_string = line[len(fence_delimiter):].strip()
+                is_annotation = info_string == self.ANNOTATION_INFO
+                if is_annotation:
+                    lines.append((line_index, line))
+                continue
+            # Task continuation lines
+            if in_task and line and line[0] == ' ':
+                lines.append((line_index, line))
+                continue
+            in_task = False
+            if line.startswith('    ') or line.startswith('\t'):
+                continue
+            if self.HEADING_PATTERN.match(line):
+                lines.append((line_index, line))
+            elif self.TASK_PATTERN.match(line):
+                lines.append((line_index, line))
+                in_task = True
+            elif self.FILE_AFTER_PATTERN.match(line):
+                lines.append((line_index, line))
+            elif self.NOTNEXT_PATTERN.match(line):
+                lines.append((line_index, line))
 
-        in_annotation = False
-        annotation_delimiter = None
+        return lines
 
-        # first pass: scan for file-level directives
+    def sections(self):
+        lines = self.relevant_content()
+
+        # scan for file-level directives
         file_deferred = None
-        for line in self.read_lines():
+        for _, line in lines:
             if match := self.FILE_AFTER_PATTERN.match(line):
                 files_str = match.group(1)
                 if files_str:
@@ -355,36 +396,44 @@ class MarkdownFile:
             if self.NOTNEXT_PATTERN.match(line):
                 self.notnext = True
 
-        deferred = file_deferred
+        heading = None
+        priority = Priority.NORMAL
+        annotation_parts = []
+        section_lines = []
+        results = []
 
-        for line_index, line in enumerate(self.read_lines(), 1):
+        # stack stores (level, text, priority, deferred) -- explicit level needed
+        # for skipped headings (# -> ### -> ##, where position != depth)
+        stack = []
+        deferred = file_deferred
+        in_annotation = False
+        annotation_delimiter = None
+
+        for line_index, line in lines:
             if in_annotation:
-                if annotation_delimiter:
-                    closes = (
-                        line.startswith(annotation_delimiter)
-                        and not line.strip()[len(annotation_delimiter):]
-                    )
-                    if closes:
-                        in_annotation = False
-                        annotation_delimiter = None
-                    else:
-                        annotation_parts.append(line)
-                elif self.ANNOTATION_END.match(line):
+                if self.is_fence_close(line, annotation_delimiter):
                     in_annotation = False
+                    annotation_delimiter = None
                 else:
                     annotation_parts.append(line)
                 continue
-            if self.ANNOTATION_START.match(line):
-                annotation_delimiter = re.match(r'^(`+)', line).group(1)
+            if fence_match := self.FENCE_PATTERN.match(line):
+                delimiter = fence_match.group(1)
                 in_annotation = True
+                annotation_delimiter = delimiter
                 continue
             if self.FILE_AFTER_PATTERN.match(line):
                 continue
+            if self.NOTNEXT_PATTERN.match(line):
+                continue
             if match := self.HEADING_PATTERN.match(line):
-                if lines:
+                if section_lines:
                     annotation = " ".join(" ".join(annotation_parts).split()) or None
-                    results.append((heading, lines, priority, annotation, deferred))
-                    lines = []
+                    results.append((
+                        heading, section_lines, priority,
+                        annotation, deferred,
+                    ))
+                    section_lines = []
                     annotation_parts = []
                 level = len(match.group(1))
                 while stack and stack[-1][0] >= level:
@@ -405,11 +454,11 @@ class MarkdownFile:
                     if stack_deferred is not None:
                         deferred = stack_deferred
             else:
-                lines.append((line_index, line))
+                section_lines.append((line_index, line))
 
-        if lines:
+        if section_lines:
             annotation = " ".join(" ".join(annotation_parts).split()) or None
-            results.append((heading, lines, priority, annotation, deferred))
+            results.append((heading, section_lines, priority, annotation, deferred))
 
         return results
 
@@ -479,10 +528,13 @@ class MarkdownFile:
         while (index := index + 1) < len(lines):
             line_number, line_content = lines[index]
             if match := self.TASK_PATTERN.match(line_content):
+                leading = match.group(1)
+                if len(leading) >= 4 or '\t' in leading:
+                    continue
                 task_line = line_number
                 marker = match.group(2)
                 text = line_content.lstrip()
-                indent = len(match.group(1)) + prefix_width
+                indent = len(leading) + prefix_width
                 while (
                     index + 1 < len(lines)
                     and self.is_continuation(lines[index + 1][1], indent)
@@ -565,32 +617,3 @@ class MarkdownFile:
                     filtered.append(task)
             tasks = filtered
         return tasks
-
-    def grouped_tasks(self, states=None, search_terms=None, priorities=None):
-        tasks = self.filtered_tasks(states, search_terms, priorities)
-        return (
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority == Priority.OVERDUE
-            ),
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority == Priority.HIGH
-            ),
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority == Priority.MEDIUM
-            ),
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority == Priority.IMMINENT
-            ),
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority == Priority.NORMAL
-            ),
-            self.sort_by_state(
-                task for task in tasks
-                    if task.priority is None
-            ),
-        )

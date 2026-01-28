@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [v2.0] - UNRELEASED
+
+**Breaking change:** `whatnext` now ignores tasks and headers within
+quoting elements -- blockquotes, code fences, and indented text.
+
+
 ## [v1.4] - 2026-01-27
 
 `next` now shows a diff of the change made to the task file.

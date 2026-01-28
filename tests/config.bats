@@ -1,140 +1,84 @@
 bats_require_minimum_version 1.5.0
 
-@test "default config is in the dir root" {
-    WHATNEXT_DIR=example \
-    WHATNEXT_TODAY=2025-01-01 \
-        run --separate-stderr \
-            whatnext
+function setup {
+    cd tests/config
+}
 
-    diff -u <(echo "") <(echo "$output")
+@test "default config is in the dir root" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        apples.md:
+            # Apples
+            - [ ] pick apples
+            - [ ] make cider
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext
+
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 
 @test "config arg is also relative to the dir root" {
-    WHATNEXT_DIR=example \
-    WHATNEXT_TODAY=2025-01-01 \
-        run --separate-stderr \
-            whatnext \
-                --config .whatnext.all \
-                --all
-
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        projects/obelisk.md:
-            # Project Obelisk / Discovery / OVERDUE 30y 2m
-            Mess with Jackson
-            - [<] watch archaeologists discover (needs time machine)
-
-        tasks.md:
-            # Get S Done / MEDIUM
-            - [ ] question entire existence
-
-        tasks.md:
-            # Get S Done
-            - [ ] come up with better projects
-            - [ ] start third project
-        projects/curtain.md:
-            # Project Curtain / Final bow
-            - [ ] Take a bow
-            # Project Curtain / Safety
-            - [ ] Lower the safety curtain
-            # Project Curtain / Close the theatre
-            - [ ] Escort everyone out
-            - [ ] Shut up shop
-        projects/obelisk.md:
-            # Project Obelisk
-            Something something star gate
-            - [/] carve runes into obelisk
-            - [ ] research into runic meaning
-            - [ ] bury obelisk in desert
-
-        archived/projects/tangerine.md:
-            # Project Tangerine / FINISHED
-            - [X] acquire trebuchet plans
-            - [X] source counterweight materials
-            - [X] build it
-            - [#] throw fruit at neighbours (they moved away)
+        oranges.md:
+            # Oranges
+            - [ ] squeeze oranges
+            - [ ] make marmalade
         EOF
     )
+
+    run --separate-stderr \
+        whatnext \
+            --config .whatnext.alt
+
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "config arg from environment" {
-    WHATNEXT_CONFIG=.whatnext.all \
-    WHATNEXT_DIR=example \
-    WHATNEXT_TODAY=2025-01-01 \
-        run --separate-stderr \
-            whatnext \
-                --all
-
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        projects/obelisk.md:
-            # Project Obelisk / Discovery / OVERDUE 30y 2m
-            Mess with Jackson
-            - [<] watch archaeologists discover (needs time machine)
-
-        tasks.md:
-            # Get S Done / MEDIUM
-            - [ ] question entire existence
-
-        tasks.md:
-            # Get S Done
-            - [ ] come up with better projects
-            - [ ] start third project
-        projects/curtain.md:
-            # Project Curtain / Final bow
-            - [ ] Take a bow
-            # Project Curtain / Safety
-            - [ ] Lower the safety curtain
-            # Project Curtain / Close the theatre
-            - [ ] Escort everyone out
-            - [ ] Shut up shop
-        projects/obelisk.md:
-            # Project Obelisk
-            Something something star gate
-            - [/] carve runes into obelisk
-            - [ ] research into runic meaning
-            - [ ] bury obelisk in desert
-
-        archived/projects/tangerine.md:
-            # Project Tangerine / FINISHED
-            - [X] acquire trebuchet plans
-            - [X] source counterweight materials
-            - [X] build it
-            - [#] throw fruit at neighbours (they moved away)
+        oranges.md:
+            # Oranges
+            - [ ] squeeze oranges
+            - [ ] make marmalade
         EOF
     )
+
+    WHATNEXT_CONFIG=.whatnext.alt \
+        run --separate-stderr \
+            whatnext
+
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "absolute config is relative to running dir" {
-    WHATNEXT_DIR=example \
-    WHATNEXT_TODAY=2025-01-01 \
-        run --separate-stderr \
-            whatnext \
-                --config ./tests/dot-whatnext
-
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        tasks.md:
-            # Get S Done / MEDIUM
-            - [ ] question entire existence
-
-        tasks.md:
-            # Get S Done
-            - [ ] come up with better projects
-            - [ ] start third project
+        apples.md:
+            # Apples
+            - [ ] pick apples
+            - [ ] make cider
+        oranges.md:
+            # Oranges
+            - [ ] squeeze oranges
+            - [ ] make marmalade
         EOF
     )
+
+    run --separate-stderr \
+        whatnext \
+            --config ../config-external
+
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
-    WHATNEXT_CONFIG=./tests/dot-whatnext \
-    WHATNEXT_DIR=example \
-    WHATNEXT_TODAY=2025-01-01 \
+    WHATNEXT_CONFIG=../config-external \
         run --separate-stderr \
             whatnext
+
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }

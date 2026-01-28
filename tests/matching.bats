@@ -1,15 +1,20 @@
 bats_require_minimum_version 1.5.0
 
+function setup {
+    export WHATNEXT_TODAY=2025-01-01
+    cd example
+}
+
 @test "arg is task search" {
     run --separate-stderr \
         whatnext \
-            dolor
+            runic
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        projects/obelisk.md:
+            # Project Obelisk
+            Something something star gate
+            - [ ] research into runic meaning
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -18,14 +23,14 @@ bats_require_minimum_version 1.5.0
     # check it will find later parts of the name
     run --separate-stderr \
         whatnext \
-            dolore
+            meaning
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
     # case insensitive
     run --separate-stderr \
         whatnext \
-            MAGNA
+            RUNIC
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
@@ -33,14 +38,13 @@ bats_require_minimum_version 1.5.0
 @test "search term matches all under a heading" {
     run --separate-stderr \
         whatnext \
-            dentat
+            Spring
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            - [ ] Ut enim ad minim veniam,
+        projects/harvest.md:
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -49,7 +53,7 @@ bats_require_minimum_version 1.5.0
     # case insensitive
     run --separate-stderr \
         whatnext \
-            MULTI
+            PLANTING
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
@@ -57,16 +61,17 @@ bats_require_minimum_version 1.5.0
 @test "args is additive search" {
     run --separate-stderr \
         whatnext \
-            dolor \
-            open
+            runic \
+            sprouts
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task
-            - [ ] open, this task is outstanding
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        projects/obelisk.md:
+            # Project Obelisk
+            Something something star gate
+            - [ ] research into runic meaning
+        projects/tinsel.md:
+            # Project Tinsel / Christmas dinner
+            - [ ] prep sprouts
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -75,24 +80,24 @@ bats_require_minimum_version 1.5.0
     # check it will find later parts of the name
     run --separate-stderr \
         whatnext \
-            dolore \
-            tstanding
+            meaning \
+            SPROUTS
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
     # case insensitive
     run --separate-stderr \
         whatnext \
-            MAGNA \
-            OPEN
+            RUNIC \
+            SPROUTS
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
     # order is immaterial
     run --separate-stderr \
         whatnext \
-            open \
-            dolor
+            sprouts \
+            runic
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
@@ -100,17 +105,18 @@ bats_require_minimum_version 1.5.0
 @test "args can mix tasks and headings" {
     run --separate-stderr \
         whatnext \
-            dentat \
-            open
+            Spring \
+            sprouts
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task
-            - [ ] open, this task is outstanding
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            - [ ] Ut enim ad minim veniam,
+        projects/harvest.md:
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
+
+        projects/tinsel.md:
+            # Project Tinsel / Christmas dinner
+            - [ ] prep sprouts
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -119,79 +125,98 @@ bats_require_minimum_version 1.5.0
     # case insensitive
     run --separate-stderr \
         whatnext \
-            DENTAT \
-            OPEN
+            SPRING \
+            SPROUTS
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
     # order is immaterial
     run --separate-stderr \
         whatnext \
-            OPEN \
-            DENTAT
+            sprouts \
+            Spring
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "arg matching dir restricts input" {
-    WHATNEXT_TODAY=2025-01-01 \
-        run --separate-stderr \
-            whatnext \
-                example
+    run --separate-stderr \
+        whatnext \
+            projects
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        projects/obelisk.md:
+        obelisk.md:
             # Project Obelisk / Discovery / OVERDUE 30y 2m
             Mess with Jackson
             - [<] watch archaeologists discover (needs time machine)
 
-        projects/curtain.md:
-            # Project Curtain / Final bow
-            - [ ] Take a bow
-        projects/obelisk.md:
+        harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
+
+        harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+
+        harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
+        obelisk.md:
             # Project Obelisk
             Something something star gate
             - [/] carve runes into obelisk
             - [ ] research into runic meaning
             - [ ] bury obelisk in desert
+        tinsel.md:
+            # Project Tinsel
+            - [ ] send Christmas cards
+            # Project Tinsel / Christmas dinner
+            - [ ] book Christmas delivery
+            - [ ] prep the make-ahead gravy
+            - [ ] roast the potatoes
+            - [ ] prep sprouts
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
     # if you need disambiguation
-    WHATNEXT_TODAY=2025-01-01 \
-        run --separate-stderr \
-            whatnext \
-                ./example
+    run --separate-stderr \
+        whatnext \
+            ./projects
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "args match multiple dirs" {
-    WHATNEXT_TODAY=2025-01-01 \
-        run --separate-stderr \
-            whatnext \
-                --config /dev/null \
-                --all \
-                example \
-                archive
+    run --separate-stderr \
+        whatnext \
+            --all \
+            projects \
+            archived
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        example/projects/obelisk.md:
+        projects/obelisk.md:
             # Project Obelisk / Discovery / OVERDUE 30y 2m
             Mess with Jackson
             - [<] watch archaeologists discover (needs time machine)
 
-        example/tasks.md:
-            # Get S Done / MEDIUM
-            - [ ] question entire existence
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
 
-        example/tasks.md:
-            # Get S Done
-            - [ ] come up with better projects
-            - [ ] start third project
-        example/projects/curtain.md:
+        projects/harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+
+        projects/curtain.md:
             # Project Curtain / Final bow
             - [ ] Take a bow
             # Project Curtain / Safety
@@ -199,19 +224,35 @@ bats_require_minimum_version 1.5.0
             # Project Curtain / Close the theatre
             - [ ] Escort everyone out
             - [ ] Shut up shop
-        example/projects/obelisk.md:
+        projects/harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
+        projects/obelisk.md:
             # Project Obelisk
             Something something star gate
             - [/] carve runes into obelisk
             - [ ] research into runic meaning
             - [ ] bury obelisk in desert
+        projects/tinsel.md:
+            # Project Tinsel
+            - [ ] send Christmas cards
+            # Project Tinsel / Christmas dinner
+            - [ ] book Christmas delivery
+            - [ ] prep the make-ahead gravy
+            - [ ] roast the potatoes
+            - [ ] prep sprouts
 
-        archive/done/tasks.md:
-            # Some old stuff / FINISHED
-            - [X] Do the first thing
-            - [X] Do the second thing
-            - [X] do the last thing all lowercase
-        example/archived/projects/tangerine.md:
+        projects/harvest.md:
+            # Project Harvest / Hardening off / FINISHED
+            - [X] move seedlings to cold frame
+            # Project Harvest / Autumn / FINISHED
+            - [#] enter giant marrow contest (too late)
+        projects/obelisk.md:
+            # Project Obelisk / FINISHED
+            Something something star gate
+            - [X] secure desert burial site
+        archived/projects/tangerine.md:
             # Project Tangerine / FINISHED
             - [X] acquire trebuchet plans
             - [X] source counterweight materials
@@ -226,12 +267,11 @@ bats_require_minimum_version 1.5.0
 @test "dirs plus search" {
     run --separate-stderr \
         whatnext \
-            --config /dev/null \
-            example \
+            projects \
             runic
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        projects/obelisk.md:
+        obelisk.md:
             # Project Obelisk
             Something something star gate
             - [ ] research into runic meaning
@@ -243,8 +283,7 @@ bats_require_minimum_version 1.5.0
     # if you need disambiguation
     run --separate-stderr \
         whatnext \
-            --config /dev/null \
-            ./example \
+            ./projects \
             runic
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
@@ -252,20 +291,78 @@ bats_require_minimum_version 1.5.0
     # order is immaterial
     run --separate-stderr \
         whatnext \
-            --config /dev/null \
             runic \
-            ./example
+            ./projects
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "duplicate dirs do not duplicate output" {
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        projects/obelisk.md:
+        obelisk.md:
             # Project Obelisk / Discovery / OVERDUE 30y 2m
             Mess with Jackson
             - [<] watch archaeologists discover (needs time machine)
 
+        harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
+
+        harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+
+        harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
+        obelisk.md:
+            # Project Obelisk
+            Something something star gate
+            - [/] carve runes into obelisk
+            - [ ] research into runic meaning
+            - [ ] bury obelisk in desert
+        tinsel.md:
+            # Project Tinsel
+            - [ ] send Christmas cards
+            # Project Tinsel / Christmas dinner
+            - [ ] book Christmas delivery
+            - [ ] prep the make-ahead gravy
+            - [ ] roast the potatoes
+            - [ ] prep sprouts
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            projects
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+
+    run --separate-stderr \
+        whatnext \
+            projects \
+            projects
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+
+    run --separate-stderr \
+        whatnext \
+            projects \
+            projects/../projects
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "arg matching file restricts input" {
+    run --separate-stderr \
+        whatnext \
+            tasks.md
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
         tasks.md:
             # Get S Done / MEDIUM
             - [ ] question entire existence
@@ -274,53 +371,6 @@ bats_require_minimum_version 1.5.0
             # Get S Done
             - [ ] come up with better projects
             - [ ] start third project
-        projects/curtain.md:
-            # Project Curtain / Final bow
-            - [ ] Take a bow
-        projects/obelisk.md:
-            # Project Obelisk
-            Something something star gate
-            - [/] carve runes into obelisk
-            - [ ] research into runic meaning
-            - [ ] bury obelisk in desert
-        EOF
-    )
-
-    WHATNEXT_TODAY=2025-01-01 \
-        run --separate-stderr \
-            whatnext \
-                --config /dev/null \
-                example
-    diff -u <(echo "$expected_output") <(echo "$output")
-    [ $status -eq 0 ]
-
-    WHATNEXT_TODAY=2025-01-01 \
-        run --separate-stderr \
-            whatnext \
-                --config /dev/null \
-                example \
-                example
-    diff -u <(echo "$expected_output") <(echo "$output")
-    [ $status -eq 0 ]
-
-    WHATNEXT_TODAY=2025-01-01 \
-        run --separate-stderr \
-            whatnext \
-                --config /dev/null \
-                example \
-                example/../example
-    diff -u <(echo "$expected_output") <(echo "$output")
-    [ $status -eq 0 ]
-}
-
-@test "arg matching file restricts input" {
-    run --separate-stderr \
-        whatnext \
-            tests/headerless.md
-
-    expected_output=$(sed -e 's/^        //' <<"        EOF"
-        tests/headerless.md:
-            - [ ] I am not a task, I am a free list!
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -330,42 +380,32 @@ bats_require_minimum_version 1.5.0
 @test "multiple files" {
     run --separate-stderr \
         whatnext \
-            tests/headerless.md \
-            docs/usage.md
+            tasks.md \
+            projects/harvest.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/usage.md:
-            # Usage
-            - [/] carve runes into obelisk
-            - [ ] come up with better projects
-            - [ ] bury obelisk in desert
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
+
+        tasks.md:
+            # Get S Done / MEDIUM
             - [ ] question entire existence
+        projects/harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+
+        tasks.md:
+            # Get S Done
+            - [ ] come up with better projects
             - [ ] start third project
-            - [ ] Take a bow
-            - [ ] research into runic meaning
-            - [<] watch archaeologists discover (needs time machine)
-            # Usage / Matching
-            - [ ] research into runic meaning
-            - [ ] question entire existence
-            - [ ] research into runic meaning
-            # Usage / Limiting output
-            - [ ] come up with better projects
-            - [ ] bury obelisk in desert
-            - [<] watch archaeologists discover (needs time machine)
-            # Usage / Arguments
-            - [/] carve runes into obelisk
-            - [ ] come up with better projects
-            - [ ] bury obelisk in desert
-            - [ ] question entire existence
-            - [ ] start third project
-            - [ ] Take a bow
-            - [ ] Lower the safety curtain
-            - [ ] Escort everyone out
-            - [ ] Shut up shop
-            - [ ] research into runic meaning
-            - [<] watch archaeologists discover (needs time machine)
-        tests/headerless.md:
-            - [ ] I am not a task, I am a free list!
+        projects/harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -374,29 +414,35 @@ bats_require_minimum_version 1.5.0
     # order is irrelevant
     run --separate-stderr \
         whatnext \
-            docs/usage.md \
-            tests/headerless.md
+            projects/harvest.md \
+            tasks.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "duplicate files do not duplicate output" {
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        tests/headerless.md:
-            - [ ] I am not a task, I am a free list!
+        tasks.md:
+            # Get S Done / MEDIUM
+            - [ ] question entire existence
+
+        tasks.md:
+            # Get S Done
+            - [ ] come up with better projects
+            - [ ] start third project
         EOF
     )
 
     run --separate-stderr \
         whatnext \
-            tests/headerless.md
+            tasks.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
     run --separate-stderr \
         whatnext \
-            tests/headerless.md \
-            tests/headerless.md
+            tasks.md \
+            tasks.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
@@ -404,39 +450,20 @@ bats_require_minimum_version 1.5.0
 @test "arg file path is respected in output" {
     run --separate-stderr \
         whatnext \
-            docs/usage.md
+            projects/obelisk.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/usage.md:
-            # Usage
+        projects/obelisk.md:
+            # Project Obelisk / Discovery / OVERDUE 30y 2m
+            Mess with Jackson
+            - [<] watch archaeologists discover (needs time machine)
+
+        projects/obelisk.md:
+            # Project Obelisk
+            Something something star gate
             - [/] carve runes into obelisk
-            - [ ] come up with better projects
+            - [ ] research into runic meaning
             - [ ] bury obelisk in desert
-            - [ ] question entire existence
-            - [ ] start third project
-            - [ ] Take a bow
-            - [ ] research into runic meaning
-            - [<] watch archaeologists discover (needs time machine)
-            # Usage / Matching
-            - [ ] research into runic meaning
-            - [ ] question entire existence
-            - [ ] research into runic meaning
-            # Usage / Limiting output
-            - [ ] come up with better projects
-            - [ ] bury obelisk in desert
-            - [<] watch archaeologists discover (needs time machine)
-            # Usage / Arguments
-            - [/] carve runes into obelisk
-            - [ ] come up with better projects
-            - [ ] bury obelisk in desert
-            - [ ] question entire existence
-            - [ ] start third project
-            - [ ] Take a bow
-            - [ ] Lower the safety curtain
-            - [ ] Escort everyone out
-            - [ ] Shut up shop
-            - [ ] research into runic meaning
-            - [<] watch archaeologists discover (needs time machine)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -446,19 +473,14 @@ bats_require_minimum_version 1.5.0
 @test "files plus search" {
     run --separate-stderr \
         whatnext \
-            docs/usage.md \
-            obelisk
+            projects/obelisk.md \
+            runes
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/usage.md:
-            # Usage
+        projects/obelisk.md:
+            # Project Obelisk
+            Something something star gate
             - [/] carve runes into obelisk
-            - [ ] bury obelisk in desert
-            # Usage / Limiting output
-            - [ ] bury obelisk in desert
-            # Usage / Arguments
-            - [/] carve runes into obelisk
-            - [ ] bury obelisk in desert
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -469,7 +491,7 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             --dir . \
-            archive
+            archived
     [ "$output" = "" ]
     [ $status -eq 0 ]
 }
@@ -483,7 +505,7 @@ bats_require_minimum_version 1.5.0
 
     run --separate-stderr \
         whatnext \
-            docs \
+            projects \
             smurf
     diff -u <(echo "") <(echo "$output")
     [ $status -eq 0 ]
@@ -491,23 +513,25 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             smurf \
-            docs
+            projects
     diff -u <(echo "") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "explicit file overrides ignore" {
-    # tasks.md is ignored
-    grep -q "tasks.md" .whatnext
+    echo "ignore = ['tasks.md']" > "$BATS_TEST_TMPDIR/.whatnext"
 
+    # tasks.md is ignored
     run --separate-stderr \
         whatnext \
-            -all
+            --config "$BATS_TEST_TMPDIR/.whatnext" \
+            --all
     [ -z "$(echo "$output" | grep tasks.md)" ]
 
     # but you can still query it directly
     run --separate-stderr \
         whatnext \
+            --config "$BATS_TEST_TMPDIR/.whatnext" \
             --all \
             tasks.md
     [ -n "$(echo "$output" | grep tasks.md)" ]

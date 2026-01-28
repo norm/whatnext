@@ -1,68 +1,77 @@
 bats_require_minimum_version 1.5.0
 
+function setup {
+    cd example
+}
+
 @test "list tasks" {
     WHATNEXT_TODAY=2025-12-25 \
         run --separate-stderr \
             whatnext
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/deadlines.md:
-            # version 0.5 / OVERDUE 2w 6d
-            - [ ] complete and release
-            # Christmas dinner / OVERDUE 2d
+        tasks.md:
+            # Get S Done / OVERDUE 1m 3w
+            - [ ] come up with better projects
+        projects/obelisk.md:
+            # Project Obelisk / Discovery / OVERDUE 31y 2m
+            Mess with Jackson
+            - [<] watch archaeologists discover (needs time machine)
+        projects/tinsel.md:
+            # Project Tinsel / OVERDUE 2w 6d
+            - [ ] send Christmas cards
+            # Project Tinsel / Christmas dinner / OVERDUE 2d
             - [ ] book Christmas delivery
 
-        docs/deadlines.md:
-            # Christmas dinner / HIGH
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
+        projects/obelisk.md:
+            # Project Obelisk / HIGH
+            Something something star gate
+            - [ ] bury obelisk in desert
+        projects/tinsel.md:
+            # Project Tinsel / Christmas dinner / HIGH
             - [ ] roast the potatoes
-        docs/prioritisation.md:
-            # Prioritisation / HIGH
-            - [ ] super-urgent task
-            # do these first / HIGH
-            - [ ] inherently high priority task, because of the header
-            - [ ] no extra priority, still listed second
 
-        docs/deadlines.md:
-            # Christmas dinner / MEDIUM
+        tasks.md:
+            # Get S Done / MEDIUM
+            - [ ] question entire existence
+        projects/harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+        projects/tinsel.md:
+            # Project Tinsel / Christmas dinner / MEDIUM
             - [ ] prep the make-ahead gravy
-        docs/prioritisation.md:
-            # Prioritisation / MEDIUM
-            - [ ] semi-urgent task
 
-        docs/deadlines.md:
-            # Christmas dinner / IMMINENT TODAY
+        tasks.md:
+            # Get S Done / IMMINENT 11d
+            - [ ] start third project
+        projects/tinsel.md:
+            # Project Tinsel / Christmas dinner / IMMINENT TODAY
             - [ ] prep sprouts
 
-        docs/annotations.md:
-            # Project Anvil
-            Let the anvils ring!
-            - [ ] introduce ourselves
-            - [ ] inherit throne
-        docs/basics.md:
-            # Indicating the state of a task
-            - [/] in progress, this task is partially complete
-            - [ ] open, this task is outstanding
-            - [<] blocked, this task needs more input
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            - [ ] Ut enim ad minim veniam,
-        docs/prioritisation.md:
-            # Prioritisation
-            - [/] not a high priority task
-            - [ ] top, but not urgent, task
-        tests/headerless.md:
-            - [ ] I am not a task, I am a free list!
+        projects/curtain.md:
+            # Project Curtain / Final bow
+            - [ ] Take a bow
+        projects/harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
+        projects/obelisk.md:
+            # Project Obelisk
+            Something something star gate
+            - [/] carve runes into obelisk
+            - [ ] research into runic meaning
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
 
-    expected_stderr="WARNING: ignoring invalid state '@' in 'no idea what this means',"
-    expected_stderr+=" docs/basics.md line 12"
-    diff -u <(echo "$expected_stderr") <(echo "$stderr")
-
     # no extraneous blank lines at the end
-    [ $(WHATNEXT_TODAY=2025-12-25 whatnext 2>/dev/null | wc -l) -eq 47 ]
+    [ $(WHATNEXT_TODAY=2025-12-25 whatnext 2>/dev/null | wc -l) -eq 56 ]
 
     [ $status -eq 0 ]
 }
@@ -79,54 +88,53 @@ bats_require_minimum_version 1.5.0
             whatnext
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/prioritisation.md:
-            # Prioritisation / HIGH
-            - [ ] super-urgent task
-            # do these first / HIGH
-            - [ ] inherently high priority task,
-                  because of the header
-            - [ ] no extra priority, still
-                  listed second
+        projects/obelisk.md:
+            # Project Obelisk / Discovery /
+              OVERDUE 30y 2m
+            Mess with Jackson
+            - [<] watch archaeologists discover
+                  (needs time machine)
 
-        docs/prioritisation.md:
-            # Prioritisation / MEDIUM
-            - [ ] semi-urgent task
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting
+              / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
 
-        docs/annotations.md:
-            # Project Anvil
-            Let the anvils ring!
-            - [ ] introduce ourselves
-            - [ ] inherit throne
-        docs/basics.md:
-            # Indicating the state of a task
-            - [/] in progress, this task is
-                  partially complete
-            - [ ] open, this task is outstanding
-            - [<] blocked, this task needs more
-                  input
-            # Indicating the state of a task /
-              Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet,
-                  consectetur adipisicing elit,
-                  sed do eiusmod tempor
-                  incididunt ut labore et dolore
-                  magna aliqua.
-            - [ ] Ut enim ad minim veniam,
-        docs/deadlines.md:
-            # version 0.5
-            - [ ] complete and release
-            # Christmas dinner
+        tasks.md:
+            # Get S Done / MEDIUM
+            - [ ] question entire existence
+        projects/harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+
+        tasks.md:
+            # Get S Done
+            - [ ] come up with better projects
+            - [ ] start third project
+        projects/curtain.md:
+            # Project Curtain / Final bow
+            - [ ] Take a bow
+        projects/harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
+        projects/obelisk.md:
+            # Project Obelisk
+            Something something star gate
+            - [/] carve runes into obelisk
+            - [ ] research into runic meaning
+            - [ ] bury obelisk in desert
+        projects/tinsel.md:
+            # Project Tinsel
+            - [ ] send Christmas cards
+            # Project Tinsel / Christmas dinner
             - [ ] book Christmas delivery
             - [ ] prep the make-ahead gravy
             - [ ] roast the potatoes
             - [ ] prep sprouts
-        docs/prioritisation.md:
-            # Prioritisation
-            - [/] not a high priority task
-            - [ ] top, but not urgent, task
-        tests/headerless.md:
-            - [ ] I am not a task, I am a free
-                  list!
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -140,60 +148,71 @@ bats_require_minimum_version 1.5.0
                 --all
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/prioritisation.md:
-            # Prioritisation / HIGH
-            - [ ] super-urgent task
-            # do these first / HIGH
-            - [ ] inherently high priority task, because of the header
-            - [ ] no extra priority, still listed second
+        projects/obelisk.md:
+            # Project Obelisk / Discovery / OVERDUE 30y 2m
+            Mess with Jackson
+            - [<] watch archaeologists discover (needs time machine)
 
-        docs/prioritisation.md:
-            # Prioritisation / MEDIUM
-            - [ ] semi-urgent task
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
 
-        docs/annotations.md:
-            # Project Anvil
-            Let the anvils ring!
-            - [ ] introduce ourselves
-            - [ ] inherit throne
-        docs/basics.md:
-            # Indicating the state of a task
-            - [/] in progress, this task is partially complete
-            - [ ] open, this task is outstanding
-            - [<] blocked, this task needs more input
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            - [ ] Ut enim ad minim veniam,
-        docs/deadlines.md:
-            # version 0.5
-            - [ ] complete and release
-            # Christmas dinner
+        tasks.md:
+            # Get S Done / MEDIUM
+            - [ ] question entire existence
+        projects/harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+
+        tasks.md:
+            # Get S Done
+            - [ ] come up with better projects
+            - [ ] start third project
+        projects/curtain.md:
+            # Project Curtain / Final bow
+            - [ ] Take a bow
+            # Project Curtain / Safety
+            - [ ] Lower the safety curtain
+            # Project Curtain / Close the theatre
+            - [ ] Escort everyone out
+            - [ ] Shut up shop
+        projects/harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
+        projects/obelisk.md:
+            # Project Obelisk
+            Something something star gate
+            - [/] carve runes into obelisk
+            - [ ] research into runic meaning
+            - [ ] bury obelisk in desert
+        projects/tinsel.md:
+            # Project Tinsel
+            - [ ] send Christmas cards
+            # Project Tinsel / Christmas dinner
             - [ ] book Christmas delivery
             - [ ] prep the make-ahead gravy
             - [ ] roast the potatoes
             - [ ] prep sprouts
-        docs/prioritisation.md:
-            # Prioritisation
-            - [/] not a high priority task
-            - [ ] top, but not urgent, task
-        tests/headerless.md:
-            - [ ] I am not a task, I am a free list!
 
-        docs/basics.md:
-            # Indicating the state of a task / FINISHED
-            - [X] complete, this task has been finished
-            - [#] cancelled, this task has been scratched
-        docs/prioritisation.md:
-            # do these first / grouped, but still highest priority / FINISHED
-            - [X] header priority cascades down
-            # more tasks / FINISHED
-            - [#] normal priority, new header resets that
-        archive/done/tasks.md:
-            # Some old stuff / FINISHED
-            - [X] Do the first thing
-            - [X] Do the second thing
-            - [X] do the last thing all lowercase
+        projects/harvest.md:
+            # Project Harvest / Hardening off / FINISHED
+            - [X] move seedlings to cold frame
+            # Project Harvest / Autumn / FINISHED
+            - [#] enter giant marrow contest (too late)
+        projects/obelisk.md:
+            # Project Obelisk / FINISHED
+            Something something star gate
+            - [X] secure desert burial site
+        archived/projects/tangerine.md:
+            # Project Tangerine / FINISHED
+            - [X] acquire trebuchet plans
+            - [X] source counterweight materials
+            - [X] build it
+            - [#] throw fruit at neighbours (they moved away)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -201,53 +220,46 @@ bats_require_minimum_version 1.5.0
 }
 
 @test "list tasks with --dir" {
-    cp -r . "$BATS_TEST_TMPDIR/project"
-
     WHATNEXT_TODAY=2025-01-01 \
         run --separate-stderr \
             whatnext \
-                --dir "$BATS_TEST_TMPDIR/project"
+                --dir projects
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/prioritisation.md:
-            # Prioritisation / HIGH
-            - [ ] super-urgent task
-            # do these first / HIGH
-            - [ ] inherently high priority task, because of the header
-            - [ ] no extra priority, still listed second
+        obelisk.md:
+            # Project Obelisk / Discovery / OVERDUE 30y 2m
+            Mess with Jackson
+            - [<] watch archaeologists discover (needs time machine)
 
-        docs/prioritisation.md:
-            # Prioritisation / MEDIUM
-            - [ ] semi-urgent task
+        harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
 
-        docs/annotations.md:
-            # Project Anvil
-            Let the anvils ring!
-            - [ ] introduce ourselves
-            - [ ] inherit throne
-        docs/basics.md:
-            # Indicating the state of a task
-            - [/] in progress, this task is partially complete
-            - [ ] open, this task is outstanding
-            - [<] blocked, this task needs more input
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            - [ ] Ut enim ad minim veniam,
-        docs/deadlines.md:
-            # version 0.5
-            - [ ] complete and release
-            # Christmas dinner
+        harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+
+        harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
+        obelisk.md:
+            # Project Obelisk
+            Something something star gate
+            - [/] carve runes into obelisk
+            - [ ] research into runic meaning
+            - [ ] bury obelisk in desert
+        tinsel.md:
+            # Project Tinsel
+            - [ ] send Christmas cards
+            # Project Tinsel / Christmas dinner
             - [ ] book Christmas delivery
             - [ ] prep the make-ahead gravy
             - [ ] roast the potatoes
             - [ ] prep sprouts
-        docs/prioritisation.md:
-            # Prioritisation
-            - [/] not a high priority task
-            - [ ] top, but not urgent, task
-        tests/headerless.md:
-            - [ ] I am not a task, I am a free list!
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -257,13 +269,15 @@ bats_require_minimum_version 1.5.0
 @test "warnings can be suppressed" {
     run --separate-stderr \
         whatnext \
-            --quiet
+            --quiet \
+            ../tests/invalid.md
     [ $status -eq 0 ]
     [ -z "$stderr" ]
 
     WHATNEXT_QUIET=1 \
         run --separate-stderr \
-            whatnext
+            whatnext \
+                ../tests/invalid.md
     [ $status -eq 0 ]
     [ -z "$stderr" ]
 }
@@ -272,16 +286,23 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             --open \
-            docs/basics.md
+            projects/harvest.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task
-            - [ ] open, this task is outstanding
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            - [ ] Ut enim ad minim veniam,
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
+
+        projects/harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+
+        projects/harvest.md:
+            # Project Harvest
+            - [ ] plan raised bed layout
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -291,7 +312,7 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             -o \
-            docs/basics.md
+            projects/harvest.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
@@ -300,12 +321,12 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             --partial \
-            docs/basics.md
+            projects/harvest.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task
-            - [/] in progress, this task is partially complete
+        projects/harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -315,31 +336,34 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             -p \
-            docs/basics.md
+            projects/harvest.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "filter just blocked tasks" {
-    run --separate-stderr \
-        whatnext \
-            --blocked \
-            docs/basics.md
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --blocked \
+                projects/obelisk.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task
-            - [<] blocked, this task needs more input
+        projects/obelisk.md:
+            # Project Obelisk / Discovery / OVERDUE 30y 2m
+            Mess with Jackson
+            - [<] watch archaeologists discover (needs time machine)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
     # short flag
-    run --separate-stderr \
-        whatnext \
-            -b \
-            docs/basics.md
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                -b \
+                projects/obelisk.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
@@ -348,12 +372,12 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             --done \
-            docs/basics.md
+            projects/harvest.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task / FINISHED
-            - [X] complete, this task has been finished
+        projects/harvest.md:
+            # Project Harvest / Hardening off / FINISHED
+            - [X] move seedlings to cold frame
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -363,7 +387,7 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             -d \
-            docs/basics.md
+            projects/harvest.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
@@ -372,12 +396,12 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             --cancelled \
-            docs/basics.md
+            projects/harvest.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task / FINISHED
-            - [#] cancelled, this task has been scratched
+        projects/harvest.md:
+            # Project Harvest / Autumn / FINISHED
+            - [#] enter giant marrow contest (too late)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -387,26 +411,29 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             -c \
-            docs/basics.md
+            projects/harvest.md
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
 
 @test "state filters can be combined" {
-    run --separate-stderr \
-        whatnext \
-            --blocked \
-            --cancelled \
-            docs/basics.md
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --blocked \
+                --cancelled \
+                projects/harvest.md \
+                projects/obelisk.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task
-            - [<] blocked, this task needs more input
+        projects/obelisk.md:
+            # Project Obelisk / Discovery / OVERDUE 30y 2m
+            Mess with Jackson
+            - [<] watch archaeologists discover (needs time machine)
 
-        docs/basics.md:
-            # Indicating the state of a task / FINISHED
-            - [#] cancelled, this task has been scratched
+        projects/harvest.md:
+            # Project Harvest / Autumn / FINISHED
+            - [#] enter giant marrow contest (too late)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -416,46 +443,77 @@ bats_require_minimum_version 1.5.0
         whatnext \
             --open \
             --partial \
-            docs/basics.md
+            projects/harvest.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task
-            - [/] in progress, this task is partially complete
-            - [ ] open, this task is outstanding
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            - [ ] Ut enim ad minim veniam,
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
+
+        projects/harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+
+        projects/harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 
-    run --separate-stderr \
-        whatnext \
-            --blocked \
-            --cancelled \
-            --done \
-            --open \
-            --partial \
-            docs/basics.md
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --blocked \
+                --cancelled \
+                --done \
+                --open \
+                --partial \
+                projects/harvest.md \
+                projects/obelisk.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task
-            - [/] in progress, this task is partially complete
-            - [ ] open, this task is outstanding
-            - [<] blocked, this task needs more input
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            - [ ] Ut enim ad minim veniam,
+        projects/obelisk.md:
+            # Project Obelisk / Discovery / OVERDUE 30y 2m
+            Mess with Jackson
+            - [<] watch archaeologists discover (needs time machine)
 
-        docs/basics.md:
-            # Indicating the state of a task / FINISHED
-            - [X] complete, this task has been finished
-            - [#] cancelled, this task has been scratched
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
+
+        projects/harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
+
+        projects/harvest.md:
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
+        projects/obelisk.md:
+            # Project Obelisk
+            Something something star gate
+            - [/] carve runes into obelisk
+            - [ ] research into runic meaning
+            - [ ] bury obelisk in desert
+
+        projects/harvest.md:
+            # Project Harvest / Hardening off / FINISHED
+            - [X] move seedlings to cold frame
+            # Project Harvest / Autumn / FINISHED
+            - [#] enter giant marrow contest (too late)
+        projects/obelisk.md:
+            # Project Obelisk / FINISHED
+            Something something star gate
+            - [X] secure desert burial site
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -466,14 +524,13 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             --open \
-            lorem \
-            docs/basics.md
+            squash \
+            projects/harvest.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task / Multiline tasks and indentation
-            - [ ] Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -484,15 +541,15 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             --priority high \
-            docs/prioritisation.md
+            projects/harvest.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/prioritisation.md:
-            # Prioritisation / HIGH
-            - [ ] super-urgent task
-            # do these first / HIGH
-            - [ ] inherently high priority task, because of the header
-            - [ ] no extra priority, still listed second
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -504,19 +561,19 @@ bats_require_minimum_version 1.5.0
         whatnext \
             --priority high \
             --priority medium \
-            docs/prioritisation.md
+            projects/harvest.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/prioritisation.md:
-            # Prioritisation / HIGH
-            - [ ] super-urgent task
-            # do these first / HIGH
-            - [ ] inherently high priority task, because of the header
-            - [ ] no extra priority, still listed second
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
 
-        docs/prioritisation.md:
-            # Prioritisation / MEDIUM
-            - [ ] semi-urgent task
+        projects/harvest.md:
+            # Project Harvest / MEDIUM
+            - [ ] buy copper tape for slugs
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -527,13 +584,15 @@ bats_require_minimum_version 1.5.0
     run --separate-stderr \
         whatnext \
             --priority high \
-            header \
-            docs/prioritisation.md
+            seeds \
+            projects/harvest.md
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/prioritisation.md:
-            # do these first / HIGH
-            - [ ] inherently high priority task, because of the header
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -547,21 +606,21 @@ bats_require_minimum_version 1.5.0
                 5
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/prioritisation.md:
-            # Prioritisation / HIGH
-            - [ ] super-urgent task
-            # do these first / HIGH
-            - [ ] inherently high priority task, because of the header
-            - [ ] no extra priority, still listed second
+        projects/obelisk.md:
+            # Project Obelisk / Discovery / OVERDUE 30y 2m
+            Mess with Jackson
+            - [<] watch archaeologists discover (needs time machine)
 
-        docs/prioritisation.md:
-            # Prioritisation / MEDIUM
-            - [ ] semi-urgent task
+        projects/harvest.md:
+            # Project Harvest / HIGH
+            - [ ] order squash seeds
+            # Project Harvest / Spring planting / HIGH
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
 
-        docs/annotations.md:
-            # Project Anvil
-            Let the anvils ring!
-            - [ ] introduce ourselves
+        tasks.md:
+            # Get S Done / MEDIUM
+            - [ ] question entire existence
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -576,9 +635,10 @@ bats_require_minimum_version 1.5.0
                 5
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        docs/basics.md:
-            # Indicating the state of a task
-            - [<] blocked, this task needs more input
+        projects/obelisk.md:
+            # Project Obelisk / Discovery / OVERDUE 30y 2m
+            Mess with Jackson
+            - [<] watch archaeologists discover (needs time machine)
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")

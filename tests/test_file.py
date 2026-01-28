@@ -4,6 +4,103 @@ from textwrap import dedent
 from whatnext.models import MarkdownFile, Priority, State
 
 
+class TestContentFiltering:
+    def filtered_content(self, source):
+        file = MarkdownFile(
+            source=source,
+            today=date(2025, 1, 1),
+        )
+        return "\n".join(
+            line
+                for _, line in file.relevant_content()
+        ) + "\n"
+
+    def test_tasks(self):
+        assert self.filtered_content("example/tasks.md") == dedent("""\
+            # Get S Done
+            - [ ] **come up with better projects** @2025-11-01
+            - [ ] start third project @2026-01-05
+            - [ ] _question entire existence_
+        """)
+
+    def test_template(self):
+        assert self.filtered_content("example/template.md") == dedent("""\
+            @notnext this is an example template
+            # New Project Template
+            - [ ] define project scope
+            - [ ] identify stakeholders
+            - [ ] create timeline
+        """)
+
+    def test_obelisk(self):
+        assert self.filtered_content("example/projects/obelisk.md") == dedent("""\
+            # Project Obelisk
+            ```whatnext
+            Something   something    star    gate
+            ```
+            - [X] **secure desert burial site**
+            - [ ] research into runic meaning
+            - [/] carve runes into obelisk
+            - [ ] **bury obelisk in desert** @2026-01-05
+            ## Discovery
+            ~~~whatnext
+            Mess with Jackson
+            ~~~
+            - [<] watch archaeologists discover (needs time machine) @1994-10-28
+        """)
+
+    def test_curtain(self):
+        assert self.filtered_content("example/projects/curtain.md") == dedent("""\
+            # Project Curtain
+            @after
+            ## Final bow @after tangerine.md
+            - [ ] Take a bow
+            ## Safety @after obelisk.md
+            - [ ] Lower the safety curtain
+            ## Close the theatre
+            - [ ] Escort everyone out
+            - [ ] Shut up shop
+        """)
+
+    def test_harvest(self):
+        assert self.filtered_content("example/projects/harvest.md") == dedent("""\
+            # Project Harvest
+            - [/] turn compost heap
+            - [ ] plan raised bed layout
+            - [ ] _buy copper tape for slugs_
+            - [ ] **order squash seeds**
+            ## **Spring planting**
+            - [ ] sow tomato seeds indoors
+            - [ ] direct sow carrots
+            ## Hardening off
+            - [X] move seedlings to cold frame
+            ## Autumn
+            - [#] enter giant marrow contest (too late)
+        """)
+
+    def test_tinsel(self):
+        assert self.filtered_content("example/projects/tinsel.md") == dedent("""\
+            # Project Tinsel
+            - [ ] send Christmas cards @2025-12-05
+            ## Christmas dinner
+            - [ ] book Christmas delivery @2025-12-23/3w
+            - [ ] _prep the make-ahead gravy_ @2025-12-25/1d
+            - [ ] **roast the potatoes** @2025-12-25/0d
+            - [ ] prep sprouts @2025-12-25
+        """)
+
+    def test_tangerine(self):
+        assert self.filtered_content(
+            "example/archived/projects/tangerine.md"
+        ) == dedent("""\
+            # Project Tangerine
+            - [X] acquire trebuchet plans
+            - [X] source counterweight materials
+            - [X] build it
+            - [#] throw fruit at neighbours (they moved away)
+        """)
+
+
 class TestFileParsing:
     def test_open_task(self):
         file = MarkdownFile(
@@ -19,6 +116,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_in_progress_task(self):
@@ -34,6 +133,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_complete_task(self):
@@ -49,6 +150,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_cancelled_task(self):
@@ -64,6 +167,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_blocked_task(self):
@@ -79,6 +184,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_multiline_task(self):
@@ -104,6 +211,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_multiline_task_wrong_indent(self):
@@ -122,6 +231,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_normal_priority(self):
@@ -137,6 +248,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_medium_priority(self):
@@ -152,6 +265,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_high_priority(self):
@@ -167,6 +282,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_priority_from_header_and_precedence(self):
@@ -198,6 +315,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
         assert file.tasks[1].as_dict() == {
             "heading": "# do these first",
@@ -207,6 +326,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 5,
+            "deferred": None,
         }
         assert file.tasks[2].as_dict() == {
             "heading": "# do these first",
@@ -216,6 +337,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 6,
+            "deferred": None,
         }
         assert file.tasks[3].as_dict() == {
             "heading": "# do these first / grouped, but still highest priority",
@@ -225,6 +348,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 10,
+            "deferred": None,
         }
         assert file.tasks[4].as_dict() == {
             "heading": "# more tasks",
@@ -234,6 +359,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 14,
+            "deferred": None,
         }
 
     def test_high_task_under_medium_header(self):
@@ -253,6 +380,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 3,
+            "deferred": None,
         }
 
     def test_medium_task_under_high_header(self):
@@ -272,6 +401,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 3,
+            "deferred": None,
         }
 
     def test_medium_subsection_under_high_header(self):
@@ -293,6 +424,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 5,
+            "deferred": None,
         }
 
     def test_simple_deadline(self):
@@ -311,87 +444,103 @@ class TestFileParsing:
             "due": date(2025, 12, 5),
             "imminent": date(2025, 11, 21),
             "annotation": None,
+            "line": 2,
+            "deferred": None,
         }
 
     def test_deadline_outside_urgency_window_no_priority(self):
         file = MarkdownFile(
-            source_string=dedent("""\
-                # Christmas dinner
-                - [ ] book Christmas delivery @2025-12-23/3w
-                - [ ] _prep the make-ahead gravy_ @2025-12-25/1d
-                - [ ] **roast the potatoes** @2025-12-25/0d
-            """),
-            today=date(2025, 12, 1),
+            source="example/projects/tinsel.md",
+            today=date(2025, 1, 1),
         )
         assert file.tasks[0].as_dict() == {
-            "heading": "# Christmas dinner",
+            "heading": "# Project Tinsel",
+            "state": State.OPEN,
+            "text": "send Christmas cards",
+            "priority": Priority.NORMAL,
+            "due": date(2025, 12, 5),
+            "imminent": date(2025, 11, 21),
+            "annotation": None,
+            "line": 3,
+            "deferred": None,
+        }
+        assert file.tasks[1].as_dict() == {
+            "heading": "# Project Tinsel / Christmas dinner",
             "state": State.OPEN,
             "text": "book Christmas delivery",
             "priority": Priority.NORMAL,
             "due": date(2025, 12, 23),
             "imminent": date(2025, 12, 2),
             "annotation": None,
+            "line": 7,
+            "deferred": None,
         }
-        assert file.tasks[1].as_dict() == {
-            "heading": "# Christmas dinner",
+        assert file.tasks[2].as_dict() == {
+            "heading": "# Project Tinsel / Christmas dinner",
             "state": State.OPEN,
             "text": "prep the make-ahead gravy",
             "priority": Priority.NORMAL,
             "due": date(2025, 12, 25),
             "imminent": date(2025, 12, 24),
             "annotation": None,
+            "line": 8,
+            "deferred": None,
         }
-        assert file.tasks[2].as_dict() == {
-            "heading": "# Christmas dinner",
+        assert file.tasks[3].as_dict() == {
+            "heading": "# Project Tinsel / Christmas dinner",
             "state": State.OPEN,
             "text": "roast the potatoes",
             "priority": Priority.NORMAL,
             "due": date(2025, 12, 25),
             "imminent": date(2025, 12, 25),
             "annotation": None,
+            "line": 9,
+            "deferred": None,
+        }
+        assert file.tasks[4].as_dict() == {
+            "heading": "# Project Tinsel / Christmas dinner",
+            "state": State.OPEN,
+            "text": "prep sprouts",
+            "priority": Priority.NORMAL,
+            "due": date(2025, 12, 25),
+            "imminent": date(2025, 12, 11),
+            "annotation": None,
+            "line": 10,
+            "deferred": None,
         }
 
     def test_deadline_inside_urgency_gains_imminent_priority(self):
         file = MarkdownFile(
-            source_string=dedent("""\
-                # Christmas dinner
-                - [ ] book Christmas delivery @2025-12-23/3w
-                - [ ] _prep the make-ahead gravy_ @2025-12-25/1d
-                - [ ] **roast the potatoes** @2025-12-25/0d
-            """),
+            source="example/projects/tinsel.md",
             today=date(2025, 12, 15),
         )
-        assert file.tasks[0].priority == Priority.IMMINENT
-        assert file.tasks[1].priority == Priority.NORMAL
+        assert file.tasks[0].priority == Priority.OVERDUE
+        assert file.tasks[1].priority == Priority.IMMINENT
         assert file.tasks[2].priority == Priority.NORMAL
+        assert file.tasks[3].priority == Priority.NORMAL
+        assert file.tasks[4].priority == Priority.IMMINENT
 
     def test_deadline_inside_urgency_regains_priority(self):
         file = MarkdownFile(
-            source_string=dedent("""\
-                # Christmas dinner
-                - [ ] book Christmas delivery @2025-12-23/3w
-                - [ ] _prep the make-ahead gravy_ @2025-12-25/1d
-                - [ ] **roast the potatoes** @2025-12-25/0d
-            """),
+            source="example/projects/tinsel.md",
             today=date(2025, 12, 24),
         )
         assert file.tasks[0].priority == Priority.OVERDUE
-        assert file.tasks[1].priority == Priority.MEDIUM
-        assert file.tasks[2].priority == Priority.NORMAL
+        assert file.tasks[1].priority == Priority.OVERDUE
+        assert file.tasks[2].priority == Priority.MEDIUM
+        assert file.tasks[3].priority == Priority.NORMAL
+        assert file.tasks[4].priority == Priority.IMMINENT
 
     def test_deadline_past_deadline_always_overdue(self):
         file = MarkdownFile(
-            source_string=dedent("""\
-                # Christmas dinner
-                - [ ] book Christmas delivery @2025-12-22/3w
-                - [ ] _prep the make-ahead gravy_ @2025-12-25/1d
-                - [ ] **roast the potatoes** @2025-12-25/0d
-            """),
+            source="example/projects/tinsel.md",
             today=date(2025, 12, 26),
         )
         assert file.tasks[0].priority == Priority.OVERDUE
         assert file.tasks[1].priority == Priority.OVERDUE
         assert file.tasks[2].priority == Priority.OVERDUE
+        assert file.tasks[3].priority == Priority.OVERDUE
+        assert file.tasks[4].priority == Priority.OVERDUE
 
     def test_invalid_date_ignored(self):
         file = MarkdownFile(
@@ -406,6 +555,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_non_date_format_ignored(self):
@@ -421,6 +572,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_invalid_urgency_invalidates_deadline(self):
@@ -436,6 +589,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_email_not_deadline(self):
@@ -451,6 +606,8 @@ class TestFileParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 1,
+            "deferred": None,
         }
 
     def test_backticks_prevent_deadline_parsing(self):
@@ -486,625 +643,25 @@ class TestFileParsing:
         assert file.tasks[0].due is None
 
 
-class GroupedTasksTestCase:
-    def tasks(self, grouped_tasks):
-        return tuple(
-            [
-                (task.heading, task.text, task.state, task.priority)
-                for task in group
-            ]
-            for group in grouped_tasks
-        )
-
-
-class TestGroupedTasksBasics(GroupedTasksTestCase):
-    file = MarkdownFile(source="docs/basics.md", today=date.today())
-
-    def test_no_args_returns_all_grouped_by_priority(self):
-        assert self.tasks(self.file.grouped_tasks()) == (
-            [],
-            [],
-            [],
-            [],
-            [
-                (
-                    "# Indicating the state of a task",
-                    "in progress, this task is partially complete",
-                    State.IN_PROGRESS,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Indicating the state of a task",
-                    "open, this task is outstanding",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Indicating the state of a task",
-                    "blocked, this task needs more input",
-                    State.BLOCKED,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Indicating the state of a task / Multiline tasks and indentation",  # noqa: E501
-                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit, "
-                    "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",  # noqa: E501
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Indicating the state of a task / Multiline tasks and indentation",  # noqa: E501
-                    "Ut enim ad minim veniam,",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-            ],
-            [
-                (
-                    "# Indicating the state of a task",
-                    "complete, this task has been finished",
-                    State.COMPLETE,
-                    None
-                ),
-                (
-                    "# Indicating the state of a task",
-                    "cancelled, this task has been scratched",
-                    State.CANCELLED,
-                    None
-                ),
-            ],
-        )
-
-    def test_state_two_selected(self):
-        assert self.tasks(
-            self.file.grouped_tasks(states={State.IN_PROGRESS, State.BLOCKED})
-        ) == (
-            [],
-            [],
-            [],
-            [],
-            [
-                (
-                    "# Indicating the state of a task",
-                    "in progress, this task is partially complete",
-                    State.IN_PROGRESS,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Indicating the state of a task",
-                    "blocked, this task needs more input",
-                    State.BLOCKED,
-                    Priority.NORMAL
-                ),
-            ],
-            [],
-        )
-
-    def test_search_terms(self):
-        assert self.tasks(self.file.grouped_tasks(search_terms=["multiline"])) == (
-            [],
-            [],
-            [],
-            [],
-            [
-                (
-                    "# Indicating the state of a task / Multiline tasks and indentation",  # noqa: E501
-                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit, "
-                    "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",  # noqa: E501
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Indicating the state of a task / Multiline tasks and indentation",  # noqa: E501
-                    "Ut enim ad minim veniam,",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-            ],
-            [],
-        )
-
-    def test_search_terms_and_state(self):
-        assert self.tasks(
-            self.file.grouped_tasks(
-                states={State.COMPLETE, State.CANCELLED},
-                search_terms=["task"],
-            )
-        ) == (
-            [],
-            [],
-            [],
-            [],
-            [],
-            [
-                (
-                    "# Indicating the state of a task",
-                    "complete, this task has been finished",
-                    State.COMPLETE,
-                    None
-                ),
-                (
-                    "# Indicating the state of a task",
-                    "cancelled, this task has been scratched",
-                    State.CANCELLED,
-                    None
-                ),
-            ],
-        )
-
-    def test_search_terms_and_state_no_overlap(self):
-        assert self.tasks(
-            self.file.grouped_tasks(
-                states={State.COMPLETE},
-                search_terms=["lorem"],
-            )
-        ) == ([], [], [], [], [], [])
-
-    def test_priority_high(self):
-        assert self.tasks(
-            self.file.grouped_tasks(priorities={Priority.HIGH})
-        ) == ([], [], [], [], [], [])
-
-    def test_priority_high_and_medium(self):
-        assert self.tasks(
-            self.file.grouped_tasks(priorities={Priority.HIGH, Priority.MEDIUM})
-        ) == ([], [], [], [], [], [])
-
-
-class TestGroupedTasksPrioritisation(GroupedTasksTestCase):
-    file = MarkdownFile(source="docs/prioritisation.md", today=date.today())
-
-    def test_no_args_returns_all_grouped_by_priority(self):
-        assert self.tasks(self.file.grouped_tasks()) == (
-            [],
-            [
-                (
-                    "# Prioritisation",
-                    "super-urgent task",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-                (
-                    "# do these first",
-                    "inherently high priority task, because of the header",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-                (
-                    "# do these first",
-                    "no extra priority, still listed second",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-            ],
-            [
-                (
-                    "# Prioritisation",
-                    "semi-urgent task",
-                    State.OPEN,
-                    Priority.MEDIUM
-                ),
-            ],
-            [],
-            [
-                (
-                    "# Prioritisation",
-                    "not a high priority task",
-                    State.IN_PROGRESS,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Prioritisation",
-                    "top, but not urgent, task",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-            ],
-            [
-                (
-                    "# do these first / grouped, but still highest priority",
-                    "header priority cascades down",
-                    State.COMPLETE,
-                    None
-                ),
-                (
-                    "# more tasks",
-                    "normal priority, new header resets that",
-                    State.CANCELLED,
-                    None
-                ),
-            ],
-        )
-
-    def test_state_two_selected(self):
-        assert self.tasks(
-            self.file.grouped_tasks(states={State.IN_PROGRESS, State.BLOCKED})
-        ) == (
-            [],
-            [],
-            [],
-            [],
-            [
-                (
-                    "# Prioritisation",
-                    "not a high priority task",
-                    State.IN_PROGRESS,
-                    Priority.NORMAL
-                ),
-            ],
-            [],
-        )
-
-    def test_search_terms(self):
-        assert self.tasks(self.file.grouped_tasks(search_terms=["priority"])) == (
-            [],
-            [
-                (
-                    "# do these first",
-                    "inherently high priority task, because of the header",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-                (
-                    "# do these first",
-                    "no extra priority, still listed second",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-            ],
-            [],
-            [],
-            [
-                (
-                    "# Prioritisation",
-                    "not a high priority task",
-                    State.IN_PROGRESS,
-                    Priority.NORMAL
-                ),
-            ],
-            [
-                (
-                    "# do these first / grouped, but still highest priority",
-                    "header priority cascades down",
-                    State.COMPLETE,
-                    None
-                ),
-                (
-                    "# more tasks",
-                    "normal priority, new header resets that",
-                    State.CANCELLED,
-                    None
-                ),
-            ],
-        )
-
-    def test_search_terms_and_state(self):
-        assert self.tasks(
-            self.file.grouped_tasks(
-                states={State.COMPLETE},
-                search_terms=["header"],
-            )
-        ) == (
-            [],
-            [],
-            [],
-            [],
-            [],
-            [
-                (
-                    "# do these first / grouped, but still highest priority",
-                    "header priority cascades down",
-                    State.COMPLETE,
-                    None
-                ),
-            ],
-        )
-
-    def test_search_terms_and_state_no_overlap(self):
-        assert self.tasks(
-            self.file.grouped_tasks(
-                states={State.COMPLETE},
-                search_terms=["urgent"],
-            )
-        ) == ([], [], [], [], [], [])
-
-    def test_priority_high(self):
-        assert self.tasks(
-            self.file.grouped_tasks(priorities={Priority.HIGH})
-        ) == (
-            [],
-            [
-                (
-                    "# Prioritisation",
-                    "super-urgent task",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-                (
-                    "# do these first",
-                    "inherently high priority task, because of the header",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-                (
-                    "# do these first",
-                    "no extra priority, still listed second",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-            ],
-            [],
-            [],
-            [],
-            [],
-        )
-
-    def test_priority_high_and_medium(self):
-        assert self.tasks(
-            self.file.grouped_tasks(priorities={Priority.HIGH, Priority.MEDIUM})
-        ) == (
-            [],
-            [
-                (
-                    "# Prioritisation",
-                    "super-urgent task",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-                (
-                    "# do these first",
-                    "inherently high priority task, because of the header",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-                (
-                    "# do these first",
-                    "no extra priority, still listed second",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-            ],
-            [
-                (
-                    "# Prioritisation",
-                    "semi-urgent task",
-                    State.OPEN,
-                    Priority.MEDIUM
-                ),
-            ],
-            [],
-            [],
-            [],
-        )
-
-
-class TestGroupedTasksDeadlines(GroupedTasksTestCase):
-    def test_outside_all_windows_all_normal(self):
-        file = MarkdownFile(source="docs/deadlines.md", today=date(2025, 1, 1))
-        assert self.tasks(file.grouped_tasks()) == (
-            [],
-            [],
-            [],
-            [],
-            [
-                (
-                    "# version 0.5",
-                    "complete and release",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Christmas dinner",
-                    "book Christmas delivery",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Christmas dinner",
-                    "prep the make-ahead gravy",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Christmas dinner",
-                    "roast the potatoes",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Christmas dinner",
-                    "prep sprouts",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-            ],
-            [],
-        )
-
-    def test_inside_window_becomes_imminent(self):
-        file = MarkdownFile(source="docs/deadlines.md", today=date(2025, 12, 2))
-        assert self.tasks(file.grouped_tasks()) == (
-            [],
-            [],
-            [],
-            [
-                (
-                    "# version 0.5",
-                    "complete and release",
-                    State.OPEN,
-                    Priority.IMMINENT
-                ),
-                (
-                    "# Christmas dinner",
-                    "book Christmas delivery",
-                    State.OPEN,
-                    Priority.IMMINENT
-                ),
-            ],
-            [
-                (
-                    "# Christmas dinner",
-                    "prep the make-ahead gravy",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Christmas dinner",
-                    "roast the potatoes",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-                (
-                    "# Christmas dinner",
-                    "prep sprouts",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-            ],
-            [],
-        )
-
-    def test_emphasis_applies_inside_window(self):
-        file = MarkdownFile(source="docs/deadlines.md", today=date(2025, 12, 24))
-        assert self.tasks(file.grouped_tasks()) == (
-            [
-                (
-                    "# version 0.5",
-                    "complete and release",
-                    State.OPEN,
-                    Priority.OVERDUE
-                ),
-                (
-                    "# Christmas dinner",
-                    "book Christmas delivery",
-                    State.OPEN,
-                    Priority.OVERDUE
-                ),
-            ],
-            [],
-            [
-                (
-                    "# Christmas dinner",
-                    "prep the make-ahead gravy",
-                    State.OPEN,
-                    Priority.MEDIUM
-                ),
-            ],
-            [
-                (
-                    "# Christmas dinner",
-                    "prep sprouts",
-                    State.OPEN,
-                    Priority.IMMINENT
-                ),
-            ],
-            [
-                (
-                    "# Christmas dinner",
-                    "roast the potatoes",
-                    State.OPEN,
-                    Priority.NORMAL
-                ),
-            ],
-            [],
-        )
-
-    def test_high_emphasis_on_deadline_day(self):
-        file = MarkdownFile(source="docs/deadlines.md", today=date(2025, 12, 25))
-        assert self.tasks(file.grouped_tasks()) == (
-            [
-                (
-                    "# version 0.5",
-                    "complete and release",
-                    State.OPEN,
-                    Priority.OVERDUE
-                ),
-                (
-                    "# Christmas dinner",
-                    "book Christmas delivery",
-                    State.OPEN,
-                    Priority.OVERDUE
-                ),
-            ],
-            [
-                (
-                    "# Christmas dinner",
-                    "roast the potatoes",
-                    State.OPEN,
-                    Priority.HIGH
-                ),
-            ],
-            [
-                (
-                    "# Christmas dinner",
-                    "prep the make-ahead gravy",
-                    State.OPEN,
-                    Priority.MEDIUM
-                ),
-            ],
-            [
-                (
-                    "# Christmas dinner",
-                    "prep sprouts",
-                    State.OPEN,
-                    Priority.IMMINENT
-                ),
-            ],
-            [],
-            [],
-        )
-
-    def test_past_deadline_becomes_overdue(self):
-        file = MarkdownFile(source="docs/deadlines.md", today=date(2025, 12, 26))
-        assert self.tasks(file.grouped_tasks()) == (
-            [
-                (
-                    "# version 0.5",
-                    "complete and release",
-                    State.OPEN,
-                    Priority.OVERDUE
-                ),
-                (
-                    "# Christmas dinner",
-                    "book Christmas delivery",
-                    State.OPEN,
-                    Priority.OVERDUE
-                ),
-                (
-                    "# Christmas dinner",
-                    "prep the make-ahead gravy",
-                    State.OPEN,
-                    Priority.OVERDUE
-                ),
-                (
-                    "# Christmas dinner",
-                    "roast the potatoes",
-                    State.OPEN,
-                    Priority.OVERDUE
-                ),
-                (
-                    "# Christmas dinner",
-                    "prep sprouts",
-                    State.OPEN,
-                    Priority.OVERDUE
-                ),
-            ],
-            [],
-            [],
-            [],
-            [],
-            [],
-        )
-
-
 class TestAnnotationParsing:
     def test_annotations_associated_with_headings(self):
         file = MarkdownFile(
             source="example/projects/obelisk.md",
             today=date(2025, 1, 1),
         )
-        assert len(file.tasks) == 4
+        assert len(file.tasks) == 5
         assert file.tasks[0].as_dict() == {
+            "heading": "# Project Obelisk",
+            "state": State.COMPLETE,
+            "text": "secure desert burial site",
+            "priority": None,
+            "due": None,
+            "imminent": None,
+            "annotation": "Something something star gate",
+            "line": 7,
+            "deferred": None,
+        }
+        assert file.tasks[1].as_dict() == {
             "heading": "# Project Obelisk",
             "state": State.OPEN,
             "text": "research into runic meaning",
@@ -1112,8 +669,10 @@ class TestAnnotationParsing:
             "due": None,
             "imminent": None,
             "annotation": "Something something star gate",
+            "line": 8,
+            "deferred": None,
         }
-        assert file.tasks[1].as_dict() == {
+        assert file.tasks[2].as_dict() == {
             "heading": "# Project Obelisk",
             "state": State.IN_PROGRESS,
             "text": "carve runes into obelisk",
@@ -1121,8 +680,10 @@ class TestAnnotationParsing:
             "due": None,
             "imminent": None,
             "annotation": "Something something star gate",
+            "line": 9,
+            "deferred": None,
         }
-        assert file.tasks[2].as_dict() == {
+        assert file.tasks[3].as_dict() == {
             "heading": "# Project Obelisk",
             "state": State.OPEN,
             "text": "bury obelisk in desert",
@@ -1130,8 +691,10 @@ class TestAnnotationParsing:
             "due": date(2026, 1, 5),
             "imminent": date(2025, 12, 22),
             "annotation": "Something something star gate",
+            "line": 10,
+            "deferred": None,
         }
-        assert file.tasks[3].as_dict() == {
+        assert file.tasks[4].as_dict() == {
             "heading": "# Project Obelisk / Discovery",
             "state": State.BLOCKED,
             "text": "watch archaeologists discover (needs time machine)",
@@ -1139,6 +702,8 @@ class TestAnnotationParsing:
             "due": date(1994, 10, 28),
             "imminent": date(1994, 10, 14),
             "annotation": "Mess with Jackson",
+            "line": 21,
+            "deferred": None,
         }
 
     def test_other_fenced_blocks_ignored(self):
@@ -1171,6 +736,8 @@ class TestAnnotationParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 7,
+            "deferred": None,
         }
         assert file.tasks[1].as_dict() == {
             "heading": "# Only 'whatnext' blocks",
@@ -1180,6 +747,8 @@ class TestAnnotationParsing:
             "due": None,
             "imminent": None,
             "annotation": None,
+            "line": 15,
+            "deferred": None,
         }
 
     def test_multiple_annotations_combine(self):
@@ -1214,6 +783,8 @@ class TestAnnotationParsing:
             "due": None,
             "imminent": None,
             "annotation": "notes notes notes more notes what are this?",
+            "line": 11,
+            "deferred": None,
         }
         assert file.tasks[1].as_dict() == {
             "heading": "# Shattered thoughts",
@@ -1223,6 +794,8 @@ class TestAnnotationParsing:
             "due": None,
             "imminent": None,
             "annotation": "notes notes notes more notes what are this?",
+            "line": 17,
+            "deferred": None,
         }
 
 
