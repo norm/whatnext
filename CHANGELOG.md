@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [v2.0] - UNRELEASED
+## [v2.0] - 2026-01-28
 
 **Breaking change:** `whatnext` now ignores tasks and headers within
 quoting elements -- blockquotes, code fences, and indented text.
