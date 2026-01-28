@@ -40,7 +40,7 @@ setup() {
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
-    diff -u <(echo "+18 example/projects/obelisk.md") <(cat "$EDITOR_LOG")
+    diff -u <(echo "+21 example/projects/obelisk.md") <(cat "$EDITOR_LOG")
     [ $status -eq 0 ]
 }
 
@@ -61,7 +61,7 @@ setup() {
             --all
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        +18 example/projects/obelisk.md
+        +21 example/projects/obelisk.md
         +6 example/projects/harvest.md
         +5 example/tasks.md
         +7 example/projects/curtain.md

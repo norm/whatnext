@@ -1,6 +1,15 @@
+import inspect
 from datetime import date
 
 from whatnext.models import MarkdownFile, Priority, Task, State
+
+
+def test_as_dict_includes_all_attributes():
+    init_params = set(inspect.signature(Task.__init__).parameters) - {"self", "file"}
+    dict_keys = set(Task.as_dict(Task(
+        None, None, "", State.OPEN,
+    )).keys())
+    assert dict_keys == init_params
 
 
 class TestTask:

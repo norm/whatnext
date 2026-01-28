@@ -26,6 +26,7 @@ PRIORITY_COLOURS = {
     Priority.IMMINENT: ("green", None),
 }
 
+ACTIVE_STATES = {State.OPEN, State.IN_PROGRESS, State.BLOCKED}
 COMPLETE_STATES = {State.COMPLETE, State.CANCELLED}
 
 
@@ -49,7 +50,7 @@ def check_dependencies(files, quiet=False):
         basename = os.path.basename(file.path)
         deps = set()
         for task in file.tasks:
-            if task.deferred and len(task.deferred) > 0:
+            if task.deferred:
                 deps.update(task.deferred)
         dependencies[basename] = deps
 
@@ -520,7 +521,7 @@ def main():
         }
     elif not states:
         # default view is incomplete tasks
-        states = {State.OPEN, State.IN_PROGRESS, State.BLOCKED}
+        states = ACTIVE_STATES
 
     priorities = {
         Priority[priority.upper()]

@@ -48,4 +48,4 @@ class TestTaskLineNumber:
         )
         assert len(file.tasks) == 5
         lines = [task.line for task in file.tasks]
-        assert lines == [7, 8, 9, 10, 18]
+        assert lines == [7, 8, 9, 10, 21]
