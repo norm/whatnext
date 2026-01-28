@@ -127,7 +127,7 @@ dropped as a redundant weaker version of the prioritisation tests.
 
 - [X] Fix any other failing tests
 - [X] Test deleting the docs directory, all tests should still pass.
-- [ ] Any tests that use static content that mimics what is in ./example?
+- [X] Any tests that use static content that mimics what is in ./example?
       Let's prefer using the example files except when stress testing things
       like the parser.
-- [ ] Check coverage on grouped_tasks().
+- [X] Check coverage on grouped_tasks().

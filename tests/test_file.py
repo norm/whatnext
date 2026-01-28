@@ -315,16 +315,20 @@ class TestFileParsing:
 
     def test_deadline_outside_urgency_window_no_priority(self):
         file = MarkdownFile(
-            source_string=dedent("""\
-                # Christmas dinner
-                - [ ] book Christmas delivery @2025-12-23/3w
-                - [ ] _prep the make-ahead gravy_ @2025-12-25/1d
-                - [ ] **roast the potatoes** @2025-12-25/0d
-            """),
-            today=date(2025, 12, 1),
+            source="example/projects/tinsel.md",
+            today=date(2025, 1, 1),
         )
         assert file.tasks[0].as_dict() == {
-            "heading": "# Christmas dinner",
+            "heading": "# Project Tinsel",
+            "state": State.OPEN,
+            "text": "send Christmas cards",
+            "priority": Priority.NORMAL,
+            "due": date(2025, 12, 5),
+            "imminent": date(2025, 11, 21),
+            "annotation": None,
+        }
+        assert file.tasks[1].as_dict() == {
+            "heading": "# Project Tinsel / Christmas dinner",
             "state": State.OPEN,
             "text": "book Christmas delivery",
             "priority": Priority.NORMAL,
@@ -332,8 +336,8 @@ class TestFileParsing:
             "imminent": date(2025, 12, 2),
             "annotation": None,
         }
-        assert file.tasks[1].as_dict() == {
-            "heading": "# Christmas dinner",
+        assert file.tasks[2].as_dict() == {
+            "heading": "# Project Tinsel / Christmas dinner",
             "state": State.OPEN,
             "text": "prep the make-ahead gravy",
             "priority": Priority.NORMAL,
@@ -341,8 +345,8 @@ class TestFileParsing:
             "imminent": date(2025, 12, 24),
             "annotation": None,
         }
-        assert file.tasks[2].as_dict() == {
-            "heading": "# Christmas dinner",
+        assert file.tasks[3].as_dict() == {
+            "heading": "# Project Tinsel / Christmas dinner",
             "state": State.OPEN,
             "text": "roast the potatoes",
             "priority": Priority.NORMAL,
@@ -350,48 +354,48 @@ class TestFileParsing:
             "imminent": date(2025, 12, 25),
             "annotation": None,
         }
+        assert file.tasks[4].as_dict() == {
+            "heading": "# Project Tinsel / Christmas dinner",
+            "state": State.OPEN,
+            "text": "prep sprouts",
+            "priority": Priority.NORMAL,
+            "due": date(2025, 12, 25),
+            "imminent": date(2025, 12, 11),
+            "annotation": None,
+        }
 
     def test_deadline_inside_urgency_gains_imminent_priority(self):
         file = MarkdownFile(
-            source_string=dedent("""\
-                # Christmas dinner
-                - [ ] book Christmas delivery @2025-12-23/3w
-                - [ ] _prep the make-ahead gravy_ @2025-12-25/1d
-                - [ ] **roast the potatoes** @2025-12-25/0d
-            """),
+            source="example/projects/tinsel.md",
             today=date(2025, 12, 15),
         )
-        assert file.tasks[0].priority == Priority.IMMINENT
-        assert file.tasks[1].priority == Priority.NORMAL
+        assert file.tasks[0].priority == Priority.OVERDUE
+        assert file.tasks[1].priority == Priority.IMMINENT
         assert file.tasks[2].priority == Priority.NORMAL
+        assert file.tasks[3].priority == Priority.NORMAL
+        assert file.tasks[4].priority == Priority.IMMINENT
 
     def test_deadline_inside_urgency_regains_priority(self):
         file = MarkdownFile(
-            source_string=dedent("""\
-                # Christmas dinner
-                - [ ] book Christmas delivery @2025-12-23/3w
-                - [ ] _prep the make-ahead gravy_ @2025-12-25/1d
-                - [ ] **roast the potatoes** @2025-12-25/0d
-            """),
+            source="example/projects/tinsel.md",
             today=date(2025, 12, 24),
         )
         assert file.tasks[0].priority == Priority.OVERDUE
-        assert file.tasks[1].priority == Priority.MEDIUM
-        assert file.tasks[2].priority == Priority.NORMAL
+        assert file.tasks[1].priority == Priority.OVERDUE
+        assert file.tasks[2].priority == Priority.MEDIUM
+        assert file.tasks[3].priority == Priority.NORMAL
+        assert file.tasks[4].priority == Priority.IMMINENT
 
     def test_deadline_past_deadline_always_overdue(self):
         file = MarkdownFile(
-            source_string=dedent("""\
-                # Christmas dinner
-                - [ ] book Christmas delivery @2025-12-22/3w
-                - [ ] _prep the make-ahead gravy_ @2025-12-25/1d
-                - [ ] **roast the potatoes** @2025-12-25/0d
-            """),
+            source="example/projects/tinsel.md",
             today=date(2025, 12, 26),
         )
         assert file.tasks[0].priority == Priority.OVERDUE
         assert file.tasks[1].priority == Priority.OVERDUE
         assert file.tasks[2].priority == Priority.OVERDUE
+        assert file.tasks[3].priority == Priority.OVERDUE
+        assert file.tasks[4].priority == Priority.OVERDUE
 
     def test_invalid_date_ignored(self):
         file = MarkdownFile(
