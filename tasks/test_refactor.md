@@ -52,20 +52,20 @@ or explicit file args (`docs/basics.md`, `docs/prioritisation.md`).
 Uses `docs/basics.md`, `docs/usage.md`, `example/`, `archive/`,
 `tasks.md`, `.whatnext`.
 
-- [ ] "arg is task search"
-- [ ] "search term matches all under a heading"
-- [ ] "args is additive search"
-- [ ] "args can mix tasks and headings"
-- [ ] "arg matching dir restricts input"
-- [ ] "args match multiple dirs"
-- [ ] "dirs plus search"
-- [ ] "duplicate dirs do not duplicate output"
-- [ ] "multiple files"
-- [ ] "arg file path is respected in output"
-- [ ] "files plus search"
-- [ ] "matchers override default search space"
-- [ ] "no results is not an error"
-- [ ] "explicit file overrides ignore"
+- [X] "arg is task search"
+- [X] "search term matches all under a heading"
+- [X] "args is additive search"
+- [X] "args can mix tasks and headings"
+- [X] "arg matching dir restricts input"
+- [X] "args match multiple dirs"
+- [X] "dirs plus search"
+- [X] "duplicate dirs do not duplicate output"
+- [X] "multiple files"
+- [X] "arg file path is respected in output"
+- [X] "files plus search"
+- [X] "matchers override default search space"
+- [X] "no results is not an error"
+- [X] "explicit file overrides ignore"
 
 
 # tests/summary.bats
@@ -125,6 +125,7 @@ dropped as a redundant weaker version of the prioritisation tests.
 
 # wrap-up
 
+- [ ] Fix any other failing tests
 - [ ] Test deleting the docs directory, all tests should still pass.
 - [ ] Any tests that use static content that mimics what is in ./example?
       Let's prefer using the example files except when stress testing things
