@@ -40,7 +40,7 @@ setup() {
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")
-    diff -u <(echo "+17 example/projects/obelisk.md") <(cat "$EDITOR_LOG")
+    diff -u <(echo "+18 example/projects/obelisk.md") <(cat "$EDITOR_LOG")
     [ $status -eq 0 ]
 }
 
@@ -50,7 +50,7 @@ setup() {
             --edit \
             runes
 
-    diff -u <(echo "+8 example/projects/obelisk.md") <(cat "$EDITOR_LOG")
+    diff -u <(echo "+9 example/projects/obelisk.md") <(cat "$EDITOR_LOG")
     [ $status -eq 0 ]
 }
 
@@ -61,9 +61,11 @@ setup() {
             --all
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        +17 example/projects/obelisk.md
+        +18 example/projects/obelisk.md
+        +6 example/projects/harvest.md
         +5 example/tasks.md
         +7 example/projects/curtain.md
+        +3 example/projects/tinsel.md
         +3 example/archived/projects/tangerine.md
         EOF
     )

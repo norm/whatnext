@@ -125,8 +125,8 @@ dropped as a redundant weaker version of the prioritisation tests.
 
 # wrap-up
 
-- [ ] Fix any other failing tests
-- [ ] Test deleting the docs directory, all tests should still pass.
+- [X] Fix any other failing tests
+- [X] Test deleting the docs directory, all tests should still pass.
 - [ ] Any tests that use static content that mimics what is in ./example?
       Let's prefer using the example files except when stress testing things
       like the parser.
