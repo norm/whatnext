@@ -1,11 +1,13 @@
 # Changelog
 
 
-## [Unreleased]
+## [v2.0] - 2026-02-09
+
+Added `@queue` directive show only one task at a time, for simple sequential
+work that doesn't need to be split across files using `@after`.
 
 **Fixes:**
-- Annotations in `whatnext` blocks not appearing in output for headerless files
-- Priority indicators (overdue/high/medium/imminent) not appearing for headerless files
+- Annotation and priority indicators were not appearing for headerless files
 
 
 ## [v2.0] - 2026-01-28

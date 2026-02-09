@@ -65,6 +65,7 @@ setup() {
         +6 example/projects/harvest.md
         +5 example/tasks.md
         +7 example/projects/curtain.md
+        +5 example/projects/fountain.md
         +3 example/projects/tinsel.md
         +3 example/archived/projects/tangerine.md
         EOF

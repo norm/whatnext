@@ -161,6 +161,8 @@ function setup {
             # Project Harvest / MEDIUM
             - [ ] buy copper tape for slugs
 
+        fountain.md:
+            - [ ] nigredo, the blackening or melanosis
         harvest.md:
             # Project Harvest
             - [/] turn compost heap
@@ -224,6 +226,11 @@ function setup {
             # Project Curtain / Close the theatre
             - [ ] Escort everyone out
             - [ ] Shut up shop
+        projects/fountain.md:
+            - [ ] nigredo, the blackening or melanosis
+            - [ ] albedo, the whitening or leucosis
+            - [ ] citrinitas, the yellowing or xanthosis
+            - [ ] rubedo, the reddening, purpling, or iosis
         projects/harvest.md:
             # Project Harvest
             - [/] turn compost heap
@@ -315,6 +322,8 @@ function setup {
             # Project Harvest / MEDIUM
             - [ ] buy copper tape for slugs
 
+        fountain.md:
+            - [ ] nigredo, the blackening or melanosis
         harvest.md:
             # Project Harvest
             - [/] turn compost heap

@@ -135,6 +135,44 @@ def filter_deferred(data):
     return result
 
 
+def filter_queue(data):
+    result = []
+    for file, tasks in data:
+        if not file.queue:
+            result.append((file, tasks))
+            continue
+
+        in_progress = [
+            t for t in tasks
+                if t.state == State.IN_PROGRESS
+        ]
+        if in_progress:
+            result.append((file, in_progress))
+            continue
+
+        open_tasks = [
+            t for t in tasks
+                if t.state == State.OPEN
+        ]
+        if open_tasks:
+            best = min(open_tasks, key=lambda t: t.priority.value)
+            result.append((file, [best]))
+            continue
+
+        blocked = [
+            t for t in tasks
+                if t.state == State.BLOCKED
+        ]
+        if blocked:
+            best = min(blocked, key=lambda t: t.priority.value)
+            result.append((file, [best]))
+            continue
+
+        result.append((file, []))
+
+    return result
+
+
 def get_terminal_width():
     columns_env = os.environ.get("COLUMNS")
     if columns_env:
@@ -552,6 +590,9 @@ def main():
 
     if not args.all and not args.ignore_after:
         filtered_data = filter_deferred(filtered_data)
+
+    if not args.all and not args.summary:
+        filtered_data = filter_queue(filtered_data)
 
     if args.summary:
         output = format_summary(

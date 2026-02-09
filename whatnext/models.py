@@ -102,6 +102,7 @@ class Task:
         self.deferred = deferred
 
     def as_dict(self):
+        # provided for easier testing
         return {
             "heading": self.heading,
             "state": self.state,
@@ -242,6 +243,7 @@ class MarkdownFile:
     """, re.VERBOSE)
     FILE_AFTER_PATTERN = re.compile(r"^@after(?:\s+(.+))?\s*$")
     NOTNEXT_PATTERN = re.compile(r"^@notnext(?:\s|$)")
+    QUEUE_PATTERN = re.compile(r"^@queue(?:\s|$)")
     DEFAULT_URGENCY = timedelta(weeks=2)
 
     def __init__(
@@ -269,6 +271,7 @@ class MarkdownFile:
         self.today = today
         self.warnings = []
         self.notnext = False
+        self.queue = False
         self.tasks = self.extract_tasks()
 
     @staticmethod
@@ -388,6 +391,8 @@ class MarkdownFile:
                 lines.append((line_index, line))
             elif self.NOTNEXT_PATTERN.match(line):
                 lines.append((line_index, line))
+            elif self.QUEUE_PATTERN.match(line):
+                lines.append((line_index, line))
 
         return lines
 
@@ -405,6 +410,8 @@ class MarkdownFile:
                     file_deferred = []
             if self.NOTNEXT_PATTERN.match(line):
                 self.notnext = True
+            if self.QUEUE_PATTERN.match(line):
+                self.queue = True
 
         heading = None
         priority = Priority.NORMAL

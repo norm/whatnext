@@ -876,3 +876,70 @@ class TestNotnextParsing:
             today=date(2025, 1, 1),
         )
         assert file.notnext is False
+
+
+class TestQueueParsing:
+    def test_file_without_queue(self):
+        file = MarkdownFile(
+            source_string="- [ ] normal task",
+            today=date(2025, 1, 1),
+        )
+        assert file.queue is False
+
+    def test_file_with_queue(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                @queue
+
+                - [ ] first task
+                - [ ] second task
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.queue is True
+
+    def test_queue_anywhere_in_file(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Tasks
+
+                - [ ] first task
+
+                @queue
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.queue is True
+
+    def test_escaped_queue_in_backticks(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                Use `@queue` to limit output.
+
+                - [ ] first task
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.queue is False
+
+    def test_escaped_queue_with_backslash(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                Use \\@queue to limit output.
+
+                - [ ] first task
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.queue is False
+
+    def test_queue_must_be_on_own_line(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Tasks
+
+                - [ ] something @queue something else
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.queue is False

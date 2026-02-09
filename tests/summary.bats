@@ -11,14 +11,15 @@ function setup {
                 --summary
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-                                                           B P  O
-        ░░░░░░░░░░░░░░░░░░░░░░░░                           0 0  3  tasks.md
-        ░░░░░░░░                                           0 0  1  projects/curtain.md
-        ▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0 1  5  projects/harvest.md
-        ▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░                  1 1  2  projects/obelisk.md
-        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0 0  5  projects/tinsel.md
-                                                           ──────
-                                                           1 2 16  19, of 29 total
+                                                          B P  O
+        ░░░░░░░░░░░░░░░░░░░░░░░░                          0 0  3  tasks.md
+        ░░░░░░░░                                          0 0  1  projects/curtain.md
+        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                  0 0  4  projects/fountain.md
+        ▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0 1  5  projects/harvest.md
+        ▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░                  1 1  2  projects/obelisk.md
+        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0 0  5  projects/tinsel.md
+                                                          ──────
+                                                          1 2 20  23, of 33 total
 
         ▚ Blocked  ▓ Partial  ░ Open
         EOF
@@ -38,12 +39,13 @@ function setup {
                                             C D B P  O
         ░░░░░░░░░░░░░                       0 0 0 0  3  tasks.md
         ░░░░░░░░░░░░░░░░░                   0 0 0 0  4  projects/curtain.md
+        ░░░░░░░░░░░░░░░░░                   0 0 0 0  4  projects/fountain.md
         ▚▚▚▚████▒▒▒▒▒░░░░░░░░░░░░░░░░░░░░░  1 1 0 1  5  projects/harvest.md
         ████▓▓▓▓▒▒▒▒▒░░░░░░░░               0 1 1 1  2  projects/obelisk.md
         ░░░░░░░░░░░░░░░░░░░░░               0 0 0 0  5  projects/tinsel.md
         ▚▚▚▚█████████████                   1 3 0 0  0  archived/projects/tangerine.md
                                             ──────────
-                                            2 5 1 2 19  29, of 29 total
+                                            2 5 1 2 23  33, of 33 total
 
         ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
         EOF
@@ -93,12 +95,13 @@ function setup {
                     C D B P  O
         ░░░░        0 0 0 0  3  tasks.md
         ░░░░░       0 0 0 0  4  projects/curtain.md
+        ░░░░░       0 0 0 0  4  projects/fountain.md
         ▚█▒▒░░░░░░  1 1 0 1  5  projects/harvest.md
         █▓▒▒░░      0 1 1 1  2  projects/obelisk.md
         ░░░░░░      0 0 0 0  5  projects/tinsel.md
         ▚████       1 3 0 0  0  archived/projects/tangerine.md
                     ──────────
-                    2 5 1 2 19  29, of 29 total
+                    2 5 1 2 23  33, of 33 total
 
         ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
         EOF
@@ -115,14 +118,15 @@ function setup {
                 --open
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-                                                                O
-        ████████████████████████████████                        3  tasks.md
-        ███████████                                             1  projects/curtain.md
-        █████████████████████████████████████████████████████   5  projects/harvest.md
-        █████████████████████                                   2  projects/obelisk.md
-        █████████████████████████████████████████████████████   5  projects/tinsel.md
-                                                               ──
-                                                               16  16, of 29 total
+                                                               O
+        ███████████████████████████████                        3  tasks.md
+        ██████████                                             1  projects/curtain.md
+        ██████████████████████████████████████████             4  projects/fountain.md
+        ████████████████████████████████████████████████████   5  projects/harvest.md
+        █████████████████████                                  2  projects/obelisk.md
+        ████████████████████████████████████████████████████   5  projects/tinsel.md
+                                                              ──
+                                                              20  20, of 33 total
 
         █ Open
         EOF
@@ -143,12 +147,13 @@ function setup {
                                                   O  ~
         ███████████████                           3  0  tasks.md
         █████                                     1  0  projects/curtain.md
+        ████████████████████                      4  0  projects/fountain.md
         ████████████████████████░░░░░░░░░░░░░░░   5  3  projects/harvest.md
         ██████████░░░░░░░░░░░░░░                  2  3  projects/obelisk.md
         ████████████████████████                  5  0  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                                  ─────
-                                                 16 10  26, of 29 total
+                                                 20 10  30, of 33 total
 
         █ Open  ░ (Cancelled/Done/Blocked/Partial)
         EOF
@@ -169,12 +174,13 @@ function setup {
                                                   P  ~
         ░░░░░░░░░░░░░░░                           0  3  tasks.md
         ░░░░░                                     0  1  projects/curtain.md
+        ░░░░░░░░░░░░░░░░░░░░                      0  4  projects/fountain.md
         █████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1  7  projects/harvest.md
         █████░░░░░░░░░░░░░░░░░░░░                 1  4  projects/obelisk.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                                   ────
-                                                  2 24  26, of 29 total
+                                                  2 28  30, of 33 total
 
         █ Partial  ░ (Cancelled/Done/Blocked/Open)
         EOF
@@ -195,12 +201,13 @@ function setup {
                                                   B  ~
         ░░░░░░░░░░░░░░░                           0  3  tasks.md
         ░░░░░                                     0  1  projects/curtain.md
+        ░░░░░░░░░░░░░░░░░░░░                      0  4  projects/fountain.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0  8  projects/harvest.md
         █████░░░░░░░░░░░░░░░░░░░░                 1  4  projects/obelisk.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                                   ────
-                                                  1 25  26, of 29 total
+                                                  1 29  30, of 33 total
 
         █ Blocked  ░ (Cancelled/Done/Partial/Open)
         EOF
@@ -221,12 +228,13 @@ function setup {
                                                   D  ~
         ░░░░░░░░░░░░░░░                           0  3  tasks.md
         ░░░░░                                     0  1  projects/curtain.md
+        ░░░░░░░░░░░░░░░░░░░░                      0  4  projects/fountain.md
         █████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1  7  projects/harvest.md
         █████░░░░░░░░░░░░░░░░░░░░                 1  4  projects/obelisk.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         ███████████████░░░░░                      3  1  archived/projects/tangerine.md
                                                   ────
-                                                  5 21  26, of 29 total
+                                                  5 25  30, of 33 total
 
         █ Done  ░ (Cancelled/Blocked/Partial/Open)
         EOF
@@ -247,12 +255,13 @@ function setup {
                                                   C  ~
         ░░░░░░░░░░░░░░░                           0  3  tasks.md
         ░░░░░                                     0  1  projects/curtain.md
+        ░░░░░░░░░░░░░░░░░░░░                      0  4  projects/fountain.md
         █████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1  7  projects/harvest.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/obelisk.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         █████░░░░░░░░░░░░░░░                      1  3  archived/projects/tangerine.md
                                                   ────
-                                                  2 24  26, of 29 total
+                                                  2 28  30, of 33 total
 
         █ Cancelled  ░ (Done/Blocked/Partial/Open)
         EOF
@@ -274,12 +283,13 @@ function setup {
                                                 C  O ~
         ▓▓▓▓▓▓▓▓▓▓▓▓▓▓                          0  3 0  tasks.md
         ▓▓▓▓▓                                   0  1 0  projects/curtain.md
+        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                     0  4 0  projects/fountain.md
         ▚▚▚▚▚▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░  1  5 2  projects/harvest.md
         ▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░                0  2 3  projects/obelisk.md
         ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                0  5 0  projects/tinsel.md
         ▚▚▚▚▚░░░░░░░░░░░░░░                     1  0 3  archived/projects/tangerine.md
                                                 ──────
-                                                2 16 8  26, of 29 total
+                                                2 20 8  30, of 33 total
 
         ▚ Cancelled  ▓ Open  ░ (Done/Blocked/Partial)
         EOF
@@ -300,12 +310,13 @@ function setup {
                                                   H  ~
         ░░░░░░░░░░░░░░░                           0  3  tasks.md
         ░░░░░                                     0  1  projects/curtain.md
+        ░░░░░░░░░░░░░░░░░░░░                      0  4  projects/fountain.md
         ███████████████░░░░░░░░░░░░░░░░░░░░░░░░░  3  5  projects/harvest.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/obelisk.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                                   ────
-                                                  3 23  26, of 29 total
+                                                  3 27  30, of 33 total
 
         █ High  ░ (Overdue/Imminent/Medium/Normal)
         EOF
@@ -326,12 +337,13 @@ function setup {
                                                   M  ~
         █████░░░░░░░░░░                           1  2  tasks.md
         ░░░░░                                     0  1  projects/curtain.md
+        ░░░░░░░░░░░░░░░░░░░░                      0  4  projects/fountain.md
         █████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1  7  projects/harvest.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/obelisk.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                                   ────
-                                                  2 24  26, of 29 total
+                                                  2 28  30, of 33 total
 
         █ Medium  ░ (Overdue/Imminent/High/Normal)
         EOF
@@ -353,12 +365,13 @@ function setup {
                                                H  N  ~
         ▓▓▓▓▓▓▓▓▓░░░░░                         0  2  1  tasks.md
         ▓▓▓▓▓                                  0  1  0  projects/curtain.md
+        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                     0  4  0  projects/fountain.md
         ▚▚▚▚▚▚▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░  3  2  3  projects/harvest.md
         ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░                0  3  2  projects/obelisk.md
         ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                0  5  0  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░                     0  0  4  archived/projects/tangerine.md
                                                ───────
-                                               3 13 10  26, of 29 total
+                                               3 17 10  30, of 33 total
 
         ▚ High  ▓ Normal  ░ (Overdue/Imminent/Medium)
         EOF
