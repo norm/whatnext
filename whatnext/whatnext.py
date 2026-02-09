@@ -253,11 +253,14 @@ def flatten_by_priority(filtered_data):
     return result
 
 
+_NOT_YET_SHOWN = object()
+
+
 def format_tasks(tasks, width, use_colour=False):
     output = []
     current_priority = None
     current_file = None
-    current_heading = None
+    current_heading = _NOT_YET_SHOWN
 
     for task in tasks:
         if task.priority != current_priority:
@@ -265,7 +268,7 @@ def format_tasks(tasks, width, use_colour=False):
                 output.append("")
             current_priority = task.priority
             current_file = None
-            current_heading = None
+            current_heading = _NOT_YET_SHOWN
 
         text_colour = None
         block_colour = None
@@ -281,9 +284,9 @@ def format_tasks(tasks, width, use_colour=False):
         if task.file != current_file:
             lines.append(f"{task.file.display_path}:")
             current_file = task.file
-            current_heading = None
+            current_heading = _NOT_YET_SHOWN
 
-        if task.heading and task.heading != current_heading:
+        if task.heading != current_heading:
             lines.extend(task.wrapped_heading(width))
             current_heading = task.heading
             if task.annotation:

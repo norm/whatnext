@@ -172,17 +172,27 @@ class Task:
         )
 
     def wrapped_heading(self, width=80, indent="    "):
-        if not self.heading:
-            return []
-        heading = self.heading
         if self.priority == Priority.OVERDUE:
-            heading = f"{self.heading} / OVERDUE {self.format_overdue_duration()}"
+            suffix = f"OVERDUE {self.format_overdue_duration()}"
         elif self.priority == Priority.IMMINENT:
-            heading = f"{self.heading} / IMMINENT {self.format_imminent_countdown()}"
+            suffix = f"IMMINENT {self.format_imminent_countdown()}"
         elif self.priority is None:
-            heading = f"{self.heading} / FINISHED"
+            suffix = "FINISHED"
         elif self.priority != Priority.NORMAL:
-            heading = f"{self.heading} / {self.priority.label.upper()}"
+            suffix = self.priority.label.upper()
+        else:
+            suffix = None
+
+        if self.heading:
+            if suffix:
+                heading = f"{self.heading} / {suffix}"
+            else:
+                heading = self.heading
+        elif suffix:
+            heading = f"# {suffix}"
+        else:
+            return []
+
         if width is None or len(indent + heading) <= width:
             return [indent + heading]
         return textwrap.wrap(

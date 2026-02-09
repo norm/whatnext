@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [Unreleased]
+
+**Fixes:**
+- Annotations in `whatnext` blocks not appearing in output for headerless files
+- Priority indicators (overdue/high/medium/imminent) not appearing for headerless files
+
+
 ## [v2.0] - 2026-01-28
 
 **Breaking change:** `whatnext` now ignores tasks and headers within

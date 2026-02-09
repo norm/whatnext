@@ -15,3 +15,5 @@ New features go in `./tasks/[feature].md`.
 > next: error: unrecognized arguments: -e something
 - [X] headers in fenceblocks are used as headers and should not be -- should whatnext ignore tasks in fenceblocks too?
 - [X] `--summary --relative` with multiple states uses the same character for the second selected state and the unselected complement
+- [X] annotations in `whatnext` blocks don't appear in output unless preceded by a heading
+- [X] overdue/high/medium/imminent comments are not appearing when there are no headings

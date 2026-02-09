@@ -662,3 +662,34 @@ function setup {
 
     [ "$found_different" -eq 1 ]
 }
+
+@test "headerless file shows annotation" {
+    run --separate-stderr \
+        whatnext \
+            ../tests/headerless/annotation.md
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        ../tests/headerless/annotation.md:
+            This annotation should appear even without a heading.
+            - [ ] a task without heading
+        EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "headerless file shows priority" {
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                ../tests/headerless/deadline.md
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        ../tests/headerless/deadline.md:
+            # OVERDUE 5y
+            - [ ] an overdue task without heading
+        EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
