@@ -76,7 +76,9 @@ class TestLimit:
 
 class TestRandomSelection:
     today = date(2025, 12, 25)
-    example_files = find_markdown_files("example", today)
+    example_files = find_markdown_files(
+        "example", today, ignore_patterns=(), quiet=True
+    )
 
     def filter_active(self, files):
         return [

@@ -42,7 +42,7 @@ def files_by_basename(files):
     }
 
 
-def check_dependencies(files, quiet=False):
+def check_dependencies(files, ignore_patterns, quiet):
     file_by_basename = files_by_basename(files)
 
     dependencies = {}
@@ -61,6 +61,8 @@ def check_dependencies(files, quiet=False):
                 continue
             for dep in task.deferred:
                 if dep in file_by_basename or quiet:
+                    continue
+                if is_dependency_ignored(dep, ignore_patterns):
                     continue
                 key = (file.display_path, dep)
                 if key in warned:
@@ -96,7 +98,7 @@ def check_dependencies(files, quiet=False):
             )
 
 
-def filter_deferred(data):
+def filter_deferred(data, ignore_patterns):
     all_files = [file for file, tasks in data]
     file_by_basename = files_by_basename(all_files)
 
@@ -115,6 +117,8 @@ def filter_deferred(data):
             break
 
     def is_file_complete(basename):
+        if is_dependency_ignored(basename, ignore_patterns):
+            return True
         if basename not in file_by_basename:
             return False
         file = file_by_basename[basename]
@@ -209,9 +213,16 @@ def is_ignored(filepath, ignore_patterns):
     return False
 
 
-def find_markdown_files(paths, today, ignore_patterns=None, quiet=False):
-    if ignore_patterns is None:
-        ignore_patterns = []
+def is_dependency_ignored(basename, ignore_patterns):
+    for pattern in ignore_patterns:
+        if fnmatch.fnmatch(basename, pattern):
+            return True
+        if pattern.endswith("/" + basename) or pattern.endswith(os.sep + basename):
+            return True
+    return False
+
+
+def find_markdown_files(paths, today, ignore_patterns, quiet):
     if isinstance(paths, str):
         paths = [paths]
 
@@ -542,7 +553,7 @@ def main():
         return
 
     try:
-        check_dependencies(task_files, quiet=quiet)
+        check_dependencies(task_files, ignore_patterns, quiet)
     except CircularDependencyError as error:
         print(f"ERROR: {error}", file=sys.stderr, flush=True)
         sys.exit(1)
@@ -589,7 +600,7 @@ def main():
         ]
 
     if not args.all and not args.ignore_after:
-        filtered_data = filter_deferred(filtered_data)
+        filtered_data = filter_deferred(filtered_data, ignore_patterns)
 
     if not args.all and not args.summary:
         filtered_data = filter_queue(filtered_data)

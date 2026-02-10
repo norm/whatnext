@@ -57,7 +57,7 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 }
 
-@test "warning suppressed with --quiet" {
+@test "warning suppresseds" {
     run --separate-stderr \
         whatnext \
             --quiet \
@@ -79,7 +79,7 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 }
 
-@test "bare @after tasks shown when file queried directly" {
+@test "tasks shown when file queried directly" {
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         tests/deferring/bare-after.md:
             - [ ] do this last
@@ -104,5 +104,22 @@ bats_require_minimum_version 1.5.0
 
     run whatnext --ignore-after tests/deferring/regular.md tests/deferring/deferred.md
     diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "dependency treated as satisfied when file is deliberately ignored" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/deferred.md:
+            - [ ] wait for regular
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            --ignore regular.md \
+            tests/deferring/deferred.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    diff -u <(echo "") <(echo "$stderr")
     [ $status -eq 0 ]
 }

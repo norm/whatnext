@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [Unreleased]
+
+**Fixes:**
+- `@after` referencing a file excluded by `--ignore` no longer warns about
+  the file not existing, instead treating the dependency as complete.
+
+
 ## [v2.0] - 2026-02-09
 
 Added `@queue` directive show only one task at a time, for simple sequential

@@ -309,7 +309,7 @@ class TestFilterDeferredBasic:
             today=date(2025, 1, 1),
         )
         data = [(file, file.tasks)]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result) == 1
         assert len(result[0][1]) == 1
         assert result[0][1][0].text == "normal task"
@@ -323,7 +323,7 @@ class TestFilterDeferredBasic:
             today=date(2025, 1, 1),
         )
         data = [(file, file.tasks)]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[0][1]) == 1
         assert result[0][1][0].text == "normal task"
 
@@ -336,7 +336,7 @@ class TestFilterDeferredBasic:
             today=date(2025, 1, 1),
         )
         data = [(file, file.tasks)]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[0][1]) == 2
 
     def test_bare_after_shown_when_all_cancelled(self):
@@ -348,7 +348,7 @@ class TestFilterDeferredBasic:
             today=date(2025, 1, 1),
         )
         data = [(file, file.tasks)]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[0][1]) == 2
 
     def test_bare_after_hidden_when_blocked_exists(self):
@@ -360,7 +360,7 @@ class TestFilterDeferredBasic:
             today=date(2025, 1, 1),
         )
         data = [(file, file.tasks)]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[0][1]) == 1
         assert result[0][1][0].text == "blocked task"
 
@@ -373,7 +373,7 @@ class TestFilterDeferredBasic:
             today=date(2025, 1, 1),
         )
         data = [(file, file.tasks)]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[0][1]) == 1
         assert result[0][1][0].text == "in progress task"
 
@@ -391,7 +391,7 @@ class TestFilterDeferredAcrossFiles:
             today=date(2025, 1, 1),
         )
         data = [(file1, file1.tasks), (file2, file2.tasks)]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[0][1]) == 1
         assert len(result[1][1]) == 0
 
@@ -422,7 +422,7 @@ class TestFilterDeferredAcrossFiles:
             (documentation, documentation.tasks),
             (release, release.tasks),
         ]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[1][1]) == 1
         assert result[1][1][0].text == "build the feature"
         assert len(result[2][1]) == 0
@@ -449,7 +449,7 @@ class TestFilterDeferredAcrossFiles:
             (documentation, documentation.tasks),
             (release, release.tasks),
         ]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[1][1]) == 1
         assert len(result[2][1]) == 1
 
@@ -467,7 +467,7 @@ class TestFilterDeferredWithFileDependencies:
             today=date(2025, 1, 1),
         )
         data = [(prereq, prereq.tasks), (dependent, dependent.tasks)]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[0][1]) == 1
         assert len(result[1][1]) == 0
 
@@ -483,7 +483,7 @@ class TestFilterDeferredWithFileDependencies:
             today=date(2025, 1, 1),
         )
         data = [(prereq, prereq.tasks), (dependent, dependent.tasks)]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[1][1]) == 1
 
     def test_after_file_matches_basename(self):
@@ -498,7 +498,7 @@ class TestFilterDeferredWithFileDependencies:
             today=date(2025, 1, 1),
         )
         data = [(prereq, prereq.tasks), (dependent, dependent.tasks)]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[1][1]) == 1
 
     def test_after_multiple_files_all_must_be_complete(self):
@@ -522,7 +522,7 @@ class TestFilterDeferredWithFileDependencies:
             (file2, file2.tasks),
             (dependent, dependent.tasks),
         ]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[2][1]) == 0
 
     def test_after_multiple_files_shown_when_all_complete(self):
@@ -546,7 +546,7 @@ class TestFilterDeferredWithFileDependencies:
             (file2, file2.tasks),
             (dependent, dependent.tasks),
         ]
-        result = filter_deferred(data)
+        result = filter_deferred(data, ignore_patterns=())
         assert len(result[2][1]) == 1
 
 
@@ -563,7 +563,7 @@ class TestCheckDependencies:
             today=date(2025, 1, 1),
         )
         with pytest.raises(CircularDependencyError):
-            check_dependencies([file1, file2])
+            check_dependencies([file1, file2], ignore_patterns=(), quiet=True)
 
     def test_three_way_circular_dependency(self):
         file1 = MarkdownFile(
@@ -582,7 +582,7 @@ class TestCheckDependencies:
             today=date(2025, 1, 1),
         )
         with pytest.raises(CircularDependencyError):
-            check_dependencies([file1, file2, file3])
+            check_dependencies([file1, file2, file3], ignore_patterns=(), quiet=True)
 
     def test_self_reference_raises_error(self):
         file1 = MarkdownFile(
@@ -591,7 +591,7 @@ class TestCheckDependencies:
             today=date(2025, 1, 1),
         )
         with pytest.raises(CircularDependencyError):
-            check_dependencies([file1])
+            check_dependencies([file1], ignore_patterns=(), quiet=True)
 
     def test_no_error_when_no_cycles(self):
         file1 = MarkdownFile(
@@ -604,4 +604,4 @@ class TestCheckDependencies:
             path="file2.md",
             today=date(2025, 1, 1),
         )
-        check_dependencies([file1, file2])
+        check_dependencies([file1, file2], ignore_patterns=(), quiet=True)
