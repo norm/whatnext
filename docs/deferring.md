@@ -33,8 +33,12 @@ by naming the other task file(s):
 
     - [ ] design the booster separation
 
-Filenames are compared against all task files found, without considering
-the directory they are in.
+Filenames are resolved relative to the file containing the `@after`
+directive.
+
+    @after ../project-b/setup.md
+    @after subtask/notes.md
+    @after ~/tasks/dependency.md
 
 Circular dependencies (where A depends on B and B depends on A) will
 cause an error showing the cycle. Referencing a nonexistent file will

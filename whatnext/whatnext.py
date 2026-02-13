@@ -34,25 +34,23 @@ class CircularDependencyError(Exception):
     pass
 
 
-def files_by_basename(files):
-    # @after references use basenames, not full paths
+def files_by_path(files):
     return {
-        os.path.basename(file.path): file
+        os.path.normpath(file.path): file
             for file in files
     }
 
 
 def check_dependencies(files, ignore_patterns, quiet):
-    file_by_basename = files_by_basename(files)
+    file_by_path = files_by_path(files)
 
     dependencies = {}
     for file in files:
-        basename = os.path.basename(file.path)
         deps = set()
         for task in file.tasks:
             if task.deferred:
                 deps.update(task.deferred)
-        dependencies[basename] = deps
+        dependencies[os.path.normpath(file.path)] = deps
 
     warned = set()
     for file in files:
@@ -60,16 +58,22 @@ def check_dependencies(files, ignore_patterns, quiet):
             if not task.deferred:
                 continue
             for dep in task.deferred:
-                if dep in file_by_basename or quiet:
+                if dep in file_by_path or quiet:
                     continue
-                if is_dependency_ignored(dep, ignore_patterns):
+                if os.path.exists(dep):
+                    continue
+                dep_basename = os.path.basename(dep)
+                if is_dependency_ignored(dep_basename, ignore_patterns):
                     continue
                 key = (file.display_path, dep)
                 if key in warned:
                     continue
                 warned.add(key)
+                display_dep = dep
+                if not os.path.isabs(dep):
+                    display_dep = dep_basename
                 print(
-                    f"WARNING: {file.display_path}: '{dep}' does not exist",
+                    f"WARNING: {file.display_path}: '{display_dep}' does not exist",
                     file=sys.stderr,
                 )
 
@@ -90,17 +94,18 @@ def check_dependencies(files, ignore_patterns, quiet):
         path.pop()
         return None
 
-    for basename in dependencies:
-        cycle = has_cycle(basename)
+    for file_path in dependencies:
+        cycle = has_cycle(file_path)
         if cycle:
+            cycle_basenames = [os.path.basename(p) for p in cycle]
             raise CircularDependencyError(
-                f"Circular dependency: {' -> '.join(cycle)}"
+                f"Circular dependency: {' -> '.join(cycle_basenames)}"
             )
 
 
 def filter_deferred(data, ignore_patterns):
     all_files = [file for file, tasks in data]
-    file_by_basename = files_by_basename(all_files)
+    file_by_path = files_by_path(all_files)
 
     # check if all tasks (except bare @after) across all files are complete
     # bare @after means "do this last", so it waits for everything else
@@ -116,12 +121,13 @@ def filter_deferred(data, ignore_patterns):
         if not all_other_complete:
             break
 
-    def is_file_complete(basename):
+    def is_file_complete(path):
+        basename = os.path.basename(path)
         if is_dependency_ignored(basename, ignore_patterns):
             return True
-        if basename not in file_by_basename:
+        if path not in file_by_path:
             return False
-        file = file_by_basename[basename]
+        file = file_by_path[path]
         return all(task.state in COMPLETE_STATES for task in file.tasks)
 
     def should_show_task(task):

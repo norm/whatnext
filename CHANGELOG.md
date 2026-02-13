@@ -1,7 +1,18 @@
 # Changelog
 
 
-## [Unreleased]
+## [v3.0] - unreleased
+
+**Breaking change:** `@after` filenames are now resolved relative to the
+file containing the directive, supporting
+
+```
+@after ../project-b/setup.md
+@after subtask/notes.md
+@after ~/tasks/dependency.md
+```
+
+Previously `whatnext` assumed a flat hierarchy of unique filenames.
 
 **Fixes:**
 - `@after` referencing a file excluded by `--ignore` no longer warns about

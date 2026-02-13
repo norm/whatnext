@@ -297,15 +297,22 @@ class MarkdownFile:
         imminent = due - urgency
         return (due, imminent, cleaned)
 
-    @staticmethod
-    def parse_after(text):
+    def resolve_after_path(self, dep):
+        dep = os.path.expanduser(dep)
+        if os.path.isabs(dep):
+            return dep
+        file_dir = os.path.dirname(self.path)
+        return os.path.normpath(os.path.join(file_dir, dep))
+
+    def parse_after(self, text):
         match = MarkdownFile.AFTER_PATTERN.match(text)
         if not match:
             return (None, text)
         cleaned = match.group(1).strip()
         files_str = match.group(2)
         if files_str:
-            return (files_str.split(), cleaned)
+            resolved = [self.resolve_after_path(dep) for dep in files_str.split()]
+            return (resolved, cleaned)
         return ([], cleaned)
 
     @staticmethod
@@ -405,7 +412,9 @@ class MarkdownFile:
             if match := self.FILE_AFTER_PATTERN.match(line):
                 files_str = match.group(1)
                 if files_str:
-                    file_deferred = files_str.split()
+                    file_deferred = [
+                        self.resolve_after_path(dep) for dep in files_str.split()
+                    ]
                 else:
                     file_deferred = []
             if self.NOTNEXT_PATTERN.match(line):
@@ -584,6 +593,8 @@ class MarkdownFile:
 
     @property
     def display_path(self):
+        if os.path.isabs(self.path):
+            return self.path
         return os.path.relpath(self.path, self.base_dir)
 
     @property

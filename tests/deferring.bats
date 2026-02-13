@@ -1,5 +1,13 @@
 bats_require_minimum_version 1.5.0
 
+setup_file() {
+    echo "- [ ] complete task" > /tmp/whatnext-test-prereq.md
+}
+
+teardown_file() {
+    rm -f /tmp/whatnext-test-prereq.md
+}
+
 @test "circular dependency exits with error" {
     run --separate-stderr \
         whatnext \
@@ -121,5 +129,72 @@ bats_require_minimum_version 1.5.0
 
     diff -u <(echo "$expected_output") <(echo "$output")
     diff -u <(echo "") <(echo "$stderr")
+    [ $status -eq 0 ]
+}
+
+@test "after resolves bare filename relative to file" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/samename.md:
+            - [ ] incomplete task at root
+        tests/deferring/subdir/needs-sibling.md:
+            - [ ] depends on sibling
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/subdir/needs-sibling.md \
+            tests/deferring/subdir/samename.md \
+            tests/deferring/samename.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "after resolves path descending into subdirectory" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/needs-subdir.md:
+            - [ ] depends on subdir file
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/needs-subdir.md \
+            tests/deferring/subdir/target.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "after resolves path ascending to parent directory" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/subdir/needs-parent.md:
+            - [ ] depends on parent file
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/subdir/needs-parent.md \
+            tests/deferring/root-target.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "after resolves absolute path" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        /tmp/whatnext-test-prereq.md:
+            - [ ] complete task
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/needs-absolute.md \
+            /tmp/whatnext-test-prereq.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }

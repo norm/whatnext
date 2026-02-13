@@ -37,6 +37,23 @@ class TestAfterParsingOnTasks:
         assert file.tasks[0].text == "design the booster"
         assert file.tasks[0].deferred == ["stage_one.md"]
 
+    def test_after_resolved_relative_to_file_path(self):
+        file = MarkdownFile(
+            source_string="- [ ] task @after sibling.md",
+            path="dir/subdir/file.md",
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].deferred == ["dir/subdir/sibling.md"]
+
+    def test_after_tilde_expands_to_home(self):
+        import os
+        file = MarkdownFile(
+            source_string="- [ ] task @after ~/tasks.md",
+            today=date(2025, 1, 1),
+        )
+        expected = os.path.expanduser("~/tasks.md")
+        assert file.tasks[0].deferred == [expected]
+
     def test_task_with_after_multiple_files(self):
         file = MarkdownFile(
             source_string="- [ ] design the booster @after stage_one.md stage_two.md",
@@ -475,21 +492,6 @@ class TestFilterDeferredWithFileDependencies:
         prereq = MarkdownFile(
             source_string="- [X] prerequisite task",
             path="prereq.md",
-            today=date(2025, 1, 1),
-        )
-        dependent = MarkdownFile(
-            source_string="- [ ] depends on prereq @after prereq.md",
-            path="dependent.md",
-            today=date(2025, 1, 1),
-        )
-        data = [(prereq, prereq.tasks), (dependent, dependent.tasks)]
-        result = filter_deferred(data, ignore_patterns=())
-        assert len(result[1][1]) == 1
-
-    def test_after_file_matches_basename(self):
-        prereq = MarkdownFile(
-            source_string="- [X] prerequisite task",
-            path="subdir/prereq.md",
             today=date(2025, 1, 1),
         )
         dependent = MarkdownFile(

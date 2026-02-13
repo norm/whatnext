@@ -53,7 +53,7 @@ class TestContentFiltering:
         assert self.filtered_content("example/projects/curtain.md") == dedent("""\
             # Project Curtain
             @after
-            ## Final bow @after tangerine.md
+            ## Final bow @after ../archived/projects/tangerine.md
             - [ ] Take a bow
             ## Safety @after obelisk.md
             - [ ] Lower the safety curtain
