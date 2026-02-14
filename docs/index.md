@@ -56,8 +56,8 @@ and sections can have [annotations included](annotations.md).
 If a task has a dependency on other tasks, such that it cannot be done in any
 order, you can [defer tasks](deferring.md) until all/some other tasks are complete.
 
-For sequential work where only one task can be done at a time, you can
-[limit output](sequential.md) to the next open task in the file.
+For sequential work where only one task or small group of tasks can be done at
+a time, you can [limit output](sequential.md) within the file.
 
 If you need to exclude out some Markdown files for any reason, there are
 [two ways to do that](exclusions.md).

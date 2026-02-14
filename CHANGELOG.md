@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [v3.0] - unreleased
+## [v3.0] - 2026-02-14
 
 **Breaking change:** `@after` filenames are now resolved relative to the
 file containing the directive, supporting
@@ -13,6 +13,11 @@ file containing the directive, supporting
 ```
 
 Previously `whatnext` assumed a flat hierarchy of unique filenames.
+
+**Added:**
+- `@phase` directive in section headers creates a dependency chain within
+  the file; the first phase is always visible, and subsequent phases
+  will only show when all previous phases are complete.
 
 **Fixes:**
 - `@after` referencing a file excluded by `--ignore` no longer warns about

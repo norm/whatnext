@@ -118,6 +118,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_in_progress_task(self):
@@ -135,6 +136,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_complete_task(self):
@@ -152,6 +154,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_cancelled_task(self):
@@ -169,6 +172,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_blocked_task(self):
@@ -186,6 +190,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_multiline_task(self):
@@ -213,6 +218,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_multiline_task_wrong_indent(self):
@@ -233,6 +239,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_normal_priority(self):
@@ -250,6 +257,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_medium_priority(self):
@@ -267,6 +275,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_high_priority(self):
@@ -284,6 +293,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_priority_from_header_and_precedence(self):
@@ -317,6 +327,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[1].as_dict() == {
             "heading": "# do these first",
@@ -328,6 +339,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 5,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[2].as_dict() == {
             "heading": "# do these first",
@@ -339,6 +351,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 6,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[3].as_dict() == {
             "heading": "# do these first / grouped, but still highest priority",
@@ -350,6 +363,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 10,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[4].as_dict() == {
             "heading": "# more tasks",
@@ -361,6 +375,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 14,
             "deferred": None,
+            "phase": None,
         }
 
     def test_high_task_under_medium_header(self):
@@ -382,6 +397,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 3,
             "deferred": None,
+            "phase": None,
         }
 
     def test_medium_task_under_high_header(self):
@@ -403,6 +419,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 3,
             "deferred": None,
+            "phase": None,
         }
 
     def test_medium_subsection_under_high_header(self):
@@ -426,6 +443,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 5,
             "deferred": None,
+            "phase": None,
         }
 
     def test_simple_deadline(self):
@@ -446,6 +464,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 2,
             "deferred": None,
+            "phase": None,
         }
 
     def test_deadline_outside_urgency_window_no_priority(self):
@@ -463,6 +482,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 3,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[1].as_dict() == {
             "heading": "# Project Tinsel / Christmas dinner",
@@ -474,6 +494,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 7,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[2].as_dict() == {
             "heading": "# Project Tinsel / Christmas dinner",
@@ -485,6 +506,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 8,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[3].as_dict() == {
             "heading": "# Project Tinsel / Christmas dinner",
@@ -496,6 +518,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 9,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[4].as_dict() == {
             "heading": "# Project Tinsel / Christmas dinner",
@@ -507,6 +530,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 10,
             "deferred": None,
+            "phase": None,
         }
 
     def test_deadline_inside_urgency_gains_imminent_priority(self):
@@ -557,6 +581,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_non_date_format_ignored(self):
@@ -574,6 +599,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_invalid_urgency_invalidates_deadline(self):
@@ -591,6 +617,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_email_not_deadline(self):
@@ -608,6 +635,7 @@ class TestFileParsing:
             "annotation": None,
             "line": 1,
             "deferred": None,
+            "phase": None,
         }
 
     def test_backticks_prevent_deadline_parsing(self):
@@ -660,6 +688,7 @@ class TestAnnotationParsing:
             "annotation": "Something something star gate",
             "line": 7,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[1].as_dict() == {
             "heading": "# Project Obelisk",
@@ -671,6 +700,7 @@ class TestAnnotationParsing:
             "annotation": "Something something star gate",
             "line": 8,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[2].as_dict() == {
             "heading": "# Project Obelisk",
@@ -682,6 +712,7 @@ class TestAnnotationParsing:
             "annotation": "Something something star gate",
             "line": 9,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[3].as_dict() == {
             "heading": "# Project Obelisk",
@@ -693,6 +724,7 @@ class TestAnnotationParsing:
             "annotation": "Something something star gate",
             "line": 10,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[4].as_dict() == {
             "heading": "# Project Obelisk / Discovery",
@@ -704,6 +736,7 @@ class TestAnnotationParsing:
             "annotation": "Mess with Jackson",
             "line": 21,
             "deferred": None,
+            "phase": None,
         }
 
     def test_other_fenced_blocks_ignored(self):
@@ -738,6 +771,7 @@ class TestAnnotationParsing:
             "annotation": None,
             "line": 7,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[1].as_dict() == {
             "heading": "# Only 'whatnext' blocks",
@@ -749,6 +783,7 @@ class TestAnnotationParsing:
             "annotation": None,
             "line": 15,
             "deferred": None,
+            "phase": None,
         }
 
     def test_multiple_annotations_combine(self):
@@ -785,6 +820,7 @@ class TestAnnotationParsing:
             "annotation": "notes notes notes more notes what are this?",
             "line": 11,
             "deferred": None,
+            "phase": None,
         }
         assert file.tasks[1].as_dict() == {
             "heading": "# Shattered thoughts",
@@ -796,6 +832,7 @@ class TestAnnotationParsing:
             "annotation": "notes notes notes more notes what are this?",
             "line": 17,
             "deferred": None,
+            "phase": None,
         }
 
 

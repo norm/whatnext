@@ -183,6 +183,38 @@ def filter_queue(data):
     return result
 
 
+def filter_phases(data):
+    result = []
+    for file, tasks in data:
+        # find the highest incomplete phase using original file.tasks (not the
+        # filtered tasks parameter) so state/search filters don't prematurely
+        # reveal later phases
+        max_visible_phase = None
+        for phase_num in range(1, file.total_phases + 1):
+            phase_tasks = [t for t in file.tasks if t.phase == phase_num]
+            if not phase_tasks:
+                continue
+            all_complete = all(t.state in COMPLETE_STATES for t in phase_tasks)
+            if all_complete:
+                max_visible_phase = phase_num + 1
+            else:
+                max_visible_phase = phase_num
+                break
+
+        if max_visible_phase is None:
+            result.append((file, tasks))
+            continue
+
+        # filter tasks: show non-phase tasks and tasks up to max_visible_phase
+        filtered = [
+            t for t in tasks
+                if t.phase is None or t.phase <= max_visible_phase
+        ]
+        result.append((file, filtered))
+
+    return result
+
+
 def get_terminal_width():
     columns_env = os.environ.get("COLUMNS")
     if columns_env:
@@ -607,6 +639,9 @@ def main():
 
     if not args.all and not args.ignore_after:
         filtered_data = filter_deferred(filtered_data, ignore_patterns)
+
+    if not args.all:
+        filtered_data = filter_phases(filtered_data)
 
     if not args.all and not args.summary:
         filtered_data = filter_queue(filtered_data)

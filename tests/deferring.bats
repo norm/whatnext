@@ -41,6 +41,7 @@ teardown_file() {
             tests/deferring
 
     expected_stderr=$(sed -e 's/^        //' <<"        EOF"
+        WARNING: @phase has no meaning except in a header
         WARNING: duplicate-warnings.md: 'missing-a.md' does not exist
         WARNING: duplicate-warnings.md: 'missing-b.md' does not exist
         WARNING: missing-dep.md: 'nonexistent.md' does not exist
@@ -196,5 +197,111 @@ teardown_file() {
             /tmp/whatnext-test-prereq.md
 
     diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "phase sections filter later phases" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/phases.md:
+            # Bugs
+            - [ ] fix bug
+            # New feature [phase 1/3]
+            - [ ] install dependencies
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/phases.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "phase shows next when previous complete" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/phases-partial.md:
+            # Bugs
+            - [ ] fix bug
+            # Implementation [phase 2/3]
+            - [ ] write code
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/phases-partial.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "all phases shown with --all" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/phases.md:
+            # Bugs
+            - [ ] fix bug
+            # New feature [phase 1/3]
+            - [ ] install dependencies
+            # New feature / Implement [phase 2/3]
+            - [ ] write code
+            # New feature / Test [phase 3/3]
+            - [ ] run tests
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            --all \
+            tests/deferring/phases.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "queue limits tasks within phase" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/phases-queue.md:
+            # Implementation [phase 2/3]
+            - [ ] first impl task
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/phases-queue.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "empty phase skips to next" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/phases-empty.md:
+            # Implementation [phase 3/3]
+            - [ ] write code
+            - [ ] add tests
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/phases-empty.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "warning when @phase outside header" {
+    expected_stderr=$(sed -e 's/^        //' <<"        EOF"
+        WARNING: @phase has no meaning except in a header
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/phase-misplaced.md
+
+    diff -u <(echo "$expected_stderr") <(echo "$stderr")
     [ $status -eq 0 ]
 }

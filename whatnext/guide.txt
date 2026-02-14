@@ -46,14 +46,24 @@ subset. Prioritisation does not stop the task being ignored.
 To write about @after or deadlines without them being parsed, use backticks
 (`@after`) or a backslash (\@after).
 
-For sequential work where each task in the file can only be done after the
-previous tasks are complete, add @queue and output is limited to the next
-available most important task.
+For sequential work where each individual task in the file can only be done
+after the previous tasks are complete, add @queue and output is limited to the
+next available most important task.
 
     @queue
     - [ ] backup production database
     - [ ] run migration to add audit columns
     - [ ] backfill audit data from logs
+
+To separate logical blocks of a single file so that each group of tasks will
+only be shown when previous groups are complete, use @phase on the headers.
+
+    # Red @phase
+    - [ ] add/amend tests to assert desired behaviour
+    - [ ] prove new tests fail
+    # Green @phase
+    - [ ] update code to implement desired behaviour
+    - [ ] prove tests pass
 
 Context around tasks, such as detailed decision notes and designs can be
 included in the document without showing in the task list. To include a

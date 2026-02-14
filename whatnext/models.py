@@ -89,6 +89,7 @@ class Task:
         annotation=None,
         line=None,
         deferred=None,
+        phase=None,
     ):
         self.file = file
         self.heading = heading
@@ -100,6 +101,7 @@ class Task:
         self.annotation = annotation
         self.line = line
         self.deferred = deferred
+        self.phase = phase
 
     def as_dict(self):
         # provided for easier testing
@@ -113,6 +115,7 @@ class Task:
             "annotation": self.annotation,
             "line": self.line,
             "deferred": self.deferred,
+            "phase": self.phase,
         }
 
     def wrapped_task(self, width=80, indent="    ", text_colour=None):
@@ -184,11 +187,17 @@ class Task:
         else:
             suffix = None
 
+        if self.phase is not None:
+            phase_indicator = f"[phase {self.phase}/{self.file.total_phases}]"
+        else:
+            phase_indicator = None
+
         if self.heading:
+            heading = self.heading
+            if phase_indicator:
+                heading = f"{heading} {phase_indicator}"
             if suffix:
-                heading = f"{self.heading} / {suffix}"
-            else:
-                heading = self.heading
+                heading = f"{heading} / {suffix}"
         elif suffix:
             heading = f"# {suffix}"
         else:
@@ -244,6 +253,8 @@ class MarkdownFile:
     FILE_AFTER_PATTERN = re.compile(r"^@after(?:\s+(.+))?\s*$")
     NOTNEXT_PATTERN = re.compile(r"^@notnext(?:\s|$)")
     QUEUE_PATTERN = re.compile(r"^@queue(?:\s|$)")
+    PHASE_PATTERN = re.compile(r"^(.+?)\s+@phase\s*$")
+    MISPLACED_PHASE_PATTERN = re.compile(r"(?<!`)(?<!\\)@phase(?!`)")
     DEFAULT_URGENCY = timedelta(weeks=2)
 
     def __init__(
@@ -272,6 +283,7 @@ class MarkdownFile:
         self.warnings = []
         self.notnext = False
         self.queue = False
+        self.total_phases = 0
         self.tasks = self.extract_tasks()
 
     @staticmethod
@@ -316,6 +328,14 @@ class MarkdownFile:
         return ([], cleaned)
 
     @staticmethod
+    def parse_phase(text):
+        match = MarkdownFile.PHASE_PATTERN.match(text)
+        if not match:
+            return (False, text)
+        cleaned = match.group(1).strip()
+        return (True, cleaned)
+
+    @staticmethod
     def parse_priority(text):
         if text.startswith("**") and text.endswith("**") and len(text) > 4:
             return Priority.HIGH
@@ -339,9 +359,11 @@ class MarkdownFile:
 
     def extract_tasks(self):
         tasks = []
-        for heading, lines, priority, annotation, deferred in self.sections():
+        for heading, lines, priority, annotation, deferred, phase in self.sections():
             tasks.extend(
-                self.tasks_in_section(heading, lines, priority, annotation, deferred)
+                self.tasks_in_section(
+                    heading, lines, priority, annotation, deferred, phase
+                )
             )
         return tasks
 
@@ -394,12 +416,20 @@ class MarkdownFile:
             elif self.TASK_PATTERN.match(line):
                 lines.append((line_index, line))
                 in_task = True
+                if self.MISPLACED_PHASE_PATTERN.search(line):
+                    self.warnings.append(
+                        "WARNING: @phase has no meaning except in a header"
+                    )
             elif self.FILE_AFTER_PATTERN.match(line):
                 lines.append((line_index, line))
             elif self.NOTNEXT_PATTERN.match(line):
                 lines.append((line_index, line))
             elif self.QUEUE_PATTERN.match(line):
                 lines.append((line_index, line))
+            elif self.MISPLACED_PHASE_PATTERN.search(line):
+                self.warnings.append(
+                    "WARNING: @phase has no meaning except in a header"
+                )
 
         return lines
 
@@ -428,10 +458,12 @@ class MarkdownFile:
         section_lines = []
         results = []
 
-        # stack stores (level, text, priority, deferred) -- explicit level needed
-        # for skipped headings (# -> ### -> ##, where position != depth)
+        # stack stores (level, text, priority, deferred, phase) -- explicit level
+        # needed for skipped headings (# -> ### -> ##, where position != depth)
         stack = []
         deferred = file_deferred
+        phase = None
+        phase_counter = 0
         in_annotation = False
         annotation_delimiter = None
 
@@ -457,7 +489,7 @@ class MarkdownFile:
                     annotation = " ".join(" ".join(annotation_parts).split()) or None
                     results.append((
                         heading, section_lines, priority,
-                        annotation, deferred,
+                        annotation, deferred, phase,
                     ))
                     section_lines = []
                     annotation_parts = []
@@ -465,27 +497,47 @@ class MarkdownFile:
                 while stack and stack[-1][0] >= level:
                     stack.pop()
                 heading_text = match.group(2)
-                heading_deferred, cleaned_heading = self.parse_after(heading_text)
+                heading_deferred, after_cleaned = self.parse_after(heading_text)
+                is_phase, cleaned_heading = self.parse_phase(after_cleaned)
+                if is_phase:
+                    phase_counter += 1
+                    heading_phase = phase_counter
+                else:
+                    heading_phase = None
                 heading_priority = self.parse_priority(cleaned_heading)
                 stack.append((
-                    level, cleaned_heading, heading_priority, heading_deferred
+                    level, cleaned_heading, heading_priority,
+                    heading_deferred, heading_phase,
                 ))
                 heading = "# " + " / ".join(
-                    self.strip_emphasis(text) for _, text, _, _ in stack
+                    self.strip_emphasis(text) for _, text, _, _, _ in stack
                 )
-                priority = min((p for _, _, p, _ in stack), key=lambda p: p.value)
+                priority = min((p for _, _, p, _, _ in stack), key=lambda p: p.value)
                 # find the most specific (deepest) deferred setting
                 deferred = file_deferred
-                for _, _, _, stack_deferred in stack:
+                for _, _, _, stack_deferred, _ in stack:
                     if stack_deferred is not None:
                         deferred = stack_deferred
+                # find the most specific (deepest) phase setting
+                phase = None
+                for _, _, _, _, stack_phase in stack:
+                    if stack_phase is not None:
+                        phase = stack_phase
             else:
                 section_lines.append((line_index, line))
 
         if section_lines:
             annotation = " ".join(" ".join(annotation_parts).split()) or None
-            results.append((heading, section_lines, priority, annotation, deferred))
+            results.append((
+                heading,
+                section_lines,
+                priority,
+                annotation,
+                deferred,
+                phase,
+            ))
 
+        self.total_phases = phase_counter
         return results
 
     def parse_task(
@@ -497,6 +549,7 @@ class MarkdownFile:
         line_index,
         annotation,
         section_deferred,
+        section_phase,
     ):
         state = State.from_marker(marker)
         if state is None:
@@ -546,10 +599,17 @@ class MarkdownFile:
             annotation,
             line_index,
             deferred,
+            section_phase,
         )
 
     def tasks_in_section(
-        self, heading, lines, heading_priority, annotation, section_deferred
+        self,
+        heading,
+        lines,
+        heading_priority,
+        annotation,
+        section_deferred,
+        section_phase,
     ):
         prefix_width = len("- [.] ")
         tasks = []
@@ -579,6 +639,7 @@ class MarkdownFile:
                     task_line,
                     annotation,
                     section_deferred,
+                    section_phase,
                 )
                 if task is not None:
                     tasks.append(task)

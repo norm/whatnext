@@ -6,6 +6,8 @@ import pytest
 from whatnext.models import MarkdownFile, Priority, State
 from whatnext.whatnext import (
     filter_deferred,
+    filter_phases,
+    filter_queue,
     check_dependencies,
     CircularDependencyError,
 )
@@ -607,3 +609,148 @@ class TestCheckDependencies:
             today=date(2025, 1, 1),
         )
         check_dependencies([file1, file2], ignore_patterns=(), quiet=True)
+
+
+class TestFilterPhases:
+    def test_backticks_prevent_phase_parsing(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Document `@phase` usage
+
+                - [ ] write docs
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].phase is None
+
+    def test_backslash_prevents_phase_parsing(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Document \\@phase usage
+
+                - [ ] write docs
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.tasks[0].phase is None
+
+    def test_second_phase_hidden_when_first_incomplete(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Bugs
+
+                - [ ] fix bug
+
+                # Setup @phase
+
+                - [ ] install dependencies
+
+                # Implementation @phase
+
+                - [ ] write code
+            """),
+            today=date(2025, 1, 1),
+        )
+        data = [(file, file.tasks)]
+        result = filter_phases(data)
+        assert len(result[0][1]) == 2
+        assert result[0][1][0].text == "fix bug"
+        assert result[0][1][1].text == "install dependencies"
+
+    def test_second_phase_shown_when_first_complete(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Bugs
+
+                - [ ] fix bug
+
+                # Setup @phase
+
+                - [X] install dependencies
+
+                # Implementation @phase
+
+                - [ ] write code
+            """),
+            today=date(2025, 1, 1),
+        )
+        data = [(file, file.tasks)]
+        result = filter_phases(data)
+        assert len(result[0][1]) == 3
+        assert result[0][1][0].text == "fix bug"
+        assert result[0][1][1].text == "install dependencies"
+        assert result[0][1][2].text == "write code"
+
+    def test_phases_are_per_file(self):
+        file1 = MarkdownFile(
+            source_string=dedent("""\
+                # Setup @phase
+
+                - [ ] file1 setup
+            """),
+            path="file1.md",
+            today=date(2025, 1, 1),
+        )
+        file2 = MarkdownFile(
+            source_string=dedent("""\
+                # Setup @phase
+
+                - [X] file2 setup
+
+                # Implementation @phase
+
+                - [ ] file2 impl
+            """),
+            path="file2.md",
+            today=date(2025, 1, 1),
+        )
+        data = [(file1, file1.tasks), (file2, file2.tasks)]
+        result = filter_phases(data)
+        assert len(result[0][1]) == 1
+        assert len(result[1][1]) == 2
+        assert result[1][1][1].text == "file2 impl"
+
+    def test_queue_limits_tasks_within_phase(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                @queue
+
+                # Setup @phase
+
+                - [ ] first setup task
+                - [ ] second setup task
+
+                # Implementation @phase
+
+                - [ ] first impl task
+            """),
+            today=date(2025, 1, 1),
+        )
+        data = [(file, file.tasks)]
+        result = filter_phases(data)
+        result = filter_queue(result)
+        assert len(result[0][1]) == 1
+        assert result[0][1][0].text == "first setup task"
+
+    def test_empty_phase_skips_to_next(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Setup @phase
+
+                - [X] install dependencies
+
+                ## Configuration @phase
+
+                # Implementation @phase
+
+                - [ ] write code
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.total_phases == 3
+        data = [(file, file.tasks)]
+        result = filter_phases(data)
+        assert len(result[0][1]) == 2
+        texts = [t.text for t in result[0][1]]
+        assert "install dependencies" in texts
+        assert "write code" in texts

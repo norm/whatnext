@@ -28,6 +28,7 @@ class TestLimit:
                 "annotation": "Mess with Jackson",
                 "line": 21,
                 "deferred": None,
+                "phase": None,
             },
         ]
 
@@ -48,6 +49,7 @@ class TestLimit:
                 "annotation": "Mess with Jackson",
                 "line": 21,
                 "deferred": None,
+                "phase": None,
             },
             {
                 "heading": "# Project Obelisk",
@@ -59,6 +61,7 @@ class TestLimit:
                 "annotation": "Something something star gate",
                 "line": 10,
                 "deferred": None,
+                "phase": None,
             },
             {
                 "heading": "# Project Obelisk",
@@ -70,6 +73,7 @@ class TestLimit:
                 "annotation": "Something something star gate",
                 "line": 9,
                 "deferred": None,
+                "phase": None,
             },
         ]
 
