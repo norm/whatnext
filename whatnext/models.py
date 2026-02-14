@@ -658,18 +658,6 @@ class MarkdownFile:
             return self.path
         return os.path.relpath(self.path, self.base_dir)
 
-    @property
-    def incomplete(self):
-        outstanding_states = {
-            State.IN_PROGRESS,
-            State.OPEN,
-            State.BLOCKED,
-        }
-        return self.sort_by_state(
-            task for task in self.tasks
-                if task.state in outstanding_states
-        )
-
     def sort_by_state(self, tasks):
         by_heading = {}
         for task in tasks:
