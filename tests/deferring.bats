@@ -218,6 +218,21 @@ teardown_file() {
     [ $status -eq 0 ]
 }
 
+@test "dependencies checked when not in search" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/subdir/needs-parent.md:
+            - [ ] depends on parent file
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            tests/deferring/subdir/needs-parent.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
 @test "phase shows next when previous complete" {
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         tests/deferring/phases-partial.md:

@@ -125,9 +125,12 @@ def filter_deferred(data, ignore_patterns):
         basename = os.path.basename(path)
         if is_dependency_ignored(basename, ignore_patterns):
             return True
-        if path not in file_by_path:
+        if path in file_by_path:
+            file = file_by_path[path]
+        elif os.path.exists(path):
+            file = MarkdownFile(source=path, today=all_files[0].today)
+        else:
             return False
-        file = file_by_path[path]
         return all(task.state in COMPLETE_STATES for task in file.tasks)
 
     def should_show_task(task):

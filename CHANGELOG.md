@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [v3.1] - 2026-03-14
+
+**Fixes:**
+- `@after` ignoring dependencies not explicitly in search terms.
+
+
 ## [v3.0] - 2026-02-14
 
 **Breaking change:** `@after` filenames are now resolved relative to the

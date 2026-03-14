@@ -15,23 +15,52 @@ projects/obelisk.md:
     # Project Obelisk / Discovery / OVERDUE 31y 2m
     Mess with Jackson
     - [<] watch archaeologists discover (needs time machine)
+projects/tinsel.md:
+    # Project Tinsel / OVERDUE 2w 6d
+    - [ ] send Christmas cards
+    # Project Tinsel / Christmas dinner / OVERDUE 2d
+    - [ ] book Christmas delivery
 
+projects/harvest.md:
+    # Project Harvest / HIGH
+    - [ ] order squash seeds
+    # Project Harvest / Spring planting / HIGH
+    - [ ] sow tomato seeds indoors
+    - [ ] direct sow carrots
 projects/obelisk.md:
     # Project Obelisk / HIGH
     Something something star gate
     - [ ] bury obelisk in desert
+projects/tinsel.md:
+    # Project Tinsel / Christmas dinner / HIGH
+    - [ ] roast the potatoes
 
 tasks.md:
     # Get S Done / MEDIUM
     - [ ] question entire existence
+projects/harvest.md:
+    # Project Harvest / MEDIUM
+    - [ ] buy copper tape for slugs
+projects/tinsel.md:
+    # Project Tinsel / Christmas dinner / MEDIUM
+    - [ ] prep the make-ahead gravy
 
 tasks.md:
     # Get S Done / IMMINENT 11d
     - [ ] start third project
+projects/tinsel.md:
+    # Project Tinsel / Christmas dinner / IMMINENT TODAY
+    - [ ] prep sprouts
 
 projects/curtain.md:
     # Project Curtain / Final bow
     - [ ] Take a bow
+projects/fountain.md:
+    - [ ] nigredo, the blackening or melanosis
+projects/harvest.md:
+    # Project Harvest
+    - [/] turn compost heap
+    - [ ] plan raised bed layout
 projects/obelisk.md:
     # Project Obelisk
     Something something star gate
@@ -91,11 +120,9 @@ projects/obelisk.md:
     # Project Obelisk / Discovery / OVERDUE 31y 2m
     Mess with Jackson
     - [<] watch archaeologists discover (needs time machine)
-
-projects/obelisk.md:
-    # Project Obelisk / HIGH
-    Something something star gate
-    - [ ] bury obelisk in desert
+projects/tinsel.md:
+    # Project Tinsel / OVERDUE 2w 6d
+    - [ ] send Christmas cards
 ```
 
 Tasks are shown in priority order, so the limit returns the most urgent first.
@@ -120,19 +147,42 @@ To show a random selection of tasks rather than by priority, use `5r`.
         # Project Obelisk / Discovery / OVERDUE 31y 2m
         Mess with Jackson
         - [<] watch archaeologists discover (needs time machine)
+    projects/tinsel.md:
+        # Project Tinsel / OVERDUE 2w 6d
+        - [ ] send Christmas cards
+        # Project Tinsel / Christmas dinner / OVERDUE 2d
+        - [ ] book Christmas delivery
 
+    projects/harvest.md:
+        # Project Harvest / HIGH
+        - [ ] order squash seeds
+        # Project Harvest / Spring planting / HIGH
+        - [ ] sow tomato seeds indoors
+        - [ ] direct sow carrots
     projects/obelisk.md:
         # Project Obelisk / HIGH
         Something something star gate
         - [ ] bury obelisk in desert
+    projects/tinsel.md:
+        # Project Tinsel / Christmas dinner / HIGH
+        - [ ] roast the potatoes
 
     tasks.md:
         # Get S Done / MEDIUM
         - [ ] question entire existence
+    projects/harvest.md:
+        # Project Harvest / MEDIUM
+        - [ ] buy copper tape for slugs
+    projects/tinsel.md:
+        # Project Tinsel / Christmas dinner / MEDIUM
+        - [ ] prep the make-ahead gravy
 
     tasks.md:
         # Get S Done / IMMINENT 11d
         - [ ] start third project
+    projects/tinsel.md:
+        # Project Tinsel / Christmas dinner / IMMINENT TODAY
+        - [ ] prep sprouts
 
     projects/curtain.md:
         # Project Curtain / Final bow
@@ -142,12 +192,30 @@ To show a random selection of tasks rather than by priority, use `5r`.
         # Project Curtain / Close the theatre
         - [ ] Escort everyone out
         - [ ] Shut up shop
+    projects/fountain.md:
+        - [ ] nigredo, the blackening or melanosis
+        - [ ] albedo, the whitening or leucosis
+        - [ ] citrinitas, the yellowing or xanthosis
+        - [ ] rubedo, the reddening, purpling, or iosis
+    projects/harvest.md:
+        # Project Harvest
+        - [/] turn compost heap
+        - [ ] plan raised bed layout
     projects/obelisk.md:
         # Project Obelisk
         Something something star gate
         - [/] carve runes into obelisk
         - [ ] research into runic meaning
 
+    projects/harvest.md:
+        # Project Harvest / Hardening off / FINISHED
+        - [X] move seedlings to cold frame
+        # Project Harvest / Autumn / FINISHED
+        - [#] enter giant marrow contest (too late)
+    projects/obelisk.md:
+        # Project Obelisk / FINISHED
+        Something something star gate
+        - [X] secure desert burial site
     archived/projects/tangerine.md:
         # Project Tangerine / FINISHED
         - [X] acquire trebuchet plans
@@ -176,12 +244,15 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
     ```bash
     (computer)% whatnext --summary
-                                                        B P O
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              0 0 3  tasks.md
-    ░░░░░░░░░░░░                                        0 0 1  projects/curtain.md
-    ▚▚▚▚▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░  1 1 2  projects/obelisk.md
-                                                        ─────
-                                                        1 1 6  8, of 15 total
+                                                      B P  O
+    ░░░░░░░░░░░░░░░░░░░░░░░░                          0 0  3  tasks.md
+    ░░░░░░░░                                          0 0  1  projects/curtain.md
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                  0 0  4  projects/fountain.md
+    ▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0 1  5  projects/harvest.md
+    ▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░                  1 1  2  projects/obelisk.md
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0 0  5  projects/tinsel.md
+                                                      ──────
+                                                      1 2 20  23, of 33 total
 
     ▚ Blocked  ▓ Partial  ░ Open
     ```
@@ -194,13 +265,16 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
     ```bash
     (computer)% whatnext --summary --all
-                                         C D B P O
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░           0 0 0 0 3  tasks.md
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0 0 0 0 4  projects/curtain.md
-    ▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░  0 0 1 1 2  projects/obelisk.md
-    ▚▚▚▚▚▚▚▚▚██████████████████████████  1 3 0 0 0  archived/projects/tangerine.md
-                                         ─────────
-                                         1 3 1 1 9  15, of 15 total
+                                        C D B P  O
+    ░░░░░░░░░░░░░                       0 0 0 0  3  tasks.md
+    ░░░░░░░░░░░░░░░░░                   0 0 0 0  4  projects/curtain.md
+    ░░░░░░░░░░░░░░░░░                   0 0 0 0  4  projects/fountain.md
+    ▚▚▚▚████▒▒▒▒▒░░░░░░░░░░░░░░░░░░░░░  1 1 0 1  5  projects/harvest.md
+    ████▓▓▓▓▒▒▒▒▒░░░░░░░░               0 1 1 1  2  projects/obelisk.md
+    ░░░░░░░░░░░░░░░░░░░░░               0 0 0 0  5  projects/tinsel.md
+    ▚▚▚▚█████████████                   1 3 0 0  0  archived/projects/tangerine.md
+                                        ──────────
+                                        2 5 1 2 23  33, of 33 total
 
     ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
     ```
@@ -220,12 +294,15 @@ To show a random selection of tasks rather than by priority, use `5r`.
     ```bash
     (computer)% whatnext --summary --relative --priority high
                                               H  ~
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░            0  3  tasks.md
-    ░░░░░░░░░░                                0  1  projects/curtain.md
-    ██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1  3  projects/obelisk.md
-    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0  4  archived/projects/tangerine.md
+    ░░░░░░░░░░░░░░░                           0  3  tasks.md
+    ░░░░░                                     0  1  projects/curtain.md
+    ░░░░░░░░░░░░░░░░░░░░                      0  4  projects/fountain.md
+    ███████████████░░░░░░░░░░░░░░░░░░░░░░░░░  3  5  projects/harvest.md
+    █████░░░░░░░░░░░░░░░░░░░░                 1  4  projects/obelisk.md
+    █████░░░░░░░░░░░░░░░░░░░░                 1  4  projects/tinsel.md
+    ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                               ────
-                                              1 11  12, of 15 total
+                                              5 25  30, of 33 total
 
     █ High  ░ (Overdue/Imminent/Medium/Normal)
     ```

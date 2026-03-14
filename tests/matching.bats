@@ -161,6 +161,9 @@ function setup {
             # Project Harvest / MEDIUM
             - [ ] buy copper tape for slugs
 
+        curtain.md:
+            # Project Curtain / Final bow
+            - [ ] Take a bow
         fountain.md:
             - [ ] nigredo, the blackening or melanosis
         harvest.md:
@@ -322,6 +325,9 @@ function setup {
             # Project Harvest / MEDIUM
             - [ ] buy copper tape for slugs
 
+        curtain.md:
+            # Project Curtain / Final bow
+            - [ ] Take a bow
         fountain.md:
             - [ ] nigredo, the blackening or melanosis
         harvest.md:

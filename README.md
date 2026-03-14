@@ -38,15 +38,15 @@ Now run it and it'll tell you what's next, sorting by priority and state:
 ```bash
 (computer)% whatnext
 README.md:
-    # What next? / HIGH
-    - [ ] a lot more important
+    # Make apple pie from scratch / HIGH
+    - [ ] invent the universe
 
 README.md:
     # What next? / MEDIUM
-    - [ ] a little more important
+    - [ ] an important task
 
 README.md:
-    # What next? / IMMINENT 6d
+    # Things for later / IMMINENT 6d
     - [ ] get NYE fireworks tickets
 
 README.md:
