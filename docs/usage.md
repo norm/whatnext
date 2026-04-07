@@ -252,7 +252,7 @@ To show a random selection of tasks rather than by priority, use `5r`.
     ▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░                  1 1  2  projects/obelisk.md
     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0 0  5  projects/tinsel.md
                                                       ──────
-                                                      1 2 20  23, of 33 total
+    ▚▚▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1 2 20  23, of 33 total
 
     ▚ Blocked  ▓ Partial  ░ Open
     ```
@@ -274,7 +274,7 @@ To show a random selection of tasks rather than by priority, use `5r`.
     ░░░░░░░░░░░░░░░░░░░░░               0 0 0 0  5  projects/tinsel.md
     ▚▚▚▚█████████████                   1 3 0 0  0  archived/projects/tangerine.md
                                         ──────────
-                                        2 5 1 2 23  33, of 33 total
+    ▚▚█████▓▒▒░░░░░░░░░░░░░░░░░░░░░░░░  2 5 1 2 23  33, of 33 total
 
     ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
     ```
@@ -302,7 +302,7 @@ To show a random selection of tasks rather than by priority, use `5r`.
     █████░░░░░░░░░░░░░░░░░░░░                 1  4  projects/tinsel.md
     ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                               ────
-                                              5 25  30, of 33 total
+    ███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  5 25  30, of 33 total
 
     █ High  ░ (Overdue/Imminent/Medium/Normal)
     ```

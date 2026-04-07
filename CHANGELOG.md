@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [v3.2] - Unreleased
+
+**Added:**
+- Summary view now shows a progress bar on the totals line.
+
+
 ## [v3.1] - 2026-03-14
 
 **Fixes:**

@@ -19,7 +19,7 @@ function setup {
         ▚▚▚▚▚▚▚▚▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░                  1 1  2  projects/obelisk.md
         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░          0 0  5  projects/tinsel.md
                                                           ──────
-                                                          1 2 20  23, of 33 total
+        ▚▚▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1 2 20  23, of 33 total
 
         ▚ Blocked  ▓ Partial  ░ Open
         EOF
@@ -45,7 +45,7 @@ function setup {
         ░░░░░░░░░░░░░░░░░░░░░               0 0 0 0  5  projects/tinsel.md
         ▚▚▚▚█████████████                   1 3 0 0  0  archived/projects/tangerine.md
                                             ──────────
-                                            2 5 1 2 23  33, of 33 total
+        ▚▚█████▓▒▒░░░░░░░░░░░░░░░░░░░░░░░░  2 5 1 2 23  33, of 33 total
 
         ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
         EOF
@@ -101,7 +101,7 @@ function setup {
         ░░░░░░      0 0 0 0  5  projects/tinsel.md
         ▚████       1 3 0 0  0  archived/projects/tangerine.md
                     ──────────
-                    2 5 1 2 23  33, of 33 total
+        ▚█▒░░░░░░░  2 5 1 2 23  33, of 33 total
 
         ▚ Cancelled  █ Done  ▓ Blocked  ▒ Partial  ░ Open
         EOF
@@ -126,7 +126,7 @@ function setup {
         █████████████████████                                  2  projects/obelisk.md
         ████████████████████████████████████████████████████   5  projects/tinsel.md
                                                               ──
-                                                              20  20, of 33 total
+        ████████████████████████████████████████████████████  20  20, of 33 total
 
         █ Open
         EOF
@@ -153,7 +153,7 @@ function setup {
         ████████████████████████                  5  0  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                                  ─────
-                                                 20 10  30, of 33 total
+        ██████████████████████████░░░░░░░░░░░░░  20 10  30, of 33 total
 
         █ Open  ░ (Cancelled/Done/Blocked/Partial)
         EOF
@@ -180,7 +180,7 @@ function setup {
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                                   ────
-                                                  2 28  30, of 33 total
+        ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  2 28  30, of 33 total
 
         █ Partial  ░ (Cancelled/Done/Blocked/Open)
         EOF
@@ -207,7 +207,7 @@ function setup {
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                                   ────
-                                                  1 29  30, of 33 total
+        █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  1 29  30, of 33 total
 
         █ Blocked  ░ (Cancelled/Done/Partial/Open)
         EOF
@@ -234,7 +234,7 @@ function setup {
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         ███████████████░░░░░                      3  1  archived/projects/tangerine.md
                                                   ────
-                                                  5 25  30, of 33 total
+        ███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  5 25  30, of 33 total
 
         █ Done  ░ (Cancelled/Blocked/Partial/Open)
         EOF
@@ -261,7 +261,7 @@ function setup {
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         █████░░░░░░░░░░░░░░░                      1  3  archived/projects/tangerine.md
                                                   ────
-                                                  2 28  30, of 33 total
+        ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  2 28  30, of 33 total
 
         █ Cancelled  ░ (Done/Blocked/Partial/Open)
         EOF
@@ -289,7 +289,7 @@ function setup {
         ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                0  5 0  projects/tinsel.md
         ▚▚▚▚▚░░░░░░░░░░░░░░                     1  0 3  archived/projects/tangerine.md
                                                 ──────
-                                                2 20 8  30, of 33 total
+        ▚▚▚▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░  2 20 8  30, of 33 total
 
         ▚ Cancelled  ▓ Open  ░ (Done/Blocked/Partial)
         EOF
@@ -316,7 +316,7 @@ function setup {
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                                   ────
-                                                  3 27  30, of 33 total
+        ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  3 27  30, of 33 total
 
         █ High  ░ (Overdue/Imminent/Medium/Normal)
         EOF
@@ -343,7 +343,7 @@ function setup {
         ░░░░░░░░░░░░░░░░░░░░░░░░░                 0  5  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░░░                      0  4  archived/projects/tangerine.md
                                                   ────
-                                                  2 28  30, of 33 total
+        ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  2 28  30, of 33 total
 
         █ Medium  ░ (Overdue/Imminent/High/Normal)
         EOF
@@ -371,7 +371,7 @@ function setup {
         ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                0  5  0  projects/tinsel.md
         ░░░░░░░░░░░░░░░░░░                     0  0  4  archived/projects/tangerine.md
                                                ───────
-                                               3 17 10  30, of 33 total
+        ▚▚▚▚▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░  3 17 10  30, of 33 total
 
         ▚ High  ▓ Normal  ░ (Overdue/Imminent/Medium)
         EOF

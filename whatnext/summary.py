@@ -244,8 +244,13 @@ def format_summary(
         if all_tasks_total is None:
             all_tasks_total = displayed_total
         lines.append(f"{' ' * bar_width}{gap}{'─' * count_width}")
+        total_bar = build_bar(
+            total_counts, displayed_total, bar_width, char_map, bar_order
+        )
+        if use_colour:
+            total_bar = colored(total_bar, "blue", force_color=True)
         lines.append(
-            f"{' ' * bar_width}{gap}{total_str.rjust(count_width)}{gap}"
+            f"{total_bar}{gap}{total_str.rjust(count_width)}{gap}"
             f"{displayed_total}, of {all_tasks_total} total"
         )
 
