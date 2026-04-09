@@ -5,6 +5,9 @@
 
 **Added:**
 - Summary view now shows a progress bar on the totals line.
+- `--ignore-queue` flag to ignore `@queue` constraints.
+- `--ignore-phase` flag to ignore `@phase` constraints.
+- `--ignore-all` flag to ignore all deferral constraints.
 
 
 ## [v3.1] - 2026-03-14

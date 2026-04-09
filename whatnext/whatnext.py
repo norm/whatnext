@@ -487,7 +487,22 @@ def main():
     parser.add_argument(
         "--ignore-after",
         action="store_true",
-        help="Show all tasks, ignoring @after constraints",
+        help="Ignore @after constraints",
+    )
+    parser.add_argument(
+        "--ignore-queue",
+        action="store_true",
+        help="Ignore @queue constraints",
+    )
+    parser.add_argument(
+        "--ignore-phase",
+        action="store_true",
+        help="Ignore @phase constraints",
+    )
+    parser.add_argument(
+        "--ignore-all",
+        action="store_true",
+        help="Ignore all deferral constraints (@after, @phase, @queue)",
     )
     parser.add_argument(
         "--config",
@@ -640,13 +655,18 @@ def main():
                 for file in task_files
         ]
 
-    if not args.all and not args.ignore_after:
+    if not args.all and not args.ignore_after and not args.ignore_all:
         filtered_data = filter_deferred(filtered_data, ignore_patterns)
 
-    if not args.all:
+    if not args.all and not args.ignore_phase and not args.ignore_all:
         filtered_data = filter_phases(filtered_data)
 
-    if not args.all and not args.summary:
+    if (
+        not args.all
+        and not args.ignore_queue
+        and not args.ignore_all
+        and not args.summary
+    ):
         filtered_data = filter_queue(filtered_data)
 
     if args.summary:

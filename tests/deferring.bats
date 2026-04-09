@@ -320,3 +320,75 @@ teardown_file() {
     diff -u <(echo "$expected_stderr") <(echo "$stderr")
     [ $status -eq 0 ]
 }
+
+@test "queue can be ignored" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        example/projects/fountain.md:
+            - [ ] nigredo, the blackening or melanosis
+            - [ ] albedo, the whitening or leucosis
+            - [ ] citrinitas, the yellowing or xanthosis
+            - [ ] rubedo, the reddening, purpling, or iosis
+        EOF
+    )
+
+    WHATNEXT_TODAY=2025-01-01 \
+        run whatnext --ignore-queue example/projects/fountain.md
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "phase can be ignored" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tests/deferring/phases.md:
+            # Bugs
+            - [ ] fix bug
+            # New feature [phase 1/3]
+            - [ ] install dependencies
+            # New feature / Implement [phase 2/3]
+            - [ ] write code
+            # New feature / Test [phase 3/3]
+            - [ ] run tests
+        EOF
+    )
+
+    run --separate-stderr \
+        whatnext \
+            --ignore-phase \
+            tests/deferring/phases.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "all deferral constraints can be ignored" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        example/projects/fountain.md:
+            - [ ] nigredo, the blackening or melanosis
+            - [ ] albedo, the whitening or leucosis
+            - [ ] citrinitas, the yellowing or xanthosis
+            - [ ] rubedo, the reddening, purpling, or iosis
+        tests/deferring/deferred.md:
+            - [ ] wait for regular
+        tests/deferring/phases.md:
+            # Bugs
+            - [ ] fix bug
+            # New feature [phase 1/3]
+            - [ ] install dependencies
+            # New feature / Implement [phase 2/3]
+            - [ ] write code
+            # New feature / Test [phase 3/3]
+            - [ ] run tests
+        EOF
+    )
+
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --ignore-all \
+                example/projects/fountain.md \
+                tests/deferring/deferred.md \
+                tests/deferring/phases.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}

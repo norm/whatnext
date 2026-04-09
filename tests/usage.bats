@@ -7,7 +7,8 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--guide] [--dir DIR] [-s] [-e]
-                        [--relative] [-a] [--ignore-after] [--config CONFIG]
+                        [--relative] [-a] [--ignore-after] [--ignore-queue]
+                        [--ignore-phase] [--ignore-all] [--config CONFIG]
                         [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d] [-c]
                         [--priority LEVEL] [--color | --no-color]
                         [match ...]
@@ -24,7 +25,8 @@ bats_require_minimum_version 1.5.0
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--guide] [--dir DIR] [-s] [-e]
-                        [--relative] [-a] [--ignore-after] [--config CONFIG]
+                        [--relative] [-a] [--ignore-after] [--ignore-queue]
+                        [--ignore-phase] [--ignore-all] [--config CONFIG]
                         [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d] [-c]
                         [--priority LEVEL] [--color | --no-color]
                         [match ...]
@@ -51,7 +53,11 @@ bats_require_minimum_version 1.5.0
           --relative           Show selected states relative to all others (use with
                                --summary)
           -a, --all            Include all tasks and files, not just incomplete
-          --ignore-after       Show all tasks, ignoring @after constraints
+          --ignore-after       Ignore @after constraints
+          --ignore-queue       Ignore @queue constraints
+          --ignore-phase       Ignore @phase constraints
+          --ignore-all         Ignore all deferral constraints (@after, @phase,
+                               @queue)
           --config CONFIG      Path to config file (default: WHATNEXT_CONFIG, or
                                '.whatnext' in --dir)
           --ignore PATTERN     Ignore files matching pattern (can be specified

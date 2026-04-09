@@ -224,7 +224,13 @@ To show a random selection of tasks rather than by priority, use `5r`.
         - [#] throw fruit at neighbours (they moved away)
     ```
 
--   `--ignore-after` — show all tasks, ignoring `@after` constraints.
+-   `--ignore-after` — ignore `@after` constraints.
+
+-   `--ignore-queue` — ignore `@queue` constraints.
+
+-   `--ignore-phase` — ignore `@phase` constraints.
+
+-   `--ignore-all` — ignore all deferral constraints (`@after`, `@phase`, `@queue`).
 
 -   `-o` / `--open` — show only open tasks.
 

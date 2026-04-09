@@ -22,3 +22,9 @@ Later sections also tagged with phase are not shown when earlier phases
 are incomplete. Non-tagged sections are shown as normal.
 
 - [X] implement \@phase directive for section-level sequencing
+
+Be able to ignore deferring controls to list all incomplete tasks.
+
+- [X] implement --ignore-queue
+- [X] implement --ignore-phase
+- [X] implement catch-all ignore flag
