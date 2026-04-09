@@ -552,3 +552,75 @@ function setup {
     [ -n "$(echo "$output" | grep tasks.md)" ]
     [ $status -eq 0 ]
 }
+
+@test "ignore patterns without wildcard only match on whole names" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tasks.md:
+            # Get S Done / MEDIUM
+            - [ ] question entire existence
+
+        tasks.md:
+            # Get S Done
+            - [ ] come up with better projects
+            - [ ] start third project
+
+        archived/projects/tangerine.md:
+            # Project Tangerine / FINISHED
+            - [X] acquire trebuchet plans
+            - [X] source counterweight materials
+            - [X] build it
+            - [#] throw fruit at neighbours (they moved away)
+        EOF
+    )
+
+    echo "ignore = ['projects', 'task']" > "$BATS_TEST_TMPDIR/.whatnext"
+
+    run --separate-stderr \
+        whatnext \
+            --config "$BATS_TEST_TMPDIR/.whatnext" \
+            --all
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+
+    echo "ignore = ['projects/', 'tasks']" > "$BATS_TEST_TMPDIR/.whatnext"
+
+    run --separate-stderr \
+        whatnext \
+            --config "$BATS_TEST_TMPDIR/.whatnext" \
+            --all
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "glob patterns still work with directory patterns" {
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+        tasks.md:
+            # Get S Done / MEDIUM
+            - [ ] question entire existence
+
+        tasks.md:
+            # Get S Done
+            - [ ] come up with better projects
+            - [ ] start third project
+
+        archived/projects/tangerine.md:
+            # Project Tangerine / FINISHED
+            - [X] acquire trebuchet plans
+            - [X] source counterweight materials
+            - [X] build it
+            - [#] throw fruit at neighbours (they moved away)
+        EOF
+    )
+
+    echo "ignore = ['projects/**']" > "$BATS_TEST_TMPDIR/.whatnext"
+
+    run --separate-stderr \
+        whatnext \
+            --config "$BATS_TEST_TMPDIR/.whatnext" \
+            --all
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}

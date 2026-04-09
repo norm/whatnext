@@ -249,8 +249,18 @@ def load_config(config_path=None, directory="."):
 
 def is_ignored(filepath, ignore_patterns):
     for pattern in ignore_patterns:
-        if fnmatch.fnmatch(filepath, pattern):
-            return True
+        if pattern.endswith('/'):
+            dir_name = pattern.rstrip('/')
+            if filepath.startswith(dir_name + '/'):
+                return True
+        elif not any(c in pattern for c in ['*', '?', '[']):
+            if filepath == pattern:
+                return True
+            if filepath.startswith(pattern + '/'):
+                return True
+        else:
+            if fnmatch.fnmatch(filepath, pattern):
+                return True
     return False
 
 

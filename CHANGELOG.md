@@ -1,13 +1,17 @@
 # Changelog
 
 
-## [v3.2] - Unreleased
+## [v3.2] - 2026-04-09
 
 **Added:**
 - Summary view now shows a progress bar on the totals line.
 - `--ignore-queue` flag to ignore `@queue` constraints.
 - `--ignore-phase` flag to ignore `@phase` constraints.
 - `--ignore-all` flag to ignore all deferral constraints.
+
+**Fixes:**
+- Directories are now properly ignored without requiring wildcards,
+  (`example/` and `example` both now work, `example/**` continues to work).
 
 
 ## [v3.1] - 2026-03-14
