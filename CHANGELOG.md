@@ -1,6 +1,11 @@
 # Changelog
 
 
+## [v3.3] - Unreleased
+
+Summary totals line is now shown in yellow as a differentiator.
+
+
 ## [v3.2] - 2026-04-09
 
 **Added:**

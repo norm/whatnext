@@ -49,14 +49,10 @@ def make_header(selected_in_order, has_remainder, col_widths=None):
     return " ".join(parts)
 
 
-def make_legend(
-    char_map, selected_in_order, display_order, has_remainder, use_colour=False
-):
+def make_legend(char_map, selected_in_order, display_order, has_remainder):
     parts = []
     for item in selected_in_order:
         char = char_map[item]
-        if use_colour:
-            char = colored(char, "blue", force_color=True)
         parts.append(f"{char} {item.label}")
     if has_remainder:
         unselected = [
@@ -65,8 +61,6 @@ def make_legend(
                     if state not in selected_in_order
         ]
         char = char_map[unselected[0]]
-        if use_colour:
-            char = colored(char, "blue", force_color=True)
         parts.append(f"{char} ({'/'.join(state.label for state in unselected)})")
     return "  ".join(parts)
 
@@ -123,7 +117,6 @@ def format_summary(
     selected_states,
     selected_priorities=None,
     use_colour=False,
-    relative=False,
     all_tasks_total=None,
 ):
     if selected_priorities:
@@ -243,20 +236,24 @@ def format_summary(
         displayed_total = sum(total_counts.values())
         if all_tasks_total is None:
             all_tasks_total = displayed_total
-        lines.append(f"{' ' * bar_width}{gap}{'─' * count_width}")
+        separator = f"{' ' * bar_width}{gap}{'─' * count_width}"
+        if use_colour:
+            separator = colored(separator, "yellow", force_color=True)
+        lines.append(separator)
         total_bar = build_bar(
             total_counts, displayed_total, bar_width, char_map, bar_order
         )
-        if use_colour:
-            total_bar = colored(total_bar, "blue", force_color=True)
-        lines.append(
+        total_line = (
             f"{total_bar}{gap}{total_str.rjust(count_width)}{gap}"
             f"{displayed_total}, of {all_tasks_total} total"
         )
+        if use_colour:
+            total_line = colored(total_line, "yellow", force_color=True)
+        lines.append(total_line)
 
     lines.append("")
     lines.append(make_legend(
-        char_map, selected_in_order, display_order, has_remainder, use_colour
+        char_map, selected_in_order, display_order, has_remainder
     ))
 
     return "\n".join(lines)

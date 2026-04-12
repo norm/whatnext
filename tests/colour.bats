@@ -30,6 +30,31 @@ EOF
     [ $status -eq 0 ]
 }
 
+@test "force colour output in summary" {
+    cd example
+
+    b=$'\033[34m'
+    r=$'\033[0m'
+    COLUMNS=40 \
+    WHATNEXT_TODAY=2025-01-01 \
+        run --separate-stderr \
+            whatnext \
+                --color \
+                --summary \
+                --open \
+                tasks.md
+
+    expected_output=$(sed -e 's/^        //' <<EOF
+                                   O
+        ${b}█████████████████████████${r}  3  tasks.md
+
+        █ Open
+EOF
+    )
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
 @test "disable colour output" {
     WHATNEXT_TODAY=2025-12-25 \
     WHATNEXT_COLOR=1 \
@@ -55,6 +80,30 @@ EOF
             whatnext \
                 --priority overdue \
                 example/projects/obelisk.md
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "disable colour output in summary" {
+    cd example
+
+    COLUMNS=40 \
+    WHATNEXT_TODAY=2025-01-01 \
+    WHATNEXT_COLOR=1 \
+        run --separate-stderr \
+            whatnext \
+                --no-color \
+                --summary \
+                --open \
+                tasks.md
+
+    expected_output=$(sed -e 's/^        //' <<"        EOF"
+                                   O
+        █████████████████████████  3  tasks.md
+
+        █ Open
+        EOF
+    )
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }

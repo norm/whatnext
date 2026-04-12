@@ -686,7 +686,6 @@ def main():
             states,
             priorities,
             args.color,
-            args.relative,
             sum(
                 len(file.tasks)
                     for file in task_files
