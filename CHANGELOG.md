@@ -1,9 +1,11 @@
 # Changelog
 
 
-## [v3.3] - Unreleased
+## [v3.3] - 2026-04-13
 
 **Added:**
+- `next` reads from stdin when no task text is provided, allowing piping of
+  multiple tasks (one per line) into a file.
 - `next` wraps the text of added tasks, to a default of 80 chars, which can be
   overriden in the config `wrap_width` setting, or `WHATNEXT_WRAP_WIDTH`. If
   the file has any existing lines longer than that, the file takes precedence

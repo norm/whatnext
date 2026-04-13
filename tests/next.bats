@@ -21,7 +21,7 @@ function setup {
         Add a task to a Markdown (.md file) task list.
 
         positional arguments:
-          text             task text to add
+          text             task text to add (if omitted, read from stdin)
 
         options:
           -h, --help       show this help message and exit
@@ -57,20 +57,6 @@ function setup {
     run next --help
 
     diff -u <(echo "$expected_output") <(echo "$output")
-    [ $status -eq 0 ]
-}
-
-@test "without args does nothing" {
-    expected_output=$(sed -e 's/^        //' <<-EOF
-        # Tasks
-
-        - [ ] existing task
-	EOF
-    )
-
-    run next
-
-    diff -u <(echo "$expected_output") "$HOME/tasks.md"
     [ $status -eq 0 ]
 }
 
@@ -700,6 +686,170 @@ function assert_task_added {
     )
 
     run next This is a very long task description that should wrap because it exceeds the default width of eighty characters
+
+    diff -u <(echo "$expected_content") "$HOME/tasks.md"
+    [ $status -eq 0 ]
+}
+
+@test "stdin adds multiple tasks" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        - [ ] first task
+        - [ ] second task
+        - [ ] third task
+
+        # Tasks
+
+        - [ ] existing task
+	EOF
+    )
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/tasks.md:
+        +- [ ] first task
+        +- [ ] second task
+        +- [ ] third task
+        +
+         # Tasks
+         
+	EOF
+    )
+
+    run bash -c 'printf "first task\nsecond task\nthird task\n" | next'
+
+    diff -u <(echo "$expected_content") "$HOME/tasks.md"
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "stdin with file specification" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        - [ ] piped task
+
+        # Tasks
+
+        - [ ] existing task
+	EOF
+    )
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/alternate.md:
+        +- [ ] piped task
+        +
+         # Tasks
+         
+	EOF
+    )
+
+    run bash -c 'echo "piped task" | next alternate.md'
+
+    diff -u <(echo "$expected_content") "$HOME/alternate.md"
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "stdin with section specification" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        This is an explanation.
+
+        This section currently has no tasks.
+
+        # First
+
+        - [ ] piped to section
+
+        # Second
+
+        #### Third
+
+        This section contains notes.
+
+        ## Fourth
+
+        A note.
+
+        - [ ] A task.
+
+        Another note.
+
+        # Second
+
+        There is no way to add a task here.
+
+        # Last
+
+        - [ ] second to last task
+	EOF
+    )
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/insert.md (First):
+         
+         # First
+        +
+        +- [ ] piped to section
+         
+         # Second
+	EOF
+    )
+
+    run bash -c 'echo "piped to section" | next insert.md first'
+
+    diff -u <(echo "$expected_content") "$HOME/insert.md"
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "empty stdin does nothing" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        # Tasks
+
+        - [ ] existing task
+	EOF
+    )
+
+    run bash -c 'echo -n "" | next'
+
+    diff -u <(echo "$expected_content") "$HOME/tasks.md"
+    diff -u <(echo "") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "stdin blank lines are ignored" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        - [ ] actual task
+        - [ ] another task
+
+        # Tasks
+
+        - [ ] existing task
+	EOF
+    )
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        Updated ~/tasks.md:
+        +- [ ] actual task
+        +- [ ] another task
+        +
+         # Tasks
+         
+	EOF
+    )
+
+    run bash -c 'printf "\nactual task\n\n\nanother task\n\n" | next'
+
+    diff -u <(echo "$expected_content") "$HOME/tasks.md"
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "stdin tasks are wrapped" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        - [ ] This is a very long task that should wrap because it exceeds the default
+              width of eighty characters
+
+        # Tasks
+
+        - [ ] existing task
+	EOF
+    )
+
+    run bash -c 'echo "This is a very long task that should wrap because it exceeds the default width of eighty characters" | next'
 
     diff -u <(echo "$expected_content") "$HOME/tasks.md"
     [ $status -eq 0 ]

@@ -63,3 +63,9 @@ Once the file is chosen, the file is checked for Markdown headings.
 
 If you would prefer the task is always added at the end of the file,
 set `$WHATNEXT_APPEND_ONLY` to a value, or use `next -a`.
+
+
+## The task text
+
+The task text is all remaining arguments as a string. If no arguments remain,
+`next` reads from stdin, with multiple lines making multiple tasks.
