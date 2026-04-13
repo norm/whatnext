@@ -15,32 +15,34 @@ function setup {
 }
 
 @test "shows usage" {
-    expected_output=$(sed -e 's/^        //' <<"        EOF"
-        usage: next [-h] [--version] [-a] ...
+    expected_output=$(sed -e 's/^        //' <<-EOF
+        usage: next [-h] [--version] [-a] [--config CONFIG] ...
 
         Add a task to a Markdown (.md file) task list.
 
         positional arguments:
-          text        task text to add
+          text             task text to add
 
         options:
-          -h, --help  show this help message and exit
-          --version   show program's version number and exit
-          -a          append to end of file, ignoring headings (or set
-                      WHATNEXT_APPEND_ONLY)
+          -h, --help       show this help message and exit
+          --version        show program's version number and exit
+          -a               append to end of file, ignoring headings (or set
+                           WHATNEXT_APPEND_ONLY)
+          --config CONFIG  path to config file (default: WHATNEXT_CONFIG, or
+                           '.whatnext')
 
         The file to add to is chosen indirectly:
 
         - if the first word of text is an absolute filename, use that
         - if the first word matches a file in the current directory, use that
-        - if the first word matches a file in $WHATNEXT_PROJECT_DIR, use that
-        - if the first word matches a file in $HOME, use that
-        - if the first word matches a directory in $WHATNEXT_PROJECT_DIR:
+        - if the first word matches a file in \$WHATNEXT_PROJECT_DIR, use that
+        - if the first word matches a file in \$HOME, use that
+        - if the first word matches a directory in \$WHATNEXT_PROJECT_DIR:
             - if the second word matches a file
-              $WHATNEXT_PROJECT_DIR/[project]/tasks/[word].md then use that
-            - otherwise, use $WHATNEXT_PROJECT_DIR/[project]/tasks.md
+              \$WHATNEXT_PROJECT_DIR/[project]/tasks/[word].md then use that
+            - otherwise, use \$WHATNEXT_PROJECT_DIR/[project]/tasks.md
         - if tasks.md exists in the current directory, use that
-        - otherwise, use $HOME/tasks.md
+        - otherwise, use \$HOME/tasks.md
 
         With the remaining text:
 
@@ -49,7 +51,7 @@ function setup {
               file, the task is added to that section
             - otherwise, the task is added above the first heading
         - otherwise, the task is added to the end of the file
-        EOF
+	EOF
     )
 
     run next --help
@@ -59,11 +61,11 @@ function setup {
 }
 
 @test "without args does nothing" {
-    expected_output=$(sed -e 's/^        //' <<"        EOF"
+    expected_output=$(sed -e 's/^        //' <<-EOF
         # Tasks
 
         - [ ] existing task
-        EOF
+	EOF
     )
 
     run next
@@ -73,13 +75,13 @@ function setup {
 }
 
 @test "non-markdown file is treated as part of text" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         - [ ] something.txt do something
 
         # Tasks
 
         - [ ] existing task
-        EOF
+	EOF
     )
 
     run next something.txt do something
@@ -100,13 +102,13 @@ function setup {
 }
 
 @test "nonexistent file is treated as part of text" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         - [ ] nonexistent.md do something
 
         # Tasks
 
         - [ ] existing task
-        EOF
+	EOF
     )
 
     expected_output=$(sed -e 's/^        //' <<-EOF
@@ -129,13 +131,13 @@ function assert_task_added {
     local tasks_file="$1"
     local expected_message="$2"
 
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         - [ ] do something
 
         # Tasks
 
         - [ ] existing task
-        EOF
+	EOF
     )
 
     expected_output=$(sed -e 's/^        //' <<-EOF
@@ -206,13 +208,13 @@ function assert_task_added {
 }
 
 @test "adds to master task list without WHATNEXT_PROJECT_DIR" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         - [ ] alpha do something
 
         # Tasks
 
         - [ ] existing task
-        EOF
+	EOF
     )
     expected_output=$(sed -e 's/^        //' <<-EOF
         Updated ~/tasks.md:
@@ -249,9 +251,9 @@ function assert_task_added {
 }
 
 @test "creates project tasks file" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         - [ ] do something
-        EOF
+	EOF
     )
     expected_output=$(sed -e 's/^        //' <<-EOF
         Created ~/projects/beta/tasks.md:
@@ -267,9 +269,9 @@ function assert_task_added {
 }
 
 @test "does not add to things.md as it is not tried" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         - [ ] things do something
-        EOF
+	EOF
     )
 
     expected_output=$(sed -e 's/^        //' <<-EOF
@@ -335,13 +337,13 @@ function assert_task_added {
 }
 
 @test "adds to end of file" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
 
 
 
 
         - [ ] do something
-        EOF
+	EOF
     )
 
     expected_output=$(sed -e 's/^        //' <<-EOF
@@ -360,7 +362,7 @@ function assert_task_added {
 }
 
 @test "test within file positioning" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         This is an explanation.
 
         This section currently has no tasks.
@@ -398,7 +400,7 @@ function assert_task_added {
 
         - [ ] second to last task
         - [ ] last task
-        EOF
+	EOF
     )
 
     run next insert.md do something
@@ -422,12 +424,12 @@ function assert_task_added {
 }
 
 @test "WHATNEXT_APPEND_ONLY set" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         # Tasks
 
         - [ ] existing task
         - [ ] do something
-        EOF
+	EOF
     )
     expected_output=$(sed -e 's/^        //' <<-EOF
         Updated ~/tasks.md:
@@ -446,12 +448,12 @@ function assert_task_added {
 }
 
 @test "append flag" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         # Tasks
 
         - [ ] existing task
         - [ ] do something
-        EOF
+	EOF
     )
 
     expected_output=$(sed -e 's/^        //' <<-EOF
@@ -470,13 +472,13 @@ function assert_task_added {
 }
 
 @test "flag-like text is not parsed as arguments" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         - [ ] something -e something
 
         # Tasks
 
         - [ ] existing task
-        EOF
+	EOF
     )
 
     expected_output=$(sed -e 's/^        //' <<-EOF
@@ -496,13 +498,13 @@ function assert_task_added {
 }
 
 @test "appending spaces out tasks" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         # Tasks
 
         This is where things get added.
 
         - [ ] do something
-        EOF
+	EOF
     )
 
     expected_output=$(sed -e 's/^        //' <<-EOF
@@ -522,7 +524,7 @@ function assert_task_added {
 }
 
 @test "append adds to end of file not after last task" {
-    expected_content=$(sed -e 's/^        //' <<"        EOF"
+    expected_content=$(sed -e 's/^        //' <<-EOF
         # Done
 
         - [X] completed task
@@ -530,7 +532,7 @@ function assert_task_added {
         # Next
 
         - [ ] do something
-        EOF
+	EOF
     )
 
     expected_output=$(sed -e 's/^        //' <<-EOF
@@ -574,5 +576,131 @@ function assert_task_added {
     run next -a do something
 
     diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "continuation line width is detected even when task is deferred" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        - [ ] This new task is longer than eighty characters and exceeds the continuation width to prove
+              where it wraps
+
+        # Tasks @after tasks.md
+
+        - [ ] the continuation line is deliberately longer than the first line in
+              order to confirm that width detection occurs across the entire task not just the first line
+	EOF
+    )
+
+    WHATNEXT_WRAP_WIDTH=20 \
+        run next wrapped.md This new task is longer than eighty characters and exceeds the continuation width to prove where it wraps
+
+    diff -u <(echo "$expected_content") "$HOME/wrapped.md"
+    [ $status -eq 0 ]
+}
+
+@test "existing file with wider lines sets wrap width" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        This line of context is deliberately written to be extraordinarily long, much longer than any task line in this file, to prove the script measures task width not arbitrary line width.
+
+        - [ ] short task
+        - [ ] another short task
+        - [ ] This is an existing task that is deliberately written to be wider than eighty characters on a single line
+        - [ ] Adding another long task that would normally wrap at eighty but should not wrap here because existing
+              tasks are wider
+	EOF
+    )
+
+    run next wide.md Adding another long task that would normally wrap at eighty but should not wrap here because existing tasks are wider
+
+    diff -u <(echo "$expected_content") "$HOME/wide.md"
+    [ $status -eq 0 ]
+}
+
+@test "file width beats narrower env var" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        This line of context is deliberately written to be extraordinarily long, much longer than any task line in this file, to prove the script measures task width not arbitrary line width.
+
+        - [ ] short task
+        - [ ] another short task
+        - [ ] This is an existing task that is deliberately written to be wider than eighty characters on a single line
+        - [ ] This task would wrap at sixty if env var won but it does not because file width is authoritative
+	EOF
+    )
+
+    WHATNEXT_WRAP_WIDTH=60 \
+        run next wide.md This task would wrap at sixty if env var won but it does not because file width is authoritative
+
+    diff -u <(echo "$expected_content") "$HOME/wide.md"
+    [ $status -eq 0 ]
+}
+
+@test "env var sets width when file is narrower" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        - [ ] This is a task that wraps at forty
+              characters
+
+        # Tasks
+
+        - [ ] existing task
+	EOF
+    )
+
+    WHATNEXT_WRAP_WIDTH=40 \
+        run next This is a task that wraps at forty characters
+
+    diff -u <(echo "$expected_content") "$HOME/tasks.md"
+    [ $status -eq 0 ]
+}
+
+@test "config sets width when file is narrower" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        - [ ] This is a task that wraps at fifty
+              characters exactly
+
+        # Tasks
+
+        - [ ] existing task
+	EOF
+    )
+    echo 'wrap_width = 50' > "$HOME/.whatnext"
+
+    run next This is a task that wraps at fifty characters exactly
+
+    diff -u <(echo "$expected_content") "$HOME/tasks.md"
+    [ $status -eq 0 ]
+}
+
+@test "config file can be specified with --config" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        - [ ] This is a task that wraps at fifty
+              characters exactly
+
+        # Tasks
+
+        - [ ] existing task
+	EOF
+    )
+    echo 'wrap_width = 50' > "$HOME/custom.toml"
+
+    run next --config custom.toml This is a task that wraps at fifty characters exactly
+
+    diff -u <(echo "$expected_content") "$HOME/tasks.md"
+    [ $status -eq 0 ]
+}
+
+@test "long task text wraps at 80 chars by default" {
+    expected_content=$(sed -e 's/^        //' <<-EOF
+        - [ ] This is a very long task description that should wrap because it exceeds
+              the default width of eighty characters
+
+        # Tasks
+
+        - [ ] existing task
+	EOF
+    )
+
+    run next This is a very long task description that should wrap because it exceeds the default width of eighty characters
+
+    diff -u <(echo "$expected_content") "$HOME/tasks.md"
     [ $status -eq 0 ]
 }

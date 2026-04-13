@@ -1,15 +1,20 @@
 import argparse
 import difflib
+from datetime import date
 from importlib.metadata import version
 import os
+import textwrap
 from textwrap import dedent
+
+from whatnext.models import MarkdownFile
+from whatnext.whatnext import load_config
 
 
 def rewind_insertion_point(lines, position, min_position):
     first_non_blank = None
     while position > min_position:
         line = lines[position - 1]
-        if line.startswith("- ["):
+        if MarkdownFile.TASK_PATTERN.match(line):
             return position, True
         if line.strip() != "":
             first_non_blank = position
@@ -45,6 +50,35 @@ def display_path(path):
     if real_path.startswith(home):
         return "~" + real_path[len(home):]
     return path
+
+
+def detect_task_width(lines):
+    source = "".join(lines)
+    md = MarkdownFile(source_string=source, today=date.today())
+    return md.max_task_line_width
+
+
+def get_wrap_width(lines, tasks_file, config_path):
+    env_width = os.environ.get("WHATNEXT_WRAP_WIDTH")
+    if env_width:
+        default_width = int(env_width)
+    else:
+        config = load_config(config_path, os.path.dirname(tasks_file) or ".")
+        default_width = config.get("wrap_width", 80)
+    file_width = detect_task_width(lines)
+    return max(file_width, default_width)
+
+
+def wrap_task(text, width):
+    task_line = f"- [ ] {text}"
+    if len(task_line) <= width:
+        return task_line + "\n"
+    wrapped = textwrap.wrap(
+        task_line,
+        width=width,
+        subsequent_indent="      ",
+    )
+    return "\n".join(wrapped) + "\n"
 
 
 def resolve_tasks_file(args):
@@ -131,6 +165,11 @@ def main():
         help="append to end of file, ignoring headings (or set WHATNEXT_APPEND_ONLY)",
     )
     parser.add_argument(
+        "--config",
+        default=os.environ.get("WHATNEXT_CONFIG"),
+        help="path to config file (default: WHATNEXT_CONFIG, or '.whatnext')",
+    )
+    parser.add_argument(
         "text",
         nargs=argparse.REMAINDER,
         help="task text to add",
@@ -144,13 +183,17 @@ def main():
     append_only = parsed.append_only
     tasks_file, args, shown_path = resolve_tasks_file(args)
 
-    task = f"- [ ] {' '.join(args)}\n"
     if not os.path.isfile(tasks_file):
+        width = get_wrap_width([], tasks_file, parsed.config)
+        task = wrap_task(" ".join(args), width)
         update_file(tasks_file, 0, task, f"Created {shown_path}")
         return
 
     with open(tasks_file, "r") as handle:
         lines = handle.readlines()
+
+    width = get_wrap_width(lines, tasks_file, parsed.config)
+    task = wrap_task(" ".join(args), width)
 
     if append_only or os.environ.get("WHATNEXT_APPEND_ONLY"):
         position = len(lines)
@@ -182,7 +225,7 @@ def main():
             section_end = len(lines)
         section_name = line.lstrip("#").strip()
         message = f"Updated {shown_path} ({section_name})"
-        task = f"- [ ] {' '.join(args[1:])}\n"
+        task = wrap_task(" ".join(args[1:]), width)
 
         position, found_task = rewind_insertion_point(lines, section_end, line_num + 1)
         if found_task:

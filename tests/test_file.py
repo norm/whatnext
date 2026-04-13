@@ -108,6 +108,7 @@ class TestFileParsing:
             today=date(2025, 1, 1),
         )
         assert len(file.tasks) == 1
+        assert file.max_task_line_width == 36
         assert file.tasks[0].as_dict() == {
             "heading": None,
             "state": State.OPEN,
@@ -203,6 +204,7 @@ class TestFileParsing:
             """),
             today=date(2025, 1, 1),
         )
+        assert file.max_task_line_width == 43
         assert file.tasks[0].as_dict() == {
             "heading": None,
             "state": State.OPEN,

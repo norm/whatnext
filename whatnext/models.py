@@ -284,6 +284,7 @@ class MarkdownFile:
         self.notnext = False
         self.queue = False
         self.total_phases = 0
+        self.max_task_line_width = 0
         self.tasks = self.extract_tasks()
 
     @staticmethod
@@ -620,6 +621,9 @@ class MarkdownFile:
                 leading = match.group(1)
                 if len(leading) >= 4 or '\t' in leading:
                     continue
+                self.max_task_line_width = max(
+                    self.max_task_line_width, len(line_content)
+                )
                 task_line = line_number
                 marker = match.group(2)
                 text = line_content.lstrip()
@@ -629,7 +633,11 @@ class MarkdownFile:
                     and self.is_continuation(lines[index + 1][1], indent)
                 ):
                     index += 1
-                    text += " " + lines[index][1].strip()
+                    continuation_line = lines[index][1]
+                    self.max_task_line_width = max(
+                        self.max_task_line_width, len(continuation_line)
+                    )
+                    text += " " + continuation_line.strip()
                 task_content = text[prefix_width:]
                 task = self.parse_task(
                     heading,

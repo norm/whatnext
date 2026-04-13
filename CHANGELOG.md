@@ -3,7 +3,14 @@
 
 ## [v3.3] - Unreleased
 
-Summary totals line is now shown in yellow as a differentiator.
+**Added:**
+- `next` wraps the text of added tasks, to a default of 80 chars, which can be
+  overriden in the config `wrap_width` setting, or `WHATNEXT_WRAP_WIDTH`. If
+  the file has any existing lines longer than that, the file takes precedence
+  and the text is instead wrapped to match that longer width.
+- `next --config {file}` specifies a non-default location config file,
+  or set `WHATNEXT_CONFIG`.
+- Summary totals line is now shown in yellow as a differentiator.
 
 
 ## [v3.2] - 2026-04-09
