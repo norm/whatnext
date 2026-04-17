@@ -1,5 +1,47 @@
 bats_require_minimum_version 1.5.0
 
+@test "--mute creates mute entry" {
+    run whatnext --config "$BATS_TEST_TMPDIR/.whatnext" --mute 1d "apples"
+
+    # check pattern is in file (until timestamp varies)
+    diff -u <(echo 'pattern = "apples"') <(grep 'pattern' "$BATS_TEST_TMPDIR/.whatnext.mute")
+    [ $status -eq 0 ]
+}
+
+@test "--mute appends to existing file" {
+    sed -e 's/^        //' > "$BATS_TEST_TMPDIR/.whatnext.mute" <<-EOF
+        [[mute]]
+        until = 2099-12-31T23:59:59
+        pattern = "existing"
+	EOF
+
+    run whatnext --config "$BATS_TEST_TMPDIR/.whatnext" --mute 1w "new"
+
+    expected=$(sed -e 's/^        //' <<-EOF
+        pattern = "existing"
+        pattern = "new"
+	EOF
+    )
+    diff -u <(echo "$expected") <(grep 'pattern' "$BATS_TEST_TMPDIR/.whatnext.mute")
+    [ $status -eq 0 ]
+}
+
+@test "--mute rejects empty pattern" {
+    run --separate-stderr \
+        whatnext --config "$BATS_TEST_TMPDIR/.whatnext" --mute 1d ""
+
+    diff -u <(echo "ERROR: pattern cannot be empty") <(echo "$stderr")
+    [ $status -eq 1 ]
+}
+
+@test "--mute rejects invalid period" {
+    run --separate-stderr \
+        whatnext --config "$BATS_TEST_TMPDIR/.whatnext" --mute "abc" "pattern"
+
+    diff -u <(echo "ERROR: invalid period 'abc'") <(echo "$stderr")
+    [ $status -eq 1 ]
+}
+
 @test "muted tasks are excluded from output" {
     sed -e 's/^        //' > "$BATS_TEST_TMPDIR/.whatnext.mute" <<-EOF
         [[mute]]

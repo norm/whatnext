@@ -12,7 +12,7 @@ from showing up as available for them to work on.
         - anything matching a pattern is excluded from output
         - `--ignore-mute`, `--ignore-all`, `--all` bypasses this
         - show a count of muted tasks at the end
-- [ ] `whatnext --mute 'period' 'pattern'` creates the entry
+- [X] `whatnext --mute 'period' 'pattern'` creates the entry
         - period is formatted like 1d, 2d, 1w, 1m, 2m3w
         - pattern cannot be empty
 - [ ] if `whatnext [...]` produces no tasks, try again without the mute list

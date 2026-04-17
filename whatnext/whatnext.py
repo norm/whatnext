@@ -1,5 +1,5 @@
 import argparse
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import fnmatch
 import importlib.metadata
 import importlib.resources
@@ -28,6 +28,28 @@ PRIORITY_COLOURS = {
 
 ACTIVE_STATES = {State.OPEN, State.IN_PROGRESS, State.BLOCKED}
 COMPLETE_STATES = {State.COMPLETE, State.CANCELLED}
+
+PERIOD_PATTERN = re.compile(r'(\d+)([dwm])')
+
+
+def parse_period(period_str):
+    matches = PERIOD_PATTERN.findall(period_str)
+    if not matches:
+        raise ValueError(f"invalid period '{period_str}'")
+    # verify the entire string was consumed
+    reconstructed = ''.join(f"{n}{u}" for n, u in matches)
+    if reconstructed != period_str:
+        raise ValueError(f"invalid period '{period_str}'")
+    total_days = 0
+    for amount, unit in matches:
+        amount = int(amount)
+        if unit == 'd':
+            total_days += amount
+        elif unit == 'w':
+            total_days += amount * 7
+        elif unit == 'm':
+            total_days += amount * 30
+    return timedelta(days=total_days)
 
 
 class CircularDependencyError(Exception):
@@ -273,11 +295,21 @@ def get_editor():
     return "vi"
 
 
-def load_config(config_path=None, directory=".", extensions=None):
+def resolve_config_path(config_path, directory):
     if config_path is None:
-        config_path = os.path.join(directory, ".whatnext")
-    elif not (config_path.startswith("./") or os.path.isabs(config_path)):
-        config_path = os.path.join(directory, config_path)
+        return os.path.join(directory, ".whatnext")
+    if config_path.startswith("./") or os.path.isabs(config_path):
+        return config_path
+    return os.path.join(directory, config_path)
+
+
+def write_mute_config(config_path, mutes):
+    mute_path = config_path + ".mute"
+    with open(mute_path, "w") as handle:
+        toml.dump({"mute": mutes}, handle)
+
+
+def load_config(config_path, extensions=None):
     if os.path.exists(config_path):
         with open(config_path) as handle:
             config = toml.load(handle)
@@ -299,9 +331,7 @@ def load_config(config_path=None, directory=".", extensions=None):
             if entry["until"] > now
         ]
         if len(config["mute"]) != len(original):
-            mute_path = config_path + ".mute"
-            with open(mute_path, "w") as handle:
-                toml.dump({"mute": config["mute"]}, handle)
+            write_mute_config(config_path, config["mute"])
 
     return config
 
@@ -579,6 +609,12 @@ def main():
         help="Ignore mute settings",
     )
     parser.add_argument(
+        "--mute",
+        nargs=2,
+        metavar=("TIME", "MATCH"),
+        help="Mute tasks matching pattern for period (e.g. 1d, 2w, 1m)",
+    )
+    parser.add_argument(
         "--config",
         default=os.environ.get("WHATNEXT_CONFIG"),
         help="Path to config file (default: WHATNEXT_CONFIG, or '.whatnext' in --dir)",
@@ -649,6 +685,24 @@ def main():
              "    [n]r       - limit to n results, selected at random",
     )
     args = parser.parse_args()
+    config_path = resolve_config_path(args.config, args.dir)
+
+    if args.mute:
+        period_str, pattern = args.mute
+        if not pattern:
+            print("ERROR: pattern cannot be empty", file=sys.stderr)
+            sys.exit(1)
+        try:
+            period = parse_period(period_str)
+        except ValueError as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            sys.exit(1)
+        until = datetime.now() + period
+        config = load_config(config_path, extensions=["mute"])
+        mutes = config.get("mute", [])
+        mutes.append({"until": until, "pattern": pattern})
+        write_mute_config(config_path, mutes)
+        return
 
     # build the search space
     paths = []
@@ -669,7 +723,7 @@ def main():
     if not paths:
         paths = [args.dir]
 
-    config = load_config(args.config, args.dir, extensions=["mute"])
+    config = load_config(config_path, extensions=["mute"])
     ignore_patterns = config.get("ignore", []) + args.ignore
     mute_patterns = [
         entry["pattern"].lower()
