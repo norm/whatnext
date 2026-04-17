@@ -154,14 +154,14 @@ teardown_file() {
 
 @test "after resolves path descending into subdirectory" {
     expected_output=$(sed -e 's/^        //' <<"        EOF"
-        tests/deferring/needs-subdir.md:
+        tests/deferring/needs-subdir-file.md:
             - [ ] depends on subdir file
         EOF
     )
 
     run --separate-stderr \
         whatnext \
-            tests/deferring/needs-subdir.md \
+            tests/deferring/needs-subdir-file.md \
             tests/deferring/subdir/target.md
 
     diff -u <(echo "$expected_output") <(echo "$output")
@@ -388,6 +388,27 @@ teardown_file() {
                 example/projects/fountain.md \
                 tests/deferring/deferred.md \
                 tests/deferring/phases.md
+
+    diff -u <(echo "$expected_output") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "after directory with incomplete tasks hides deferred task" {
+    run whatnext tests/deferring/needs-subdir.md
+
+    diff -u <(echo "") <(echo "$output")
+    [ $status -eq 0 ]
+}
+
+@test "after directory with all complete tasks shows deferred task" {
+    expected_output=$(sed -e 's/^        //' <<"    EOF"
+        tests/deferring/needs-dir-complete.md:
+            # Waiting
+            - [ ] depends on directory
+    EOF
+    )
+
+    run whatnext tests/deferring/needs-dir-complete.md
 
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]

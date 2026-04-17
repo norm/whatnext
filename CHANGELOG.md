@@ -1,7 +1,12 @@
 # Changelog
 
 
-## [v3.4] - 2026-04-17
+## [v3.3.2] - 2026-04-17
+
+**Fixes:** `@after` with a directory waits on all tasks under that dir.
+
+
+## [v3.3.1] - 2026-04-17
 
 **Fixes:** Empty tasks (`- [ ]\n`) no longer cause a stacktrace.
 

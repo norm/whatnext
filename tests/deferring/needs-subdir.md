@@ -1,1 +1,3 @@
-- [ ] depends on subdir file @after subdir/target.md
+# Waiting
+
+- [ ] depends on directory @after subdir

@@ -37,7 +37,7 @@ Filenames are resolved relative to the file containing the `@after`
 directive.
 
     @after ../project-b/setup.md
-    @after subtask/notes.md
+    @after subtask/
     @after ~/tasks/dependency.md
 
 Circular dependencies (where A depends on B and B depends on A) will

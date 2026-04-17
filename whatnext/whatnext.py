@@ -125,9 +125,17 @@ def filter_deferred(data, ignore_patterns):
         basename = os.path.basename(path)
         if is_dependency_ignored(basename, ignore_patterns):
             return True
+        if os.path.isdir(path):
+            for root, dirs, files in os.walk(path):
+                for filename in files:
+                    if filename.endswith(".md"):
+                        filepath = os.path.join(root, filename)
+                        if not is_file_complete(filepath):
+                            return False
+            return True
         if path in file_by_path:
             file = file_by_path[path]
-        elif os.path.exists(path):
+        elif os.path.isfile(path):
             file = MarkdownFile(source=path, today=all_files[0].today)
         else:
             return False
