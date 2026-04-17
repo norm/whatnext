@@ -1,5 +1,5 @@
 import argparse
-from datetime import date
+from datetime import date, datetime
 import fnmatch
 import importlib.metadata
 import importlib.resources
@@ -244,15 +244,37 @@ def get_editor():
     return "vi"
 
 
-def load_config(config_path=None, directory="."):
+def load_config(config_path=None, directory=".", extensions=None):
     if config_path is None:
         config_path = os.path.join(directory, ".whatnext")
     elif not (config_path.startswith("./") or os.path.isabs(config_path)):
         config_path = os.path.join(directory, config_path)
     if os.path.exists(config_path):
         with open(config_path) as handle:
-            return toml.load(handle)
-    return {}
+            config = toml.load(handle)
+    else:
+        config = {}
+
+    if extensions:
+        for ext in extensions:
+            ext_path = config_path + "." + ext
+            if os.path.exists(ext_path):
+                with open(ext_path) as handle:
+                    config[ext] = toml.load(handle).get(ext, [])
+
+    if "mute" in config:
+        now = datetime.now()
+        original = config["mute"]
+        config["mute"] = [
+            entry for entry in original
+            if entry["until"] > now
+        ]
+        if len(config["mute"]) != len(original):
+            mute_path = config_path + ".mute"
+            with open(mute_path, "w") as handle:
+                toml.dump({"mute": config["mute"]}, handle)
+
+    return config
 
 
 def is_ignored(filepath, ignore_patterns):
@@ -613,7 +635,7 @@ def main():
     if not paths:
         paths = [args.dir]
 
-    config = load_config(args.config, args.dir)
+    config = load_config(args.config, args.dir, extensions=["mute"])
     ignore_patterns = config.get("ignore", []) + args.ignore
     quiet = args.quiet
 

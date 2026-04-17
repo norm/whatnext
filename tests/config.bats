@@ -82,3 +82,13 @@ function setup {
     diff -u <(echo "$expected_output") <(echo "$output")
     [ $status -eq 0 ]
 }
+
+@test "expired mute entries removed from file" {
+    cp -r "$BATS_TEST_DIRNAME/mute/." "$BATS_TEST_TMPDIR"
+
+    run --separate-stderr \
+        whatnext --dir "$BATS_TEST_TMPDIR"
+
+    diff -u "$BATS_TEST_DIRNAME/mute/.whatnext.mute.expected" "$BATS_TEST_TMPDIR/.whatnext.mute"
+    [ $status -eq 0 ]
+}
