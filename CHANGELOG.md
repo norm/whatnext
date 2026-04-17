@@ -62,12 +62,14 @@ Previously `whatnext` assumed a flat hierarchy of unique filenames.
   the file; the first phase is always visible, and subsequent phases
   will only show when all previous phases are complete.
 
+## [v2.1.1] - 2026-02-10
+
 **Fixes:**
 - `@after` referencing a file excluded by `--ignore` no longer warns about
   the file not existing, instead treating the dependency as complete.
 
 
-## [v2.0] - 2026-02-09
+## [v2.1] - 2026-02-09
 
 Added `@queue` directive show only one task at a time, for simple sequential
 work that doesn't need to be split across files using `@after`.
