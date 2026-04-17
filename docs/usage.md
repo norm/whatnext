@@ -232,6 +232,8 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
 -   `--ignore-all` — ignore all deferral constraints (`@after`, `@phase`, `@queue`).
 
+-   `--ignore-mute` — ignore mute settings.
+
 -   `-o` / `--open` — show only open tasks.
 
 -   `-p` / `--partial` — show only in progress tasks.

@@ -226,6 +226,35 @@ def filter_phases(data):
     return result
 
 
+def filter_muted(data, mute_patterns):
+    if not mute_patterns:
+        return data, 0
+
+    muted_count = 0
+    result = []
+    for file, tasks in data:
+        file_lower = file.display_path.lower()
+        filtered_tasks = []
+        for task in tasks:
+            heading_lower = ""
+            if task.heading:
+                heading_lower = task.heading.lower()
+            text_lower = task.text.lower()
+            is_muted = any(
+                pattern in file_lower
+                or pattern in heading_lower
+                or pattern in text_lower
+                for pattern in mute_patterns
+            )
+            if is_muted:
+                muted_count += 1
+            else:
+                filtered_tasks.append(task)
+        result.append((file, filtered_tasks))
+
+    return result, muted_count
+
+
 def get_terminal_width():
     columns_env = os.environ.get("COLUMNS")
     if columns_env:
@@ -545,6 +574,11 @@ def main():
         help="Ignore all deferral constraints (@after, @phase, @queue)",
     )
     parser.add_argument(
+        "--ignore-mute",
+        action="store_true",
+        help="Ignore mute settings",
+    )
+    parser.add_argument(
         "--config",
         default=os.environ.get("WHATNEXT_CONFIG"),
         help="Path to config file (default: WHATNEXT_CONFIG, or '.whatnext' in --dir)",
@@ -637,6 +671,10 @@ def main():
 
     config = load_config(args.config, args.dir, extensions=["mute"])
     ignore_patterns = config.get("ignore", []) + args.ignore
+    mute_patterns = [
+        entry["pattern"].lower()
+        for entry in config.get("mute", [])
+    ]
     quiet = args.quiet
 
     if "WHATNEXT_TODAY" in os.environ:
@@ -709,6 +747,10 @@ def main():
     ):
         filtered_data = filter_queue(filtered_data)
 
+    muted_count = 0
+    if not args.all and not args.ignore_all and not args.ignore_mute:
+        filtered_data, muted_count = filter_muted(filtered_data, mute_patterns)
+
     if args.summary:
         output = format_summary(
             filtered_data,
@@ -745,3 +787,9 @@ def main():
         )
 
     print(output)
+
+    if muted_count > 0:
+        noun = "tasks"
+        if muted_count == 1:
+            noun = "task"
+        print(f"\n({muted_count} {noun} muted)")

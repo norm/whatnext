@@ -8,7 +8,7 @@ from showing up as available for them to work on.
       the config
         - contains a list, each entry being a timestamp and a match pattern
         - if the timestamp is now in the past, the entry is removed
-- [ ] listing tasks uses the mute list
+- [X] listing tasks uses the mute list
         - anything matching a pattern is excluded from output
         - `--ignore-mute`, `--ignore-all`, `--all` bypasses this
         - show a count of muted tasks at the end
