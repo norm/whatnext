@@ -1,6 +1,11 @@
 # Changelog
 
 
+## [v3.4] - 2026-04-17
+
+**Fixes:** Empty tasks (`- [ ]\n`) no longer cause a stacktrace.
+
+
 ## [v3.3] - 2026-04-13
 
 **Added:**

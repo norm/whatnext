@@ -687,6 +687,7 @@ function setup {
         ../tests/headerless/annotation.md:
             This annotation should appear even without a heading.
             - [ ] a task without heading
+            - [ ] 
         EOF
     )
     diff -u <(echo "$expected_output") <(echo "$output")

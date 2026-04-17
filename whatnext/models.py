@@ -290,6 +290,8 @@ class MarkdownFile:
     @staticmethod
     def parse_deadline(text):
         match = MarkdownFile.DEADLINE_PATTERN.match(text)
+        if match is None:
+            return (None, None, text)
         cleaned = match.group(1)
         date_str = match.group(2)
         if date_str is None:
@@ -638,7 +640,7 @@ class MarkdownFile:
                         self.max_task_line_width, len(continuation_line)
                     )
                     text += " " + continuation_line.strip()
-                task_content = text[prefix_width:]
+                task_content = text[prefix_width - 1:].lstrip()
                 task = self.parse_task(
                     heading,
                     heading_priority,

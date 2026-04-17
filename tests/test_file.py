@@ -122,6 +122,61 @@ class TestFileParsing:
             "phase": None,
         }
 
+    def test_empty_task(self):
+        file = MarkdownFile(
+            source_string="- [ ]",
+            today=date(2025, 1, 1),
+        )
+        assert len(file.tasks) == 1
+        assert file.tasks[0].as_dict() == {
+            "heading": None,
+            "state": State.OPEN,
+            "text": "",
+            "priority": Priority.NORMAL,
+            "due": None,
+            "imminent": None,
+            "annotation": None,
+            "line": 1,
+            "deferred": None,
+            "phase": None,
+        }
+
+    def test_empty_task_with_deadline(self):
+        # regex looks for text before @, so this becomes literal text
+        file = MarkdownFile(
+            source_string="- [ ] @2025-06-15",
+            today=date(2025, 1, 1),
+        )
+        assert len(file.tasks) == 1
+        assert file.tasks[0].text == "@2025-06-15"
+        assert file.tasks[0].due is None
+
+    def test_empty_task_with_after(self):
+        # regex looks for text before @, so this becomes literal text
+        file = MarkdownFile(
+            source_string="- [ ] @after other.md",
+            today=date(2025, 1, 1),
+        )
+        assert len(file.tasks) == 1
+        assert file.tasks[0].text == "@after other.md"
+        assert file.tasks[0].deferred is None
+
+    def test_text_without_space_after_marker(self):
+        file = MarkdownFile(
+            source_string="- [ ]text on the marker",
+            today=date(2025, 1, 1),
+        )
+        assert len(file.tasks) == 1
+        assert file.tasks[0].text == "text on the marker"
+
+    def test_multiple_spaces_after_marker(self):
+        file = MarkdownFile(
+            source_string="- [ ]     text away from the marker",
+            today=date(2025, 1, 1),
+        )
+        assert len(file.tasks) == 1
+        assert file.tasks[0].text == "text away from the marker"
+
     def test_in_progress_task(self):
         file = MarkdownFile(
             source_string="- [/] in progress, this task is partially complete",
