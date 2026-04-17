@@ -8,9 +8,10 @@ bats_require_minimum_version 1.5.0
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--guide] [--dir DIR] [-s] [-e]
                         [--relative] [-a] [--ignore-after] [--ignore-queue]
-                        [--ignore-phase] [--ignore-all] [--config CONFIG]
-                        [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d] [-c]
-                        [--priority LEVEL] [--color | --no-color]
+                        [--ignore-phase] [--ignore-all] [--ignore-mute]
+                        [--mute TIME MATCH] [--config CONFIG] [--ignore PATTERN] [-q]
+                        [-o] [-p] [-b] [-d] [-c] [--priority LEVEL]
+                        [--color | --no-color]
                         [match ...]
         EOF
     )
@@ -26,9 +27,10 @@ bats_require_minimum_version 1.5.0
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         Usage: whatnext [-h] [--help] [--version] [--guide] [--dir DIR] [-s] [-e]
                         [--relative] [-a] [--ignore-after] [--ignore-queue]
-                        [--ignore-phase] [--ignore-all] [--config CONFIG]
-                        [--ignore PATTERN] [-q] [-o] [-p] [-b] [-d] [-c]
-                        [--priority LEVEL] [--color | --no-color]
+                        [--ignore-phase] [--ignore-all] [--ignore-mute]
+                        [--mute TIME MATCH] [--config CONFIG] [--ignore PATTERN] [-q]
+                        [-o] [-p] [-b] [-d] [-c] [--priority LEVEL]
+                        [--color | --no-color]
                         [match ...]
 
         List tasks found in Markdown files
@@ -58,6 +60,9 @@ bats_require_minimum_version 1.5.0
           --ignore-phase       Ignore @phase constraints
           --ignore-all         Ignore all deferral constraints (@after, @phase,
                                @queue)
+          --ignore-mute        Ignore mute settings
+          --mute TIME MATCH    Mute tasks matching pattern for period (e.g. 1d, 2w,
+                               1m)
           --config CONFIG      Path to config file (default: WHATNEXT_CONFIG, or
                                '.whatnext' in --dir)
           --ignore PATTERN     Ignore files matching pattern (can be specified

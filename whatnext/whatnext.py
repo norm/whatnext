@@ -1,5 +1,5 @@
 import argparse
-from datetime import date
+from datetime import date, datetime, timedelta
 import fnmatch
 import importlib.metadata
 import importlib.resources
@@ -28,6 +28,28 @@ PRIORITY_COLOURS = {
 
 ACTIVE_STATES = {State.OPEN, State.IN_PROGRESS, State.BLOCKED}
 COMPLETE_STATES = {State.COMPLETE, State.CANCELLED}
+
+PERIOD_PATTERN = re.compile(r'(\d+)([dwm])')
+
+
+def parse_period(period_str):
+    matches = PERIOD_PATTERN.findall(period_str)
+    if not matches:
+        raise ValueError(f"invalid period '{period_str}'")
+    # verify the entire string was consumed
+    reconstructed = ''.join(f"{n}{u}" for n, u in matches)
+    if reconstructed != period_str:
+        raise ValueError(f"invalid period '{period_str}'")
+    total_days = 0
+    for amount, unit in matches:
+        amount = int(amount)
+        if unit == 'd':
+            total_days += amount
+        elif unit == 'w':
+            total_days += amount * 7
+        elif unit == 'm':
+            total_days += amount * 30
+    return timedelta(days=total_days)
 
 
 class CircularDependencyError(Exception):
@@ -226,6 +248,35 @@ def filter_phases(data):
     return result
 
 
+def filter_muted(data, mute_patterns):
+    if not mute_patterns:
+        return data, 0
+
+    muted_count = 0
+    result = []
+    for file, tasks in data:
+        file_lower = file.display_path.lower()
+        filtered_tasks = []
+        for task in tasks:
+            heading_lower = ""
+            if task.heading:
+                heading_lower = task.heading.lower()
+            text_lower = task.text.lower()
+            is_muted = any(
+                pattern in file_lower
+                or pattern in heading_lower
+                or pattern in text_lower
+                for pattern in mute_patterns
+            )
+            if is_muted:
+                muted_count += 1
+            else:
+                filtered_tasks.append(task)
+        result.append((file, filtered_tasks))
+
+    return result, muted_count
+
+
 def get_terminal_width():
     columns_env = os.environ.get("COLUMNS")
     if columns_env:
@@ -244,15 +295,45 @@ def get_editor():
     return "vi"
 
 
-def load_config(config_path=None, directory="."):
+def resolve_config_path(config_path, directory):
     if config_path is None:
-        config_path = os.path.join(directory, ".whatnext")
-    elif not (config_path.startswith("./") or os.path.isabs(config_path)):
-        config_path = os.path.join(directory, config_path)
+        return os.path.join(directory, ".whatnext")
+    if config_path.startswith("./") or os.path.isabs(config_path):
+        return config_path
+    return os.path.join(directory, config_path)
+
+
+def write_mute_config(config_path, mutes):
+    mute_path = config_path + ".mute"
+    with open(mute_path, "w") as handle:
+        toml.dump({"mute": mutes}, handle)
+
+
+def load_config(config_path, extensions=None):
     if os.path.exists(config_path):
         with open(config_path) as handle:
-            return toml.load(handle)
-    return {}
+            config = toml.load(handle)
+    else:
+        config = {}
+
+    if extensions:
+        for ext in extensions:
+            ext_path = config_path + "." + ext
+            if os.path.exists(ext_path):
+                with open(ext_path) as handle:
+                    config[ext] = toml.load(handle).get(ext, [])
+
+    if "mute" in config:
+        now = datetime.now()
+        original = config["mute"]
+        config["mute"] = [
+            entry for entry in original
+            if entry["until"] > now
+        ]
+        if len(config["mute"]) != len(original):
+            write_mute_config(config_path, config["mute"])
+
+    return config
 
 
 def is_ignored(filepath, ignore_patterns):
@@ -523,6 +604,17 @@ def main():
         help="Ignore all deferral constraints (@after, @phase, @queue)",
     )
     parser.add_argument(
+        "--ignore-mute",
+        action="store_true",
+        help="Ignore mute settings",
+    )
+    parser.add_argument(
+        "--mute",
+        nargs=2,
+        metavar=("TIME", "MATCH"),
+        help="Mute tasks matching pattern for period (e.g. 1d, 2w, 1m)",
+    )
+    parser.add_argument(
         "--config",
         default=os.environ.get("WHATNEXT_CONFIG"),
         help="Path to config file (default: WHATNEXT_CONFIG, or '.whatnext' in --dir)",
@@ -593,6 +685,24 @@ def main():
              "    [n]r       - limit to n results, selected at random",
     )
     args = parser.parse_args()
+    config_path = resolve_config_path(args.config, args.dir)
+
+    if args.mute:
+        period_str, pattern = args.mute
+        if not pattern:
+            print("ERROR: pattern cannot be empty", file=sys.stderr)
+            sys.exit(1)
+        try:
+            period = parse_period(period_str)
+        except ValueError as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            sys.exit(1)
+        until = datetime.now() + period
+        config = load_config(config_path, extensions=["mute"])
+        mutes = config.get("mute", [])
+        mutes.append({"until": until, "pattern": pattern})
+        write_mute_config(config_path, mutes)
+        return
 
     # build the search space
     paths = []
@@ -613,8 +723,12 @@ def main():
     if not paths:
         paths = [args.dir]
 
-    config = load_config(args.config, args.dir)
+    config = load_config(config_path, extensions=["mute"])
     ignore_patterns = config.get("ignore", []) + args.ignore
+    mute_patterns = [
+        entry["pattern"].lower()
+        for entry in config.get("mute", [])
+    ]
     quiet = args.quiet
 
     if "WHATNEXT_TODAY" in os.environ:
@@ -687,6 +801,12 @@ def main():
     ):
         filtered_data = filter_queue(filtered_data)
 
+    muted_count = 0
+    pre_mute_data = None
+    if not args.all and not args.ignore_all and not args.ignore_mute:
+        pre_mute_data = filtered_data
+        filtered_data, muted_count = filter_muted(filtered_data, mute_patterns)
+
     if args.summary:
         output = format_summary(
             filtered_data,
@@ -701,6 +821,10 @@ def main():
         )
     else:
         tasks = flatten_by_priority(filtered_data)
+        all_muted = False
+        if not tasks and muted_count > 0:
+            tasks = flatten_by_priority(pre_mute_data)
+            all_muted = True
         if randomise:
             random.shuffle(tasks)
         if limit:
@@ -716,6 +840,10 @@ def main():
             for line, filepath in files_to_edit:
                 subprocess.run([editor, f"+{line}", filepath])
 
+        if all_muted:
+            print("Only muted tasks remain:\n")
+            muted_count = 0
+
         output = format_tasks(
             tasks,
             get_terminal_width(),
@@ -723,3 +851,9 @@ def main():
         )
 
     print(output)
+
+    if muted_count > 0:
+        noun = "tasks"
+        if muted_count == 1:
+            noun = "task"
+        print(f"\n({muted_count} {noun} muted)")

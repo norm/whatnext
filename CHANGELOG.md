@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [v3.4] - Unreleased
+
+**Added:**
+- Task muting: temporarily hide tasks matching patterns from output by
+  creating a personal `.whatnext.mute` file.
+
+
 ## [v3.3.2] - 2026-04-17
 
 **Fixes:** `@after` with a directory waits on all tasks under that dir.

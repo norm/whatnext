@@ -7,7 +7,7 @@ import sys
 import textwrap
 
 from whatnext.models import MarkdownFile
-from whatnext.whatnext import load_config
+from whatnext.whatnext import load_config, resolve_config_path
 
 
 def rewind_insertion_point(lines, position, min_position):
@@ -63,7 +63,9 @@ def get_wrap_width(lines, tasks_file, config_path):
     if env_width:
         default_width = int(env_width)
     else:
-        config = load_config(config_path, os.path.dirname(tasks_file) or ".")
+        directory = os.path.dirname(tasks_file) or "."
+        resolved_path = resolve_config_path(config_path, directory)
+        config = load_config(resolved_path)
         default_width = config.get("wrap_width", 80)
     file_width = detect_task_width(lines)
     return max(file_width, default_width)
