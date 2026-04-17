@@ -802,7 +802,9 @@ def main():
         filtered_data = filter_queue(filtered_data)
 
     muted_count = 0
+    pre_mute_data = None
     if not args.all and not args.ignore_all and not args.ignore_mute:
+        pre_mute_data = filtered_data
         filtered_data, muted_count = filter_muted(filtered_data, mute_patterns)
 
     if args.summary:
@@ -819,6 +821,10 @@ def main():
         )
     else:
         tasks = flatten_by_priority(filtered_data)
+        all_muted = False
+        if not tasks and muted_count > 0:
+            tasks = flatten_by_priority(pre_mute_data)
+            all_muted = True
         if randomise:
             random.shuffle(tasks)
         if limit:
@@ -833,6 +839,10 @@ def main():
             editor = get_editor()
             for line, filepath in files_to_edit:
                 subprocess.run([editor, f"+{line}", filepath])
+
+        if all_muted:
+            print("Only muted tasks remain:\n")
+            muted_count = 0
 
         output = format_tasks(
             tasks,

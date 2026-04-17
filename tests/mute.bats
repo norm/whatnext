@@ -99,11 +99,16 @@ bats_require_minimum_version 1.5.0
         pattern = "tasks"
 	EOF
 
-    # FIXME
     expected_output=$(sed -e 's/^        //' <<-EOF
+        Only muted tasks remain:
 
-
-        (4 tasks muted)
+        tasks.md:
+            # Shopping
+            - [ ] buy apples
+            - [ ] buy oranges
+            # Gardening
+            - [ ] plant seeds
+            - [ ] water plants
 	EOF
     )
 
