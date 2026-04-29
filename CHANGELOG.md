@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [v3.4.1] - 2026-04-29
+
+**Fixed:**
+- `--mute` accepts multiple match patterns, not silently discards them.
+
+
 ## [v3.4] - 2026-04-17
 
 **Added:**

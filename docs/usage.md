@@ -234,8 +234,8 @@ To show a random selection of tasks rather than by priority, use `5r`.
 
 -   `--ignore-mute` — ignore mute settings.
 
--   `--mute [time] [match]` — for the next 'time' period (formatted `4d`, `2w`, `1m2d`)
-    mute any tasks with 'match' in the text, header, or filename.
+-   `--mute [time] match [...]` — for the next 'time' period (formatted `4d`,
+    `2w`, `1m2d`, etc) mute any tasks matching the standard match arguments.
 
 -   `-o` / `--open` — show only open tasks.
 

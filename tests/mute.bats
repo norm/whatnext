@@ -26,6 +26,18 @@ bats_require_minimum_version 1.5.0
     [ $status -eq 0 ]
 }
 
+@test "--mute accepts multiple patterns" {
+    run whatnext --config "$BATS_TEST_TMPDIR/.whatnext" --mute 1d "buy apples" "oranges"
+
+    expected=$(sed -e 's/^        //' <<-EOF
+        pattern = "buy apples"
+        pattern = "oranges"
+	EOF
+    )
+    diff -u <(echo "$expected") <(grep 'pattern' "$BATS_TEST_TMPDIR/.whatnext.mute")
+    [ $status -eq 0 ]
+}
+
 @test "--mute rejects empty pattern" {
     run --separate-stderr \
         whatnext --config "$BATS_TEST_TMPDIR/.whatnext" --mute 1d ""

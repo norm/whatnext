@@ -610,9 +610,8 @@ def main():
     )
     parser.add_argument(
         "--mute",
-        nargs=2,
-        metavar=("TIME", "MATCH"),
-        help="Mute tasks matching pattern for period (e.g. 1d, 2w, 1m)",
+        metavar="TIME",
+        help="Mute matching tasks for period (e.g. --mute 1d foo bar)",
     )
     parser.add_argument(
         "--config",
@@ -688,19 +687,20 @@ def main():
     config_path = resolve_config_path(args.config, args.dir)
 
     if args.mute:
-        period_str, pattern = args.mute
-        if not pattern:
+        patterns = [p for p in args.match if p and not re.match(r'^\d+r?$', p)]
+        if not patterns:
             print("ERROR: pattern cannot be empty", file=sys.stderr)
             sys.exit(1)
         try:
-            period = parse_period(period_str)
+            period = parse_period(args.mute)
         except ValueError as e:
             print(f"ERROR: {e}", file=sys.stderr)
             sys.exit(1)
         until = datetime.now() + period
         config = load_config(config_path, extensions=["mute"])
         mutes = config.get("mute", [])
-        mutes.append({"until": until, "pattern": pattern})
+        for pattern in patterns:
+            mutes.append({"until": until, "pattern": pattern})
         write_mute_config(config_path, mutes)
         return
 
