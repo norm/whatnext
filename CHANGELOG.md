@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [v3.5] - 2026-08-16
+
+**Added:**
+- `@include filename` inserts another file's content, as though it was
+  written there.
+
+
 ## [v3.4.1] - 2026-04-29
 
 **Fixed:**

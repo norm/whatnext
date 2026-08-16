@@ -59,6 +59,9 @@ order, you can [defer tasks](deferring.md) until all/some other tasks are comple
 For sequential work where only one task or small group of tasks can be done at
 a time, you can [limit output](sequential.md) within the file.
 
+To build a task list up from other files to apply more control, you can
+[include one file inside another](including.md).
+
 If you need to exclude out some Markdown files for any reason, there are
 [two ways to do that](exclusions.md).
 

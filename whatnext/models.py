@@ -251,6 +251,7 @@ class MarkdownFile:
         $
     """, re.VERBOSE)
     FILE_AFTER_PATTERN = re.compile(r"^@after(?:\s+(.+))?\s*$")
+    INCLUDE_PATTERN = re.compile(r"^@include\s+(.+?)\s*$")
     NOTNEXT_PATTERN = re.compile(r"^@notnext(?:\s|$)")
     QUEUE_PATTERN = re.compile(r"^@queue(?:\s|$)")
     PHASE_PATTERN = re.compile(r"^(.+?)\s+@phase\s*$")
@@ -281,6 +282,7 @@ class MarkdownFile:
         self.base_dir = base_dir
         self.today = today
         self.warnings = []
+        self.includes = []
         self.notnext = False
         self.queue = False
         self.total_phases = 0
@@ -312,12 +314,13 @@ class MarkdownFile:
         imminent = due - urgency
         return (due, imminent, cleaned)
 
-    def resolve_after_path(self, dep):
+    def resolve_relative_path(self, dep, base=None):
+        if base is None:
+            base = self.path
         dep = os.path.expanduser(dep)
         if os.path.isabs(dep):
             return dep
-        file_dir = os.path.dirname(self.path)
-        return os.path.normpath(os.path.join(file_dir, dep))
+        return os.path.normpath(os.path.join(os.path.dirname(base), dep))
 
     def parse_after(self, text):
         match = MarkdownFile.AFTER_PATTERN.match(text)
@@ -326,7 +329,7 @@ class MarkdownFile:
         cleaned = match.group(1).strip()
         files_str = match.group(2)
         if files_str:
-            resolved = [self.resolve_after_path(dep) for dep in files_str.split()]
+            resolved = [self.resolve_relative_path(dep) for dep in files_str.split()]
             return (resolved, cleaned)
         return ([], cleaned)
 
@@ -377,11 +380,39 @@ class MarkdownFile:
             and not line.strip()[len(delimiter):]
         )
 
-    def read_lines(self):
-        if self._lines is not None:
-            return self._lines
-        with open(self.path) as handle:
-            return [line.rstrip("\n") for line in handle]
+    def read_lines(self, path=None):
+        if path is None:
+            path = self.path
+            if self._lines is not None:
+                return self.expand_includes(self._lines, path)
+        with open(path) as handle:
+            raw = [line.rstrip("\n") for line in handle]
+        return self.expand_includes(raw, path)
+
+    def expand_includes(self, lines, base):
+        expanded = []
+        root_abs = os.path.abspath(self.path)
+        for line in lines:
+            match = self.INCLUDE_PATTERN.match(line)
+            if match is None:
+                expanded.append(line)
+                continue
+            target = match.group(1)
+            included_path = self.resolve_relative_path(target, base)
+            if not os.path.isfile(included_path):
+                self.warnings.append(
+                    f"WARNING: {self.display_path}: '{target}' does not exist"
+                )
+                continue
+            included_abs = os.path.abspath(included_path)
+            # a file already in the chain (or the root itself) would loop
+            if included_abs in self.includes:
+                continue
+            if included_abs == root_abs:
+                continue
+            self.includes.append(included_abs)
+            expanded.extend(self.read_lines(included_path))
+        return expanded
 
     def relevant_content(self):
         lines = []
@@ -446,7 +477,7 @@ class MarkdownFile:
                 files_str = match.group(1)
                 if files_str:
                     file_deferred = [
-                        self.resolve_after_path(dep) for dep in files_str.split()
+                        self.resolve_relative_path(dep) for dep in files_str.split()
                     ]
                 else:
                     file_deferred = []

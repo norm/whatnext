@@ -971,6 +971,28 @@ class TestNotnextParsing:
         )
         assert file.notnext is False
 
+    def test_escaped_notnext_in_backticks(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                Use `@notnext` to hide a file.
+
+                - [ ] first task
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.notnext is False
+
+    def test_escaped_notnext_with_backslash(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                Use \\@notnext to hide a file.
+
+                - [ ] first task
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert file.notnext is False
+
 
 class TestQueueParsing:
     def test_file_without_queue(self):
@@ -1037,3 +1059,119 @@ class TestQueueParsing:
             today=date(2025, 1, 1),
         )
         assert file.queue is False
+
+
+class TestIncludeParsing:
+    def test_included_tasks_substituted_at_directive(self):
+        file = MarkdownFile(
+            source="tests/including/list.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == [
+            "first in list",
+            "from the included file",
+            "last in list",
+        ]
+
+    def test_including_empty_file_contributes_nothing(self):
+        file = MarkdownFile(
+            source="tests/including/includes-empty.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == ["only task"]
+
+    def test_included_file_can_itself_include(self):
+        file = MarkdownFile(
+            source="tests/including/chain-a.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == [
+            "task in a",
+            "task in b",
+            "task in c",
+        ]
+
+    def test_circular_include_silently_skips_already_present(self):
+        file = MarkdownFile(
+            source="tests/including/loop-a.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == [
+            "task in a",
+            "task in b",
+        ]
+        assert file.warnings == []
+
+    def test_bare_include_is_silent_no_op(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                - [ ] real task
+                @include
+            """),
+            path="tests/including/probe.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == ["real task"]
+        assert file.warnings == []
+
+    def test_directive_in_included_file_applies_to_parent(self):
+        file = MarkdownFile(
+            source="tests/including/transitive.md",
+            today=date(2025, 1, 1),
+        )
+        assert file.queue is True
+        assert [task.text for task in file.tasks] == [
+            "parent task",
+            "child one",
+            "child two",
+        ]
+
+    def test_diamond_include_present_file_included_once(self):
+        file = MarkdownFile(
+            source="tests/including/diamond-a.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == [
+            "task in a",
+            "task in b",
+            "task in d",
+            "task in c",
+        ]
+
+    def test_escaped_include_in_backticks(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                Use `@include included.md` to pull a file in.
+
+                - [ ] first task
+            """),
+            path="tests/including/probe.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == ["first task"]
+
+    def test_escaped_include_with_backslash(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                Use \\@include included.md to pull a file in.
+
+                - [ ] first task
+            """),
+            path="tests/including/probe.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == ["first task"]
+
+    def test_include_must_be_on_own_line(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Tasks
+
+                - [ ] something @include included.md something else
+            """),
+            path="tests/including/probe.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == [
+            "something @include included.md something else"
+        ]

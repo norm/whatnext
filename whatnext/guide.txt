@@ -65,6 +65,13 @@ only be shown when previous groups are complete, use @phase on the headers.
     - [ ] update code to implement desired behaviour
     - [ ] prove tests pass
 
+To pull another file's contents into this one, use @include with a filename.
+It is substituted in where the directive appears, as though written there.
+
+    # Shopping
+    - [ ] buy milk
+    @include weekend.md
+
 Context around tasks, such as detailed decision notes and designs can be
 included in the document without showing in the task list. To include a
 short note in the summary, use special fence blocks:

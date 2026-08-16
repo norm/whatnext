@@ -415,6 +415,13 @@ def find_markdown_files(paths, today, ignore_patterns, quiet):
                     if file.tasks:
                         task_files[abs_path] = file
 
+    # a file pulled in via @include is part of its includer, not a source
+    included = set()
+    for file in task_files.values():
+        included.update(file.includes)
+    for abs_path in included:
+        task_files.pop(abs_path, None)
+
     # files are examined depth-last as a lightweight prioritisation
     return sorted(
         task_files.values(),
