@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [v3.5.1] - 2026-08-16
+
+**Fixed:**
+- `@include filename` should not elevate file-level directives, only
+  task-level.
+
+
 ## [v3.5] - 2026-08-16
 
 **Added:**

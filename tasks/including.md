@@ -6,3 +6,5 @@ If `tasks/list.md` contains the directive `@include tasks.md`, running
         - the included file is read and substituted into this file at the
           directive
         - the included file is no longer considered as a source
+- [X] do not elevate file-level directives, the sourcing file should be in
+      control

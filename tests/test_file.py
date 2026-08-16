@@ -1114,17 +1114,89 @@ class TestIncludeParsing:
         assert [task.text for task in file.tasks] == ["real task"]
         assert file.warnings == []
 
-    def test_directive_in_included_file_applies_to_parent(self):
+    def test_included_queue_does_not_apply_to_parent(self):
         file = MarkdownFile(
             source="tests/including/transitive.md",
             today=date(2025, 1, 1),
         )
-        assert file.queue is True
+        assert file.queue is False
         assert [task.text for task in file.tasks] == [
             "parent task",
             "child one",
             "child two",
         ]
+
+    def test_included_notnext_does_not_apply_to_parent(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                - [ ] parent task
+                @include notnext.md
+            """),
+            path="tests/including/probe.md",
+            today=date(2025, 1, 1),
+        )
+        assert file.notnext is False
+        assert [task.text for task in file.tasks] == [
+            "parent task",
+            "hidden template task",
+        ]
+
+    def test_included_file_after_does_not_defer_parent(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                - [ ] parent task
+                @include file-after.md
+            """),
+            path="tests/including/probe.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == [
+            "parent task",
+            "child task",
+        ]
+        assert [task.deferred for task in file.tasks] == [None, None]
+
+    def test_included_file_after_with_dependency_does_not_defer_parent(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                - [ ] parent task
+                @include file-after-deps.md
+            """),
+            path="tests/including/probe.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == [
+            "parent task",
+            "child task",
+        ]
+        assert [task.deferred for task in file.tasks] == [None, None]
+
+    def test_included_task_after_is_preserved(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                - [ ] parent task
+                @include subdir/deferring.md
+            """),
+            path="tests/including/probe.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == [
+            "parent task",
+            "deferred child",
+        ]
+        assert file.tasks[1].deferred == ["tests/including/sibling.md"]
+
+    def test_included_phase_is_preserved(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                - [ ] parent task
+                @include phased.md
+            """),
+            path="tests/including/probe.md",
+            today=date(2025, 1, 1),
+        )
+        assert file.total_phases == 1
+        assert [task.phase for task in file.tasks] == [None, 1]
 
     def test_diamond_include_present_file_included_once(self):
         file = MarkdownFile(

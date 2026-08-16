@@ -24,3 +24,7 @@ However, using an index task file and `@include` gives us more control:
 The result of this would be all of the subtasks are treated as though they
 are in the index file, and that file controls the output with `@queue`
 so that only the next task of `a.md` appears.
+
+File-level directives (such as `@queue` and `@notnext`) are skipped, as the
+index file is in control of that. Individual directives on tasks (such as
+`@after`) are still applied.

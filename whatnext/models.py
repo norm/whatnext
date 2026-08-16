@@ -380,14 +380,30 @@ class MarkdownFile:
             and not line.strip()[len(delimiter):]
         )
 
-    def read_lines(self, path=None):
-        if path is None:
+    def read_lines(self, path=None, keep_directives=True):
+        root = path is None
+        if root:
             path = self.path
-            if self._lines is not None:
-                return self.expand_includes(self._lines, path)
-        with open(path) as handle:
-            raw = [line.rstrip("\n") for line in handle]
-        return self.expand_includes(raw, path)
+        if root and self._lines is not None:
+            raw = self._lines
+        else:
+            with open(path) as handle:
+                raw = [line.rstrip("\n") for line in handle]
+        lines = self.expand_includes(raw, path)
+        if keep_directives:
+            return lines
+
+        # @include does not copy over file-level directives
+        kept = []
+        for line in lines:
+            if self.QUEUE_PATTERN.match(line):
+                continue
+            if self.NOTNEXT_PATTERN.match(line):
+                continue
+            if self.FILE_AFTER_PATTERN.match(line):
+                continue
+            kept.append(line)
+        return kept
 
     def expand_includes(self, lines, base):
         expanded = []
@@ -411,7 +427,7 @@ class MarkdownFile:
             if included_abs == root_abs:
                 continue
             self.includes.append(included_abs)
-            expanded.extend(self.read_lines(included_path))
+            expanded.extend(self.read_lines(included_path, keep_directives=False))
         return expanded
 
     def relevant_content(self):
