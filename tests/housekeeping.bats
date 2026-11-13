@@ -4,7 +4,7 @@ bats_require_minimum_version 1.5.0
     # whatnext terminology is "tasks" not "todos", and I keep forgetting;
     # enforce the use of tasks, except where it is used legitimately
     run rg -c todo .
-    output=$(echo "$output" | sort)
+    output=$(echo "$output" | LC_ALL=C sort)
 
     expected_output=$(sed -e 's/^        //' <<"        EOF"
         ./README.md:1
