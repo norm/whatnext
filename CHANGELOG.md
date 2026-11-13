@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [v3.6] - 2026-11-13
+
+**Added:**
+- `@stop` on a line by itself stops the parser going any further in that file
+
+
 ## [v3.5.1] - 2026-08-16
 
 **Fixed:**

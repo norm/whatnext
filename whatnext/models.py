@@ -254,6 +254,7 @@ class MarkdownFile:
     INCLUDE_PATTERN = re.compile(r"^@include\s+(.+?)\s*$")
     NOTNEXT_PATTERN = re.compile(r"^@notnext(?:\s|$)")
     QUEUE_PATTERN = re.compile(r"^@queue(?:\s|$)")
+    STOP_PATTERN = re.compile(r"^@stop(?:\s|$)")
     PHASE_PATTERN = re.compile(r"^(.+?)\s+@phase\s*$")
     MISPLACED_PHASE_PATTERN = re.compile(r"(?<!`)(?<!\\)@phase(?!`)")
     DEFAULT_URGENCY = timedelta(weeks=2)
@@ -393,9 +394,12 @@ class MarkdownFile:
         if keep_directives:
             return lines
 
-        # @include does not copy over file-level directives
+        # @include does not copy over file-level directives to the output,
+        # but does first apply the result of @stop within the file
         kept = []
         for line in lines:
+            if self.STOP_PATTERN.match(line):
+                break
             if self.QUEUE_PATTERN.match(line):
                 continue
             if self.NOTNEXT_PATTERN.match(line):
@@ -476,6 +480,8 @@ class MarkdownFile:
                 lines.append((line_index, line))
             elif self.QUEUE_PATTERN.match(line):
                 lines.append((line_index, line))
+            elif self.STOP_PATTERN.match(line):
+                break
             elif self.MISPLACED_PHASE_PATTERN.search(line):
                 self.warnings.append(
                     "WARNING: @phase has no meaning except in a header"

@@ -1061,6 +1061,27 @@ class TestQueueParsing:
         assert file.queue is False
 
 
+class TestStopParsing:
+    def test_tasks_after_stop_are_dropped(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                # Tasks
+
+                - [ ] first task
+                - [ ] second task
+
+                @stop
+
+                - [ ] ignored task
+            """),
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == [
+            "first task",
+            "second task",
+        ]
+
+
 class TestIncludeParsing:
     def test_included_tasks_substituted_at_directive(self):
         file = MarkdownFile(
@@ -1197,6 +1218,22 @@ class TestIncludeParsing:
         )
         assert file.total_phases == 1
         assert [task.phase for task in file.tasks] == [None, 1]
+
+    def test_included_stop_does_not_apply_to_parent(self):
+        file = MarkdownFile(
+            source_string=dedent("""\
+                - [ ] parent task
+                @include stop.md
+                - [ ] parent task after include
+            """),
+            path="tests/including/probe.md",
+            today=date(2025, 1, 1),
+        )
+        assert [task.text for task in file.tasks] == [
+            "parent task",
+            "child before stop",
+            "parent task after include",
+        ]
 
     def test_diamond_include_present_file_included_once(self):
         file = MarkdownFile(

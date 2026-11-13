@@ -85,6 +85,13 @@ short note in the summary, use special fence blocks:
 
     - [ ] do the thing
 
+To ignore everything from a point in a file onwards, put "@stop" on a line
+by itself.
+
+    - [ ] a real task
+    @stop
+    - [ ] not seen as a task
+
 Files can be excluded from search results by either adding "@notnext" to a
 line by itself anywhere in the file:
 

@@ -1,7 +1,21 @@
 # Excluding files
 
-If you need to ignore a file (or three), but don't want to keep typing out
-the `--ignore` option, there are two ways of doing this.
+If you need to ignore tasks from a file (or three), but don't want to keep
+typing out the `--ignore` option, there are three ways of doing this.
+
+
+## Exclude part of a file
+
+To stop tasks being read after some point in a file, add this marker on a
+line by itself:
+
+```markdown
+@stop
+```
+
+This is useful for "commenting out" tasks, or including other task-formatted
+text separate from actual tasks.
+
 
 ## Exclude a single file
 
